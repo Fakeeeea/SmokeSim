@@ -25,7 +25,7 @@ typedef struct grid_info {
 
 typedef struct gui_ctx {
     grid* grid_data;
-    grid_info* grid_info;
+    grid_info grid_info;
 
     graphics_info* g_info;
     main_menu_info* mm_info;

@@ -95,7 +95,9 @@ physics_info get_mm_p_info(const physics_shaders precompiled_p_shaders, const gr
     p_info.e_info.emitters_array = malloc(sizeof(emitter) * EMITTERS_NUM);
     p_info.o_info.obstacles_array = malloc(sizeof(obstacle) * OBSTACLES_NUM);
 
-    p_info.o_info.obstacles_array[0] = get_obstacle((vec3){(float) grid->grid3d_data.size[0] * 0.5f, (float) grid->grid3d_data.size[2] * 0.5f, 0}, 3, (vec3){0,0,0}, 1);
+    p_info.o_info.obstacles_array[0] = get_obstacle((vec3){(float) grid->grid3d_data.size[0] * 0.5f,
+                                                           (float) grid->grid3d_data.size[1] * 0.5f,
+                                                           (float) grid->grid3d_data.size[2] * 0.5f}, 3, (vec3){0,0,0}, 1);
     p_info.e_info.emitters_array[0] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.5), 2, (int)(grid->grid3d_data.size[2] * 0.5)}, 1, (ivec3){30,10,10}, 100, 0, 1);
     p_info.e_info.emitters_array[1] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.7), 2, (int)(grid->grid3d_data.size[2] * 0.5)}, 1, (ivec3){10,30,10}, 100, 0, 1);
     p_info.e_info.emitters_array[2] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.5), 2, (int)(grid->grid3d_data.size[2] * 0.7)}, 1, (ivec3){10,10,30}, 100, 0, 1);

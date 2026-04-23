@@ -17,10 +17,8 @@ layout(binding = 5, rgba16f) uniform image3D solid_map;
 layout(binding = 6, rgba16f) uniform image3D vorticity;
 
 layout(std140, binding = 1) uniform constants {
-    vec3 grid_size;
-    float _pad0;
-    vec3 wind;
-    float _pad1;
+    ivec4 grid_size;
+    vec4 wind;
     float time_step;
     float cell_size;
     float density;
@@ -69,10 +67,9 @@ void main() {
     int idx = gl_InstanceID;
 
     float min_dim = min(grid_size.x, min(grid_size.y, grid_size.z));
-    vec3 scaled_grid_size = grid_size / min_dim;
+    vec3 scaled_grid_size = vec3(grid_size.xyz) / min_dim;
 
-    ivec3 dims = ivec3(grid_size);
-    ivec3 arrow_index = ivec3(idx % dims.x, (idx / dims.x) % dims.y , idx / (dims.x * dims.y));
+    ivec3 arrow_index = ivec3(idx % grid_size.x, (idx / grid_size.x) % grid_size.y , idx / (grid_size.x * grid_size.y));
 
     vec3 vort = imageLoad(vorticity, arrow_index).xyz;
 
@@ -94,7 +91,7 @@ void main() {
 
     vec3 scaled_vertex = scale * rotated_vertex;
 
-    vec3 cell_width = scaled_grid_size / grid_size;
+    vec3 cell_width = scaled_grid_size / vec3(grid_size.xyz);
 
     gl_Position = projection * look_at * vec4(scaled_vertex + ((arrow_index + 0.5f) * cell_width), 1.0f);
 }

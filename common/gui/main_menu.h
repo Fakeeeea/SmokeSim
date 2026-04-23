@@ -61,6 +61,6 @@ void free_main_menu(main_menu_info* mm_info);
 void lerp_f(float current, float target, float* dest, float speed);
 void lerp_2f(vec2 current, vec2 target, vec2* dest, float speed);
 
-void get_viewport_data_mm(ivec2 screen_size, ivec4* out);
+void get_viewport_data_mm(ivec2 screen_size, ivec4 out);
 
 #endif //SMOKESIM_MAIN_MENU_H

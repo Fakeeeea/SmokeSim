@@ -83,6 +83,8 @@ int main() {
     bind_physics_buffers(&menu_grid);
     init_solid_map(&menu_grid, &menu_p_info.p_shaders);
 
+    g_info.g_info3d.cam.orbit.orbit_distance = 3;
+
     while(!glfwWindowShouldClose(window)) {
         process_input();
         nk_glfw3_new_frame(&glfw);
@@ -90,29 +92,29 @@ int main() {
         if(is_orbiting(&g_info.g_info3d.cam)) {
             if(mm_info.state == MM_MAIN_SCREEN)
                 auto_orbit(&g_info.g_info3d.cam, menu_grid.grid3d_data.size, glfwGetTime());
-            else if(ctx.g_ctx.grid_info->initialized == 1)
+            else if(ctx.g_ctx.grid_info.initialized == 1)
                 auto_orbit(&g_info.g_info3d.cam, sim_grid.grid3d_data.size, glfwGetTime());
         }
 
         if(mm_info.state != MM_CLOSED)
-            get_viewport_data_mm((ivec2){g_info.screen_size[0], g_info.screen_size[1]}, &g_info.draw_area);
+            get_viewport_data_mm((ivec2){g_info.screen_size[0], g_info.screen_size[1]}, g_info.draw_area);
         else
             draw_area_reset(&g_info);
 
         if(mm_info.state == MM_MAIN_SCREEN)
             bind_physics_buffers(&menu_grid);
-        else if(ctx.g_ctx.grid_info->created)
+        else if(ctx.g_ctx.grid_info.created)
             bind_physics_buffers(&sim_grid);
 
         if(mm_info.state == MM_MAIN_SCREEN) {
             run_physics_step(&menu_grid, &menu_p_info);
-        } else if (ctx.g_ctx.grid_info->created == 1 && !p_info.paused){
+        } else if (ctx.g_ctx.grid_info.created == 1 && !p_info.paused){
             run_physics_step(&sim_grid, &p_info);
         }
 
         if(mm_info.state == MM_MAIN_SCREEN) {
             draw_step(&menu_grid, &g_info, &menu_p_info);
-        } else if(ctx.g_ctx.grid_info->initialized == 1){
+        } else if(ctx.g_ctx.grid_info.initialized == 1){
             draw_step(&sim_grid, &g_info, &p_info);
         }
 
@@ -125,7 +127,7 @@ int main() {
 
         if(mm_info.state == MM_MAIN_SCREEN)
             update_time(menu_p_info.time_ubo, glfwGetTime());
-        else if(ctx.g_ctx.grid_info->created == 1)
+        else if(ctx.g_ctx.grid_info.created == 1)
             update_time(p_info.time_ubo, glfwGetTime());
 
         glfwSwapBuffers(window);

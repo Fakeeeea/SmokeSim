@@ -128,9 +128,9 @@ void free_main_menu(main_menu_info* mm_info) {
     free_text_renderer(&mm_info->t_renderer);
 }
 
-void get_viewport_data_mm(ivec2 screen_size, ivec4* out) {
-    (*out)[0] = screen_size[0] * SCREEN_FOR_MM_X_PERCENTAGE;
-    (*out)[1] = screen_size[1] * SCREEN_FOR_MM_Y_PERCENTAGE;
-    (*out)[2] = screen_size[0] - (*out)[0];
-    (*out)[3] = screen_size[1] - (*out)[1];
+void get_viewport_data_mm(ivec2 screen_size, ivec4 out) {
+    (out)[0] = screen_size[0] * SCREEN_FOR_MM_X_PERCENTAGE;
+    (out)[1] = screen_size[1] * SCREEN_FOR_MM_Y_PERCENTAGE;
+    (out)[2] = screen_size[0] - (out)[0];
+    (out)[3] = screen_size[1] - (out)[1];
 }

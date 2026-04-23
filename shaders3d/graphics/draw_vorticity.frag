@@ -15,10 +15,8 @@ layout(binding = 5, rgba16f) uniform image3D solid_map;
 layout(binding = 6, rgba16f) uniform image3D vorticity;
 
 layout(std140, binding = 1) uniform constants {
-    vec3 grid_size;
-    float _pad0;
-    vec3 wind;
-    float _pad1;
+    ivec4 grid_size;
+    vec4 wind;
     float time_step;
     float cell_size;
     float density;

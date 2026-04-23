@@ -16,7 +16,8 @@ gui_ctx init_gui_ctx(grid* grid_data,  physics_info* p_info,  physics_info* mm_p
         .mm_info = mm_info,
         .g_info = g_info,
         .s_info = {0,0},
-    };
+        .grid_info = {0,0},
+        };
     return g_ctx;
 }
 
@@ -103,13 +104,15 @@ void draw_confirm_button(gui_ctx* g_ctx) {
 
         g_ctx->mm_info->state = MM_CLOSED;
         g_ctx->g_info->g_info3d.g_s_settings.draw_grid_lines = 0;
-        g_ctx->grid_info->created = 1;
+        g_ctx->grid_info.created = 1;
     }
 }
 
 void draw_discard_button(gui_ctx* g_ctx) {
-    g_ctx->mm_info->state = MM_MAIN_SCREEN;
-    g_ctx->g_info->g_info3d.g_s_settings.draw_grid_lines = 0;
+    if(nk_button_text(g_ctx->nk_ctx, "Discard", 7)) {
+        g_ctx->mm_info->state = MM_MAIN_SCREEN;
+        g_ctx->g_info->g_info3d.g_s_settings.draw_grid_lines = 0;
+    }
 }
 
 void draw_simulation_settings(gui_ctx* g_ctx) {

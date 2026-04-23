@@ -15,7 +15,7 @@ layout(binding = 4, rgba16f) uniform image3D next_solid_map;
 layout(binding = 5, r32f) uniform image3D next_residual_map;
 
 layout(std140, binding = 1) uniform constants {
-    vec4 grid_size;
+    ivec4 grid_size;
     vec4 wind;
     float time_step;
     float cell_size;

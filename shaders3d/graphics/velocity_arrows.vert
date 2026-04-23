@@ -17,10 +17,8 @@ layout(binding = 5, rgba16f) uniform image3D solid_map;
 layout(binding = 6, rgba16f) uniform image3D vorticity;
 
 layout(std140, binding = 1) uniform constants {
-    vec3 grid_size;
-    float _pad0;
-    vec3 wind;
-    float _pad1;
+    ivec4 grid_size;
+    vec4 wind;
     float time_step;
     float cell_size;
     float density;
@@ -78,7 +76,7 @@ void main() {
     ivec3 dims;
 
     float min_dim = min(grid_size.x, min(grid_size.y, grid_size.z));
-    vec3 scaled_grid_size = grid_size / min_dim;
+    vec3 scaled_grid_size = vec3(grid_size.xyz) / min_dim;
 
     if(direction == 0) {
         dims = ivec3(grid_size.x + 1, grid_size.yz);
@@ -91,7 +89,7 @@ void main() {
     ivec3 arrow_index = ivec3(idx % dims.x, (idx / dims.x) % dims.y , idx / (dims.x * dims.y));
 
     vec3 world_pos;
-    vec3 cell_width = scaled_grid_size / grid_size;
+    vec3 cell_width = scaled_grid_size / vec3(grid_size.xyz);
     if(direction == 0) {
         velocity_value = texelFetch(vx_read_tex, arrow_index, 0).r;
         world_pos = get_world_posx(arrow_index, cell_width);

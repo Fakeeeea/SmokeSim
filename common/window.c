@@ -185,7 +185,7 @@ void init_new_grid_screen() {
 
     ctx.g_ctx.g_info->g_info3d.g_s_settings.draw_grid_lines = 1;
 
-    ctx.g_ctx.grid_info->created = 1;
+    ctx.g_ctx.grid_info.initialized = 1;
 }
 
 void get_swapped_y_pos(vec2 out) {

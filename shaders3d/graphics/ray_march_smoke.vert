@@ -17,10 +17,8 @@ layout(binding = 5, rgba16f) uniform image3D solid_map;
 layout(binding = 6, rgba16f) uniform image3D vorticity;
 
 layout(std140, binding = 1) uniform constants {
-    vec3 grid_size;
-    float _pad0;
-    vec3 wind;
-    float _pad1;
+    ivec4 grid_size;
+    vec4 wind;
     float time_step;
     float cell_size;
     float density;
@@ -56,7 +54,7 @@ out vec4 screen_pos;
 void main() {
 
     float min_dim = min(grid_size.x, min(grid_size.y, grid_size.z));
-    vec3 scaled_grid_size = grid_size / min_dim;
+    vec3 scaled_grid_size = vec3(grid_size.xyz) / min_dim;
 
     vertex_pos = pos * scaled_grid_size;
     screen_pos = projection * look_at * vec4(vertex_pos, 1.0f);

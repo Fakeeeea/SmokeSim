@@ -63,7 +63,7 @@ void upload_graphics_variables(graphics_info* g_info) {
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4), look_at);
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4), sizeof(mat4), projection);
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4)*2, sizeof(mat4), ortho);
-    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4)*3, sizeof(vec4), g_info->draw_area);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4)*3, sizeof(vec4), (vec4){g_info->draw_area[0],g_info->draw_area[1],g_info->draw_area[2],g_info->draw_area[3]});
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4)*3 + sizeof(vec4), sizeof(vec4), cam_pos_vec4);
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4)*3 + sizeof(vec4)*2, sizeof(graphics_settings), &g_info->g_settings);
 
@@ -87,7 +87,7 @@ void update_graphics_variables(const graphics_info* g_info) {
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mat4), look_at);
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4), sizeof(mat4), projection);
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4)*2, sizeof(mat4), ortho);
-    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4)*3, sizeof(vec4), g_info->draw_area);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4)*3, sizeof(vec4), (vec4){g_info->draw_area[0],g_info->draw_area[1],g_info->draw_area[2],g_info->draw_area[3]});
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4)*3 + sizeof(vec4), sizeof(vec4), cam_pos_vec4);
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(mat4)*3 + sizeof(vec4)*2, sizeof(graphics_settings), &g_info->g_settings);
 }
@@ -136,6 +136,7 @@ void draw_step(grid* grid, graphics_info* g_info, physics_info* p_info) {
 
         glBindTextureUnit(DEPTH_TEX, g_info->depth_tex.ID);
         if(g_s->draw_smoke) draw_smoke3d(&g_info->g_info3d);
+
     }
 }
 

@@ -8,10 +8,8 @@ in vec3 frag_normal;
 layout(binding = 3) uniform sampler3D smoke_read_tex;
 
 layout(std140, binding = 1) uniform constants {
-    vec3 grid_size;
-    float _pad0;
-    vec3 wind;
-    float _pad1;
+    ivec4 grid_size;
+    vec4 wind;
     float time_step;
     float cell_size;
     float density;
@@ -44,7 +42,7 @@ layout(std140, binding = 0) uniform graphics_variables {
 void main () {
 
     float min_dim = min(grid_size.x, min(grid_size.y, grid_size.z));
-    vec3 scaled_grid_size = grid_size / min_dim;
+    vec3 scaled_grid_size = vec3(grid_size.xyz) / min_dim;
 
     vec3 light_dir = normalize(light_direction.xyz);
 
@@ -61,7 +59,7 @@ void main () {
         shadow_pos += light_dir * shadow_step_size;
         if(any(lessThan(shadow_pos, vec3(0.0))) || any(greaterThan(shadow_pos, vec3(1.0)))) break;
 
-        vec3 shadow_tex = shadow_pos / grid_size;
+        vec3 shadow_tex = shadow_pos / vec3(grid_size.xyz);
         vec3 shadow_rgb = texture(smoke_read_tex, shadow_tex).rgb;
         total_light_density += (shadow_rgb.r + shadow_rgb.g + shadow_rgb.b);
     }

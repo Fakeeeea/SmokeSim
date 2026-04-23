@@ -7,10 +7,8 @@ layout(binding = 3) uniform sampler3D smoke_read_tex;
 layout(binding = 4) uniform sampler2D depth_texture;
 
 layout(std140, binding = 1) uniform constants {
-    vec3 grid_size;
-    float _pad0;
-    vec3 wind;
-    float _pad1;
+    ivec4 grid_size;
+    vec4 wind;
     float time_step;
     float cell_size;
     float density;
@@ -113,7 +111,7 @@ float phase_function(const float g, const float cos_theta) {
 
 void main() {
     float min_dim = min(grid_size.x, min(grid_size.y, grid_size.z));
-    scaled_grid_size = grid_size / min_dim;
+    scaled_grid_size = vec3(grid_size.xyz) / min_dim;
 
     vec3 ray_direction = get_direction_from_camera();
     vec2 enter_exit_distances = get_ray_enter_exit(ray_direction);

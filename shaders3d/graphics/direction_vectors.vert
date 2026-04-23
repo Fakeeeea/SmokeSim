@@ -3,10 +3,8 @@
 layout (location = 0) in vec3 pos;
 
 layout(std140, binding = 1) uniform constants {
-    vec3 grid_size;
-    float _pad0;
-    vec3 wind;
-    float _pad1;
+    ivec4 grid_size;
+    vec4 wind;
     float time_step;
     float cell_size;
     float density;
@@ -41,7 +39,7 @@ flat out int type;
 void main() {
 
     float min_dim = min(grid_size.x, min(grid_size.y, grid_size.z));
-    vec3 scaled_grid_size = grid_size / min_dim;
+    vec3 scaled_grid_size = grid_size.xyz / min_dim;
 
     if(pos.x > 0) type = 0;
     if(pos.y > 0) type = 1;

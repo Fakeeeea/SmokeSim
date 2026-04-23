@@ -4,10 +4,8 @@ layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 norm;
 
 layout(std140, binding = 1) uniform constants {
-    vec3 grid_size;
-    float _pad0;
-    vec3 wind;
-    float _pad1;
+    ivec4 grid_size;
+    vec4 wind;
     float time_step;
     float cell_size;
     float density;
@@ -55,12 +53,12 @@ void main() {
     obstacle current = obstacles_in[obstacle_idx];
 
     float min_dim = min(grid_size.x, min(grid_size.y, grid_size.z));
-    vec3 scaled_grid_size = grid_size / min_dim;
+    vec3 scaled_grid_size = vec3(grid_size.xyz) / min_dim;
 
     //vec3 world_pos = pos * (current.pos_radius.a / grid_size);
     //world_pos += (current.pos_radius.xyz / grid_size);
 
-    vec3 world_pos = (pos * current.pos_radius.a + current.pos_radius.xyz) / grid_size;
+    vec3 world_pos = (pos * current.pos_radius.a + current.pos_radius.xyz) / vec3(grid_size.xyz);
     world_pos *= scaled_grid_size;
 
     frag_normal = norm;
