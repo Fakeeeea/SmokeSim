@@ -30,6 +30,8 @@ void bind_physics_buffers(const grid* grid);
 void gen_grid_textures(grid *grid, float t_ambient);
 void free_grid(grid *grid);
 
+void clear_grid(const grid *grid, float t_ambient);
+
 void update_velocities(grid* grid, const physics_shaders* shaders);
 void advect_velocities(grid* grid, const physics_shaders* shaders);
 

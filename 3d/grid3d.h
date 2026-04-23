@@ -44,6 +44,7 @@ void swap_vy_buffer3d(grid3d* grid);
 void swap_vz_buffer3d(grid3d* grid);
 void swap_smoke_buffer3d(grid3d* grid);
 
+void clear_grid3d(const grid3d* grid, float t_ambient);
 
 
 #endif //SMOKESIM_GRID3D_H

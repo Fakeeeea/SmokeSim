@@ -42,4 +42,6 @@ void swap_vx_buffer2d(grid2d* grid);
 void swap_vy_buffer2d(grid2d* grid);
 void swap_smoke_buffer2d(grid2d* grid);
 
+void clear_grid2d(const grid2d* grid, float t_ambient);
+
 #endif //SMOKESIM_GRID2D_H

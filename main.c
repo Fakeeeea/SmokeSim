@@ -91,9 +91,9 @@ int main() {
 
         if(is_orbiting(&g_info.g_info3d.cam)) {
             if(mm_info.state == MM_MAIN_SCREEN)
-                auto_orbit(&g_info.g_info3d.cam, menu_grid.grid3d_data.size, glfwGetTime());
+                auto_orbit(&g_info.g_info3d.cam, menu_grid.grid3d_data.size, (float) glfwGetTime() * 0.3f);
             else if(ctx.g_ctx.grid_info.initialized == 1)
-                auto_orbit(&g_info.g_info3d.cam, sim_grid.grid3d_data.size, glfwGetTime());
+                auto_orbit(&g_info.g_info3d.cam, sim_grid.grid3d_data.size, (float) glfwGetTime() * 0.3f);
         }
 
         if(mm_info.state != MM_CLOSED)

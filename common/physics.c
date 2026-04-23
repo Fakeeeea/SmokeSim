@@ -47,6 +47,8 @@ physics_info init_physics_info(const physics_shaders precompiled_shaders) {
 }
 
 void p_info_upload_data(physics_info* p_info, const grid* grid) {
+    upload_obstacles(p_info->o_info.obstacles_array, p_info->o_info.obstacles_count, p_info->o_info.obstacles_ssbos);
+    p_info->e_info.emitters_ssbo = upload_emitters(p_info->e_info.emitters_array, p_info->e_info.emitters_count);
     p_info->physics_variables_ubo = upload_physics_variables(grid, p_info->p_settings);
     p_info->time_ubo = upload_time(0);
 }
@@ -102,11 +104,7 @@ physics_info get_mm_p_info(const physics_shaders precompiled_p_shaders, const gr
     p_info.e_info.emitters_array[1] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.7), 2, (int)(grid->grid3d_data.size[2] * 0.5)}, 1, (ivec3){10,30,10}, 100, 0, 1);
     p_info.e_info.emitters_array[2] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.5), 2, (int)(grid->grid3d_data.size[2] * 0.7)}, 1, (ivec3){10,10,30}, 100, 0, 1);
 
-    p_info.physics_variables_ubo = upload_physics_variables(grid, p_info.p_settings);
-    p_info.time_ubo = upload_time(0);
-
-    upload_obstacles(p_info.o_info.obstacles_array, p_info.o_info.obstacles_count, p_info.o_info.obstacles_ssbos);
-    p_info.e_info.emitters_ssbo = upload_emitters(p_info.e_info.emitters_array, p_info.e_info.emitters_count);
+    p_info_upload_data(&p_info, grid);
 
     return p_info;
 }

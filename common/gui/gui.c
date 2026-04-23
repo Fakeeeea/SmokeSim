@@ -105,6 +105,7 @@ void draw_confirm_button(gui_ctx* g_ctx) {
         g_ctx->mm_info->state = MM_CLOSED;
         g_ctx->g_info->g_info3d.g_s_settings.draw_grid_lines = 0;
         g_ctx->grid_info.created = 1;
+        g_ctx->s_info.settings_open = 1;
     }
 }
 
@@ -223,6 +224,9 @@ void draw_checkboxes(gui_ctx* g_ctx) {
     nk_checkbox_label(g_ctx->nk_ctx, "Emitters GUI", &g_ctx->s_info.emitters_window_open);
     nk_checkbox_label(g_ctx->nk_ctx, "Obstacles GUI", &g_ctx->s_info.obstacles_window_open);
     nk_checkbox_label(g_ctx->nk_ctx, "Pause Simulation", &g_ctx->p_info->paused);
+    if(nk_button_text(g_ctx->nk_ctx, "Clear grid", 10)) {
+        clear_grid(g_ctx->grid_data, g_ctx->p_info->p_settings.t_ambient);
+    }
 }
 
 //TODO update to use custom WIDH / HEIGHT ( add to defines)
@@ -231,7 +235,7 @@ void draw_emitters_settings(gui_ctx* g_ctx) {
     int change = 0;
     emitters_info* e_info_ptr = &g_ctx->p_info->e_info;
 
-    if(nk_begin(g_ctx->nk_ctx, "Emitters Settings", nk_rect(400, 50, 200, 300),
+    if(nk_begin(g_ctx->nk_ctx, "Emitters Settings", nk_rect(400, 0, 200, 300),
                 NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
 
         for(int i = 0; i < e_info_ptr->emitters_count; ++i) {
@@ -263,14 +267,16 @@ void draw_obstacles_settings(gui_ctx* g_ctx) {
     static int sync_continuously = 0;
     obstacles_info* o_info_ptr = &g_ctx->p_info->o_info;
 
-    if(nk_button_text(g_ctx->nk_ctx, "Sync GPU - CPU data", 19) || sync_continuously && o_info_ptr->obstacles_count != 0) {
-        extract_obstacles_data(o_info_ptr->obstacles_array, o_info_ptr->obstacles_count, o_info_ptr->obstacles_ssbos);
-    }
-
-    nk_checkbox_label(g_ctx->nk_ctx, "Sync data continuously", &sync_continuously);
-
-    if(nk_begin(g_ctx->nk_ctx, "Obstacles Settings", nk_rect(400, 350, 200, 300),
+    if(nk_begin(g_ctx->nk_ctx, "Obstacles Settings", nk_rect(400, 300, 200, 300),
                 NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
+
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
+        if((nk_button_text(g_ctx->nk_ctx, "Sync GPU - CPU data", 19) || sync_continuously) && o_info_ptr->obstacles_count != 0) {
+            extract_obstacles_data(o_info_ptr->obstacles_array, o_info_ptr->obstacles_count, o_info_ptr->obstacles_ssbos);
+        }
+
+        nk_checkbox_label(g_ctx->nk_ctx, "Sync data continuously", &sync_continuously);
+
         for(int i = 0; i < o_info_ptr->obstacles_count; ++i) {
             int current_change = draw_obstacle_info(g_ctx, i);
             if(current_change == -1) {

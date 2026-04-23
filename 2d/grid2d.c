@@ -142,3 +142,18 @@ void swap_smoke_buffer2d(grid2d* grid) {
     glBindTextureUnit(3, grid->smoke[grid->smoke_idx].ID);
     glBindImageTexture(3, grid->smoke[1 - grid->smoke_idx].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
 }
+
+void clear_grid2d(const grid2d* grid, const float t_ambient) {
+    glClearTexImage(grid->vx[0].ID, 0, GL_RED, GL_FLOAT, 0);
+    glClearTexImage(grid->vx[1].ID, 0, GL_RED, GL_FLOAT, 0);
+
+    glClearTexImage(grid->vy[0].ID, 0, GL_RED, GL_FLOAT, 0);
+    glClearTexImage(grid->vy[1].ID, 0, GL_RED, GL_FLOAT, 0);
+
+    float clear_smoke[4] = {0,0,0,t_ambient};
+
+    glClearTexImage(grid->smoke[0].ID, 0, GL_RGBA, GL_FLOAT, clear_smoke);
+    glClearTexImage(grid->smoke[1].ID, 0, GL_RGBA, GL_FLOAT, clear_smoke);
+
+    glClearTexImage(grid->vorticity.ID, 0, GL_RGBA, GL_FLOAT, 0);
+}

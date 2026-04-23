@@ -381,3 +381,11 @@ void swap_obstacles_buffer(obstacles_info* o_info) {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, OBSTACLES_SSBO_READ, o_info->obstacles_ssbos[o_info->obstacles_idx]);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, OBSTACLES_SSBO_WRITE, o_info->obstacles_ssbos[1-o_info->obstacles_idx]);
 }
+
+void clear_grid(const grid *grid, const float t_ambient) {
+    if(grid->is_2d) {
+        clear_grid2d(&grid->grid2d_data, t_ambient);
+    } else {
+        clear_grid3d(&grid->grid3d_data, t_ambient);
+    }
+}
