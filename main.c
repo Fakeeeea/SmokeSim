@@ -87,11 +87,11 @@ int main() {
         process_input();
         nk_glfw3_new_frame(&glfw);
 
-        if(ctx.mov_info.auto_orbit) {
+        if(is_orbiting(&g_info.g_info3d.cam)) {
             if(mm_info.state == MM_MAIN_SCREEN)
-                orbit_grid(&g_info, &menu_grid);
-            else if(ctx.init_grid == 1)
-                orbit_grid(&g_info, &sim_grid);
+                auto_orbit(&g_info.g_info3d.cam, menu_grid.grid3d_data.size, glfwGetTime());
+            else if(ctx.g_ctx.grid_info->initialized == 1)
+                auto_orbit(&g_info.g_info3d.cam, sim_grid.grid3d_data.size, glfwGetTime());
         }
 
         if(mm_info.state != MM_CLOSED)
@@ -101,31 +101,31 @@ int main() {
 
         if(mm_info.state == MM_MAIN_SCREEN)
             bind_physics_buffers(&menu_grid);
-        else if(ctx.created_grid)
+        else if(ctx.g_ctx.grid_info->created)
             bind_physics_buffers(&sim_grid);
 
         if(mm_info.state == MM_MAIN_SCREEN) {
             run_physics_step(&menu_grid, &menu_p_info);
-        } else if (ctx.created_grid == 1 && !p_info.paused){
+        } else if (ctx.g_ctx.grid_info->created == 1 && !p_info.paused){
             run_physics_step(&sim_grid, &p_info);
         }
 
         if(mm_info.state == MM_MAIN_SCREEN) {
             draw_step(&menu_grid, &g_info, &menu_p_info);
-        } else if(ctx.init_grid == 1){
+        } else if(ctx.g_ctx.grid_info->initialized == 1){
             draw_step(&sim_grid, &g_info, &p_info);
         }
 
         viewport_reset(&g_info);
 
-        if(draw_gui())
-            update_physics_variables(p_info.physics_variables_ubo, &sim_grid, p_info.p_settings);
+        handle_main_menu_events();
+        draw_gui(&ctx.g_ctx);
 
         nk_glfw3_render(&glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
 
         if(mm_info.state == MM_MAIN_SCREEN)
             update_time(menu_p_info.time_ubo, glfwGetTime());
-        else if(ctx.created_grid == 1)
+        else if(ctx.g_ctx.grid_info->created == 1)
             update_time(p_info.time_ubo, glfwGetTime());
 
         glfwSwapBuffers(window);

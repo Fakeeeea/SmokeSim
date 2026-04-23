@@ -111,3 +111,247 @@ void draw_discard_button(gui_ctx* g_ctx) {
     g_ctx->mm_info->state = MM_MAIN_SCREEN;
     g_ctx->g_info->g_info3d.g_s_settings.draw_grid_lines = 0;
 }
+
+void draw_simulation_settings(gui_ctx* g_ctx) {
+    const float WIDTH = 400;
+    const float HEIGHT = 600;
+    if(nk_begin(g_ctx->nk_ctx, "Settings", nk_rect(0,0,WIDTH,HEIGHT),
+                NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
+
+        draw_physics_settings(g_ctx);
+        draw_graphics_settings(g_ctx);
+        draw_physics_step_settings(g_ctx);
+        draw_graphics_step_settings(g_ctx);
+        draw_checkboxes(g_ctx);
+
+        nk_end(g_ctx->nk_ctx);
+    }
+
+    if(g_ctx->s_info.emitters_window_open) {
+        draw_emitters_settings(g_ctx);
+    }
+
+    if(g_ctx->s_info.obstacles_window_open) {
+        draw_obstacles_settings(g_ctx);
+    }
+
+}
+
+void draw_physics_settings(gui_ctx *g_ctx) {
+    int change = 0;
+    physics_settings* p_settings = &g_ctx->p_info->p_settings;
+
+    if(nk_tree_push(g_ctx->nk_ctx, NK_TREE_TAB, "Physics Constants", NK_MINIMIZED)) {
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
+        change += nk_property_float(g_ctx->nk_ctx, "#Time Step:", 0.0001f, &p_settings->time_step, 0.1f, 0.001f, 0.001f);
+        change += nk_property_float(g_ctx->nk_ctx, "#Density:", 0.1f, &p_settings->density, 10.0f, 0.1f, 0.05f);
+        change += nk_property_float(g_ctx->nk_ctx, "#Ambient Temp:", 0.0f, &p_settings->t_ambient, 500.0f, 1.0f, 1.0f);
+        change += nk_property_float(g_ctx->nk_ctx, "#Vorticity Confinement:", 0.0f, &p_settings->vorticity_confinement, 10.0f, 0.1f, 0.05f);
+        change += nk_property_float(g_ctx->nk_ctx, "#Temp Coefficient:", 0.0f, &p_settings->t_temp_coeff, 10.0f, 0.01f, 0.05f);
+        change += nk_property_float(g_ctx->nk_ctx, "#Weight Coefficient:", 0.0f, &p_settings->t_weight_coeff, 10.0f, 0.01f, 0.05f);
+
+        change += draw_vec3_property(g_ctx->nk_ctx, "Wind", p_settings->wind, -5, 5, 1);
+
+        nk_tree_pop(g_ctx->nk_ctx);
+    }
+
+    if(change > 0) {
+        update_physics_variables(g_ctx->p_info->physics_variables_ubo, g_ctx->grid_data, g_ctx->p_info->p_settings);
+    }
+}
+
+void draw_graphics_settings(gui_ctx *g_ctx) {
+    graphics_settings* g_settings = &g_ctx->g_info->g_settings;
+
+    if(nk_tree_push(g_ctx->nk_ctx, NK_TREE_TAB, "Graphics Settings", NK_MINIMIZED)) {
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
+        nk_property_float(g_ctx->nk_ctx, "#Smoke Density Factor:", 0.0f, &g_settings->smoke_density_factor, 200.0f, 1.0f, 1.0f);
+        nk_property_float(g_ctx->nk_ctx, "#Shadow Density Factor:", 0.0f, &g_settings->shadow_density_factor, 200.0f, 1.0f, 1.0f);
+        nk_property_float(g_ctx->nk_ctx, "#Ray March Step Size:", 0.001f, &g_settings->step_size, 0.2f, 0.001f, 0.001f);
+        nk_property_float(g_ctx->nk_ctx, "#Ray March Shadow Step Factor:", 1.0f, &g_settings->shadow_step_factor, 20.0f, 1.0f, 1.0f);
+        nk_property_float(g_ctx->nk_ctx, "#Ray March Shadow Steps:", 1.0f, &g_settings->shadow_steps, 20.0f, 1.0f, 1.0f);
+        nk_property_float(g_ctx->nk_ctx, "#Z Far:", 0.001f, &g_settings->z_far, 1000.0f, 1.0f, 1.0f);
+        nk_property_float(g_ctx->nk_ctx, "#Z Near:", 0.001f, &g_settings->z_near, 1000.0f, 1.0f, 1.0f);
+        nk_property_float(g_ctx->nk_ctx, "#Fov:", glm_rad(1), &g_settings->fov, glm_rad(90), glm_rad(1), glm_rad(1));
+
+        draw_vec3_property(g_ctx->nk_ctx, "Light Direction", g_settings->light_direction, 0.0f, 1.0f, 0.05f);
+
+        draw_color_picker(g_ctx->nk_ctx, "Ambient Color: ", g_settings->ambient_color, 1.0f);
+        draw_color_picker(g_ctx->nk_ctx, "Light Color: ", g_settings->light_color, 1.5f);
+        draw_color_picker(g_ctx->nk_ctx, "Object Color: ", g_settings->objects_color, 1.0f);
+
+        nk_tree_pop(g_ctx->nk_ctx);
+    }
+}
+
+//TODO: ADD 2d CODE
+void draw_physics_step_settings(gui_ctx* g_ctx) {
+    physics_step_settings* p_s_settings = &g_ctx->p_info->p_s_settings;
+    if(nk_tree_push(g_ctx->nk_ctx, NK_TREE_TAB, "Simulation Steps", NK_MINIMIZED)) {
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
+        nk_checkbox_label(g_ctx->nk_ctx, "Handle Emitters", &p_s_settings->handle_emitters);
+        nk_checkbox_label(g_ctx->nk_ctx, "Apply Vorticity", &p_s_settings->apply_vorticity);
+        nk_checkbox_label(g_ctx->nk_ctx, "Apply Buoyancy", &p_s_settings->apply_buoyancy);
+        nk_checkbox_label(g_ctx->nk_ctx, "Resolve Pressure", &p_s_settings->resolve_pressure);
+        nk_checkbox_label(g_ctx->nk_ctx, "Update Velocities", &p_s_settings->update_velocities);
+        nk_checkbox_label(g_ctx->nk_ctx, "Advect Velocities", &p_s_settings->advect_velocities);
+        nk_checkbox_label(g_ctx->nk_ctx, "Advect Smoke", &p_s_settings->advect_smoke);
+
+        nk_tree_pop(g_ctx->nk_ctx);
+    }
+}
+
+//TODO: ADD 2d CODE
+void draw_graphics_step_settings(gui_ctx* g_ctx) {
+    graphics_step_settings3d* g_s_settings = &g_ctx->g_info->g_info3d.g_s_settings;
+    if(nk_tree_push(g_ctx->nk_ctx, NK_TREE_TAB, "Graphics Steps", NK_MINIMIZED)) {
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
+        nk_checkbox_label(g_ctx->nk_ctx, "Draw Grid Lines", &g_s_settings->draw_grid_lines);
+        nk_checkbox_label(g_ctx->nk_ctx, "Draw Velocities", &g_s_settings->draw_velocities);
+        nk_checkbox_label(g_ctx->nk_ctx, "Draw Vorticity", &g_s_settings->draw_vorticity);
+        nk_checkbox_label(g_ctx->nk_ctx, "Draw Smoke", &g_s_settings->draw_smoke);
+        nk_checkbox_label(g_ctx->nk_ctx, "Draw Obstacles", &g_s_settings->draw_obstacles);
+
+        nk_tree_pop(g_ctx->nk_ctx);
+    }
+}
+
+void draw_checkboxes(gui_ctx* g_ctx) {
+    nk_checkbox_label(g_ctx->nk_ctx, "Emitters GUI", &g_ctx->s_info.emitters_window_open);
+    nk_checkbox_label(g_ctx->nk_ctx, "Obstacles GUI", &g_ctx->s_info.obstacles_window_open);
+    nk_checkbox_label(g_ctx->nk_ctx, "Pause Simulation", &g_ctx->p_info->paused);
+}
+
+//TODO update to use custom WIDH / HEIGHT ( add to defines)
+void draw_emitters_settings(gui_ctx* g_ctx) {
+
+    int change = 0;
+    emitters_info* e_info_ptr = &g_ctx->p_info->e_info;
+
+    if(nk_begin(g_ctx->nk_ctx, "Emitters Settings", nk_rect(400, 50, 200, 300),
+                NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
+
+        for(int i = 0; i < e_info_ptr->emitters_count; ++i) {
+            int current_change = draw_emitter_info(g_ctx, i);
+            if(current_change == -1) {
+                handle_emitter_creation(e_info_ptr->emitters_ssbo, &e_info_ptr->emitters_array, &e_info_ptr->emitters_count);
+            } else {
+                change += current_change;
+            }
+        }
+
+        if(change > 0) {
+            update_emitters(e_info_ptr->emitters_ssbo, e_info_ptr->emitters_array, e_info_ptr->emitters_count);
+        }
+
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
+        if(draw_create_button(g_ctx->nk_ctx, "Create new emitter", 18)) {
+            handle_emitter_creation(e_info_ptr->emitters_ssbo, &e_info_ptr->emitters_array, &e_info_ptr->emitters_count);
+        }
+
+    }
+    nk_end(g_ctx->nk_ctx);
+}
+
+//TODO update to use custom WIDH / HEIGHT ( add to defines)
+void draw_obstacles_settings(gui_ctx* g_ctx) {
+
+    int change = 0;
+    static int sync_continuously = 0;
+    obstacles_info* o_info_ptr = &g_ctx->p_info->o_info;
+
+    if(nk_button_text(g_ctx->nk_ctx, "Sync GPU - CPU data", 19) || sync_continuously && o_info_ptr->obstacles_count != 0) {
+        extract_obstacles_data(o_info_ptr->obstacles_array, o_info_ptr->obstacles_count, o_info_ptr->obstacles_ssbos);
+    }
+
+    nk_checkbox_label(g_ctx->nk_ctx, "Sync data continuously", &sync_continuously);
+
+    if(nk_begin(g_ctx->nk_ctx, "Obstacles Settings", nk_rect(400, 350, 200, 300),
+                NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
+        for(int i = 0; i < o_info_ptr->obstacles_count; ++i) {
+            int current_change = draw_obstacle_info(g_ctx, i);
+            if(current_change == -1) {
+                handle_obstacle_deletion(&o_info_ptr->obstacles_array, &o_info_ptr->obstacles_count, o_info_ptr->obstacles_ssbos, i);
+            } else {
+                change += current_change;
+            }
+        }
+
+        if(change > 0) {
+            update_obstacles(o_info_ptr->obstacles_array, o_info_ptr->obstacles_count, o_info_ptr->obstacles_ssbos);
+        }
+
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
+        if(draw_create_button(g_ctx->nk_ctx, "Create new obstacle", 19)) {
+            handle_obstacle_creation(&o_info_ptr->obstacles_array, &o_info_ptr->obstacles_count, o_info_ptr->obstacles_ssbos);
+        }
+    }
+    nk_end(g_ctx->nk_ctx);
+}
+
+int draw_emitter_info(gui_ctx* g_ctx, int index) {
+    int change = 0;
+    char buf[BUFFER_SIZE];
+    sprintf(buf, "Emitter %i", index);
+
+    emitter* e = &(g_ctx->p_info->e_info.emitters_array[index]);
+
+    if(nk_tree_push_id(g_ctx->nk_ctx, NK_TREE_TAB, buf, NK_MINIMIZED, index)) {
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
+
+        nk_label(g_ctx->nk_ctx, "Position:", NK_TEXT_LEFT);
+        change += draw_ivec3_property_xyz_id(g_ctx->nk_ctx, "", e->pos_radius, index, -9999, 9999, 1);
+        change += nk_property_int(g_ctx->nk_ctx, "#Radius", 1, &e->pos_radius[3], 9999, 1, 1);
+
+        nk_label(g_ctx->nk_ctx, "Densities:", NK_TEXT_LEFT);
+        change += draw_ivec3_property_rgb_id(g_ctx->nk_ctx, "", e->density_temp, index, 0, 1000000, 1);
+        change += nk_property_int(g_ctx->nk_ctx, "#Temperature", -9999, &e->density_temp[3], 1000000, 1, 1);
+        change += nk_property_int(g_ctx->nk_ctx, "#Delay between emits", 0, &e->emitter_settings[0], 100000, 1, 1);
+        change += nk_checkbox_label(g_ctx->nk_ctx, "#Falloff?", &e->emitter_settings[3]);
+
+        if(draw_delete_button(g_ctx->nk_ctx, "Delete Emitter", 14)) {
+            change = -1;
+        }
+
+        nk_tree_pop(g_ctx->nk_ctx);
+    }
+    return change;
+}
+
+int draw_obstacle_info(gui_ctx* g_ctx, int index) {
+    int change = 0;
+    char buf[BUFFER_SIZE];
+    sprintf(buf, "Obstacle %i", index);
+
+    obstacle* o = &(g_ctx->p_info->o_info.obstacles_array[index]);
+    int anchored_val = (int) o->velocities_anchored[3];
+
+    if(nk_tree_push_id(g_ctx->nk_ctx, NK_TREE_TAB, buf, NK_MINIMIZED, index)) {
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
+
+        nk_label(g_ctx->nk_ctx, "Position:", NK_TEXT_LEFT);
+        change += draw_vec3_property_xyz_id(g_ctx->nk_ctx, "", o->pos_radius, index, -9999, 9999, 1);
+        change += nk_property_float(g_ctx->nk_ctx, "Radius", 1, &o->pos_radius[3], 9999, 1, 1);
+
+        nk_label(g_ctx->nk_ctx, "Velocities:", NK_TEXT_LEFT);
+        change += draw_vec3_property_xyz_id(g_ctx->nk_ctx, "", o->velocities_anchored, index, 0, 100000, 1);
+        change += nk_checkbox_label(g_ctx->nk_ctx, "Anchored", &anchored_val);
+
+        if(draw_delete_button(g_ctx->nk_ctx, "Delete Obstacle", 15)) {
+            change = -1;
+        }
+
+        nk_tree_pop(g_ctx->nk_ctx);
+    }
+
+    o->velocities_anchored[3] = anchored_val;
+    return change;
+}
+
+void toggle_settings(gui_ctx* g_ctx) {
+    g_ctx->s_info.settings_open = !g_ctx->s_info.settings_open;
+}
+
+void toggle_paused(gui_ctx* g_ctx) {
+    g_ctx->p_info->paused = !g_ctx->p_info->paused;
+}

@@ -16,7 +16,7 @@
 
 #include "../common/texture.h"
 #include "../common/physics.h"
-#include "../common/main_menu.h"
+#include "../common/gui/main_menu.h"
 
 #define INIT_SCREEN_SIZE_X 1600
 #define INIT_SCREEN_SIZE_Y 900

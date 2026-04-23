@@ -7,9 +7,10 @@
 
 #include <cglm/cglm.h>
 
-#include "main_menu.h"
 #include "../physics.h"
 #include "../graphics.h"
+#include "main_menu.h"
+
 
 typedef struct settings_info {
     int settings_open;
@@ -37,14 +38,18 @@ typedef struct gui_ctx {
     struct nk_context* nk_ctx;
 }gui_ctx;
 
-gui_ctx init_gui_ctx(grid* grid_data,  physics_info* p_info, physics_info* mm_p_info, graphics_info* g_info, main_menu_info* mm_info, struct nk_context* nk_ctx);
+gui_ctx init_gui_ctx(grid* grid_data, physics_info* p_info, physics_info* mm_p_info, graphics_info* g_info, main_menu_info* mm_info, struct nk_context* nk_ctx);
 
 void draw_gui(gui_ctx* g_ctx);
 
 void draw_main_menu(gui_ctx* g_ctx);
 void draw_simulation_settings(gui_ctx* g_ctx);
 
-void draw_graphics_settings()
+void draw_physics_settings(gui_ctx* g_ctx);
+void draw_graphics_settings(gui_ctx* g_ctx);
+void draw_physics_step_settings(gui_ctx* g_ctx);
+void draw_graphics_step_settings(gui_ctx* g_ctx);
+void draw_checkboxes(gui_ctx* g_ctx);
 
 void draw_creation_settings(gui_ctx* g_ctx);
 
@@ -57,6 +62,13 @@ int is_in_main_menu(const gui_ctx* g_ctx);
 int is_in_grid_creation(const gui_ctx* g_ctx);
 int are_settings_open(const gui_ctx* g_ctx);
 
+void draw_emitters_settings(gui_ctx* g_ctx);
+void draw_obstacles_settings(gui_ctx* g_ctx);
 
+int draw_emitter_info(gui_ctx* g_ctx, int index);
+int draw_obstacle_info(gui_ctx* g_ctx, int index);
+
+void toggle_settings(gui_ctx* g_ctx);
+void toggle_paused(gui_ctx* g_ctx);
 
 #endif //SMOKESIM_GUI_H

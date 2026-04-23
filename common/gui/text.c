@@ -4,7 +4,7 @@
 
 #include <string.h>
 
-#include "shader.h"
+#include "../shader.h"
 #include "text.h"
 
 FT_Library init_ft() {

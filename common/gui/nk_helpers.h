@@ -28,7 +28,18 @@
 
 #include <cglm/cglm.h>
 
+#define BUFFER_SIZE 32
+
 void draw_color_picker(struct nk_context* nk_ctx,  const char* label, vec3 var, float mul);
 void draw_header(struct nk_context* nk_ctx, const char* label);
+int draw_vec3_property(struct nk_context* nk_ctx, const char* label, vec3 var, float min, float max, float step);
+
+int draw_ivec3_property_xyz_id(struct nk_context* nk_ctx, const char* label, ivec4 var, const int id, const int min, const int max, const int step);
+int draw_ivec3_property_rgb_id(struct nk_context* nk_ctx, const char* label, ivec4 var, const int id, const int min, const int max, const int step);
+
+int draw_vec3_property_xyz_id(struct nk_context* nk_ctx, const char* label, vec4 var, const int id, const float min, const float max, const float step);
+
+int draw_create_button(struct nk_context* nk_ctx, const char* label, int length);
+int draw_delete_button(struct nk_context* nk_ctx, const char* label, int length);
 
 #endif //SMOKESIM_NK_HELPERS_H

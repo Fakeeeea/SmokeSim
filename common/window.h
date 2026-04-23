@@ -9,7 +9,7 @@
 #include <GLFW/glfw3.h>
 #include "graphics.h"
 #include "physics.h"
-#include "main_menu.h"
+#include "gui/gui.h"
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -40,27 +40,9 @@ typedef struct mouse_info {
 typedef struct window_context {
     GLFWwindow* window;
 
-    graphics_info* g_info;
-
-    grid* grid;
-    physics_info* p_info;
-
-    main_menu_info* mm_info;
-    physics_info* mm_p_info;
-
     mouse_info m_info;
 
-    int init_grid;
-    int created_grid;
-
-    int settings_open;
-
-    orbit_info mov_info;
-
-    int is_obstacles_window_open;
-    int is_emitters_window_open;
-
-    struct nk_context* nk_ctx;
+    gui_ctx g_ctx;
 }window_context;
 
 window_context ctx;
@@ -69,7 +51,7 @@ void init_glfw();
 GLFWwindow* create_window();
 int load_glad();
 
-void init_window_context(GLFWwindow* window, struct nk_context* nk_ctx, grid* grid, graphics_info* g_info, physics_info* p_info, physics_info* mm_p_info, main_menu_info* mm_info);
+void init_window_context(GLFWwindow* window, struct nk_context* nk_ctx, grid* grid_data, graphics_info* g_info, physics_info* p_info, physics_info* mm_p_info, main_menu_info* mm_info);
 
 void setup_callbacks();
 
@@ -80,27 +62,8 @@ void scroll_wheel_callback(GLFWwindow *window, double xoffset, double yoffset);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
-int draw_gui();
-
-//main gui
-void draw_graphics_settings();
-void draw_graphics_step_settings();
-int draw_physics_settings();
-void draw_physics_step_settings();
-
-//general info
-void draw_camera_info();
-
-//emitters gui
-void draw_emitters_gui();
-int draw_emitter_info(int e_num);
-
-//obstacles gui
-void draw_obstacles_gui();
-int draw_obstacle_info(int o_num);
-
-//main menu options
-//TODO KEEP HERE
 void init_new_grid_screen();
+void get_swapped_y_pos(vec2 out);
+void handle_main_menu_events();
 
 #endif //SMOKESIM_WINDOW_H

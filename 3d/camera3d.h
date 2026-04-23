@@ -35,4 +35,7 @@ void auto_orbit(camera* cam, const ivec3 grid_size, float time);
 
 void toggle_orbit(camera* cam);
 void toggle_auto_orbit(camera* cam);
+
+int is_orbiting(const camera* cam);
+
 #endif //SMOKESIM_CAMERA3D_H

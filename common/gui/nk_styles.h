@@ -19,8 +19,8 @@
 #pragma warning(disable:4116)
 #endif
 
-#include "../nuklear/nuklear.h"
-#include "../nuklear/nuklear_glfw_gl3.h"
+#include "../../nuklear/nuklear.h"
+#include "../../nuklear/nuklear_glfw_gl3.h"
 
 #ifdef _MSC_VER
 #pragma warning(pop)

@@ -112,3 +112,7 @@ void toggle_orbit(camera* cam) {
 void toggle_auto_orbit(camera* cam) {
     cam->orbit.auto_orbit = !cam->orbit.auto_orbit;
 }
+
+int is_orbiting(const camera* cam) {
+    return cam->orbit.orbiting;
+}
