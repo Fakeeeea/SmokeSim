@@ -1,0 +1,80 @@
+#version 460 core
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+layout(binding = 0) uniform sampler3D vx_read_tex;
+layout(binding = 1) uniform sampler3D vy_read_tex;
+layout(binding = 2) uniform sampler3D vz_read_tex;
+layout(binding = 3) uniform sampler3D smoke_read_tex;
+
+layout(binding = 0, r32f) writeonly uniform image3D vx_write_temp_image;
+layout(binding = 1, r32f) writeonly uniform image3D vy_write_temp_image;
+layout(binding = 2, r32f) writeonly uniform image3D vz_write_temp_image;
+layout(binding = 3, rgba16f) writeonly uniform image3D smoke_write_temp_image;
+
+layout(binding = 4, r32f) uniform image3D pressure_map;
+layout(binding = 5, rgba16f) uniform image3D solid_map;
+layout(binding = 6, rgba16f) uniform image3D vorticity;
+
+layout(std140, binding = 1) uniform constants {
+    vec4 grid_size;
+    vec4 wind;
+    float time_step;
+    float cell_size;
+    float density;
+    float t_ambient;
+    float t_weight_coeff;
+    float t_temp_coeff;
+    float vorticity_confinement;
+};
+
+struct obstacle {
+    vec4 pos_radius;
+    vec4 velocities_anchored;
+};
+
+layout(std430, binding = 5) buffer obstacle_in {
+    int obstacle_count_in;
+    obstacle obstacles_in[];
+};
+
+shared obstacle shared_obs[512];
+
+void main() {
+    ivec3 idx = ivec3(gl_GlobalInvocationID.xyz);
+
+    bool valid = !(idx.x <= 1 || idx.y <= 1 || idx.z<= 1 || idx.x >= (grid_size.x - 1) || idx.y >= (grid_size.y -1) || idx.z >= (grid_size.z -1));
+    vec4 new_val = vec4(0);
+
+    int num_tiles = (obstacle_count_in + 511) / 512;
+
+    for(int tile = 0; tile < num_tiles; tile++) {
+
+        int load_idx = tile * 512 + int(gl_LocalInvocationIndex);
+
+        if(load_idx < obstacle_count_in) {
+            shared_obs[gl_LocalInvocationIndex] = obstacles_in[load_idx];
+        } else {
+            shared_obs[gl_LocalInvocationIndex].pos_radius = vec4(0);
+            shared_obs[gl_LocalInvocationIndex].velocities_anchored = vec4(0);
+        }
+
+        barrier();
+
+        if(valid) {
+            for(int i = 0; i < 512; ++i) {
+                int current_tile_idx = tile * 512 + i;
+                if(current_tile_idx >= obstacle_count_in) break;
+
+                obstacle current = shared_obs[i];
+                float dist = distance(vec3(idx), current.pos_radius.xyz);
+                if(dist < current.pos_radius.a) new_val = vec4(current.velocities_anchored.xyz * (1 - current.velocities_anchored.a), 1.0);
+            }
+        }
+
+        barrier();
+    }
+
+    if(valid)
+        imageStore(solid_map, idx, new_val);
+}

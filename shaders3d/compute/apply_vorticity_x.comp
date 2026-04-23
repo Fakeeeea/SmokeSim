@@ -1,0 +1,60 @@
+#version 460 core
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+layout(binding = 0) uniform sampler3D vx_read_tex;
+layout(binding = 1) uniform sampler3D vy_read_tex;
+layout(binding = 2) uniform sampler3D vz_read_tex;
+layout(binding = 3) uniform sampler3D smoke_read_tex;
+
+layout(binding = 0, r32f) writeonly uniform image3D vx_write_temp_image;
+layout(binding = 1, r32f) writeonly uniform image3D vy_write_temp_image;
+layout(binding = 2, r32f) writeonly uniform image3D vz_write_temp_image;
+layout(binding = 3, rgba16f) writeonly uniform image3D smoke_write_temp_image;
+
+layout(binding = 4, r32f) uniform image3D pressure_map;
+layout(binding = 5, rgba16f) uniform image3D solid_map;
+layout(binding = 6, rgba16f) uniform image3D vorticity;
+
+layout(std140, binding = 1) uniform constants {
+    vec4 grid_size;
+    vec4 wind;
+    float time_step;
+    float cell_size;
+    float density;
+    float t_ambient;
+    float t_weight_coeff;
+    float t_temp_coeff;
+    float vorticity_confinement;
+};
+
+vec3 vorticity_at(ivec3 pos) {
+    if(any(lessThan(pos, vec3(0))) || any(greaterThanEqual(pos, grid_size.xyz))) return vec3(0);
+    return imageLoad(vorticity, pos).xyz;
+}
+
+float mag(ivec3 pos) {
+    return length(vorticity_at(pos));
+}
+
+void main() {
+    ivec3 idx = ivec3(gl_GlobalInvocationID.xyz);
+    if(idx.x >= grid_size.x + 1 || idx.y >= grid_size.y || idx.z >= grid_size.z) return;
+
+    float diff_x = mag(idx + ivec3(1, 0, 0)) - mag(idx + ivec3(-1, 0, 0));
+    float diff_y = mag(idx + ivec3(0, 1, 0)) - mag(idx + ivec3(0, -1, 0));
+    float diff_z = mag(idx + ivec3(0, 0, 1)) - mag(idx + ivec3(0, 0, -1));
+
+    vec3 grad = vec3(diff_x, diff_y, diff_z) / (2*cell_size);
+
+    float epsilon = 1e-20f;
+    vec3 n = grad / (length(grad) + epsilon);
+
+    vec3 omega = vorticity_at(idx);
+    vec3 force = cross(n, omega);
+
+    float current_vx = texelFetch(vx_read_tex, idx, 0).r;
+    float new_vx = current_vx + ((force.x * 0.5f) * vorticity_confinement * cell_size * time_step) / density;
+
+    imageStore(vx_write_temp_image, idx, vec4(new_vx));
+}

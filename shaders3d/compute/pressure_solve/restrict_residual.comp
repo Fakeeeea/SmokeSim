@@ -1,0 +1,63 @@
+#version 460 core
+
+//RESTRICT RESIDUAL SHADER
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+layout(binding = 5) uniform sampler3D pressure_tex;
+
+layout(binding = 0, r32f) uniform image3D pressure_map;
+layout(binding = 1, rgba16f) uniform image3D solid_map;
+layout(binding = 2, r32f) uniform image3D residual_map;
+
+layout(binding = 3, r32f) uniform image3D next_pressure_map;
+layout(binding = 4, rgba16f) uniform image3D next_solid_map;
+layout(binding = 5, r32f) uniform image3D next_residual_map;
+
+layout(std140, binding = 1) uniform constants {
+    vec4 grid_size;
+    vec4 wind;
+    float time_step;
+    float cell_size;
+    float density;
+    float t_ambient;
+    float t_weight_coeff;
+    float t_temp_coeff;
+    float vorticity_confinement;
+};
+
+layout(std140, binding = 2) uniform multigrid_constants {
+    ivec4 grid_sizes[16];
+    int grid_levels;
+};
+
+layout(std140, binding = 3) uniform multigrid_variables {
+    int current_level;
+    float current_cell_size;
+};
+
+void main() {
+    ivec3 coarse_idx = ivec3(gl_GlobalInvocationID.xyz);
+    ivec3 coarse_grid_size = grid_sizes[current_level + 1].xyz;
+
+    if(coarse_idx.x >= coarse_grid_size.x || coarse_idx.y >= coarse_grid_size.y || coarse_idx.z >= coarse_grid_size.z) return;
+
+    ivec3 fine_idx = coarse_idx * 2;
+
+    float cell_bottom_left_back = imageLoad(residual_map, fine_idx).r;
+    float cell_bottom_left_front = imageLoad(residual_map, fine_idx + ivec3(0,0,1)).r;
+    float cell_bottom_right_back = imageLoad(residual_map, fine_idx + ivec3(1,0,0)).r;
+    float cell_bottom_right_front = imageLoad(residual_map, fine_idx + ivec3(1,0,1)).r;
+    float cell_top_left_back = imageLoad(residual_map, fine_idx + ivec3(0,1,0)).r;
+    float cell_top_left_front = imageLoad(residual_map, fine_idx + ivec3(0,1,1)).r;
+    float cell_top_right_back = imageLoad(residual_map, fine_idx + ivec3(1,1,0)).r;
+    float cell_top_right_front = imageLoad(residual_map, fine_idx + ivec3(1,1,1)).r;
+
+    float bottom_sum = cell_bottom_left_back + cell_bottom_left_front + cell_bottom_right_back + cell_bottom_right_front;
+    float top_sum = cell_top_left_back + cell_top_left_front + cell_top_right_back + cell_top_right_front;
+
+    float restricted_residual = (bottom_sum + top_sum) / 8.0f;
+
+    imageStore(next_residual_map, coarse_idx, vec4(restricted_residual));
+
+}

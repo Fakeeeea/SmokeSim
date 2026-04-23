@@ -1,0 +1,8 @@
+#Ignore directories
+.idea/
+fonts/
+cmake-build-debug/
+nuklear/
+
+#Ignore files
+common/glad.c

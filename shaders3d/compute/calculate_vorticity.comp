@@ -1,0 +1,90 @@
+#version 460 core
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+layout(binding = 0) uniform sampler3D vx_read_tex;
+layout(binding = 1) uniform sampler3D vy_read_tex;
+layout(binding = 2) uniform sampler3D vz_read_tex;
+layout(binding = 3) uniform sampler3D smoke_read_tex;
+
+layout(binding = 0, r32f) writeonly uniform image3D vx_write_temp_image;
+layout(binding = 1, r32f) writeonly uniform image3D vy_write_temp_image;
+layout(binding = 2, r32f) writeonly uniform image3D vz_write_temp_image;
+layout(binding = 3, rgba16f) writeonly uniform image3D smoke_write_temp_image;
+
+layout(binding = 4, r32f) uniform image3D pressure_map;
+layout(binding = 5, rgba16f) uniform image3D solid_map;
+layout(binding = 6, rgba16f) uniform image3D vorticity;
+
+layout(std140, binding = 1) uniform constants {
+    vec4 grid_size;
+    vec4 wind;
+    float time_step;
+    float cell_size;
+    float density;
+    float t_ambient;
+    float t_weight_coeff;
+    float t_temp_coeff;
+    float vorticity_confinement;
+};
+
+//FOR FORWARD OR BACKWARDS USE / CELLSIZE NOT / 2*CELL_SIZE
+
+bool x_clamped = false;
+bool y_clamped = false;
+bool z_clamped = false;
+
+float is_solid(ivec3 pos) {
+    if(pos.x < 0 || pos.y < 0 || pos.z < 0 ||
+    pos.x >= grid_size.x || pos.y >= grid_size.y || pos.z >= grid_size.z) return 1;
+    return imageLoad(solid_map, pos).a;
+}
+
+float get_vx(ivec3 pos) {
+    if(any(lessThan(pos, vec3(0))) || any(greaterThan(pos, vec3(grid_size.x+1, grid_size.yz)))) return 0;
+    //ivec3 clamped_pos = clamp(pos, ivec3(0), ivec3(grid_size.x, grid_size.yz - 1));
+    return texelFetch(vx_read_tex, pos, 0).r;
+}
+
+float get_vy(ivec3 pos) {
+    if(any(lessThan(pos, vec3(0))) || any(greaterThan(pos, vec3(grid_size.x, grid_size.y + 1, grid_size.z)))) return 0;
+    //ivec3 clamped_pos = clamp(pos, ivec3(0), ivec3(grid_size.x - 1, grid_size.y, grid_size.z - 1));
+    return texelFetch(vy_read_tex, pos, 0).r;
+}
+
+float get_vz(ivec3 pos) {
+    if(any(lessThan(pos, vec3(0))) || any(greaterThan(pos, vec3(grid_size.xy, grid_size.z+1)))) return 0;
+    //ivec3 clamped_pos = clamp(pos, ivec3(0), ivec3(grid_size.xy - 1, grid_size.z));
+    return texelFetch(vz_read_tex, pos, 0).r;
+}
+
+float cc_vx(ivec3 pos) { return (get_vx(pos) + get_vx(pos + ivec3(1, 0, 0))) * 0.5;}
+float cc_vy(ivec3 pos) { return (get_vy(pos) + get_vy(pos + ivec3(0, 1, 0))) * 0.5;}
+float cc_vz(ivec3 pos) { return (get_vz(pos) + get_vz(pos + ivec3(0, 0, 1))) * 0.5;}
+
+void main () {
+    ivec3 idx = ivec3(gl_GlobalInvocationID.xyz);
+
+    if(idx.x >= grid_size.x || idx.y >= grid_size.y || idx.z >= grid_size.z) return;
+
+    if(is_solid(idx) >= 1) {
+        imageStore(vorticity, idx, vec4(0));
+        return;
+    }
+
+    vec3 omega;
+
+    float x1 = cc_vz(idx + ivec3(0,1,0)) - cc_vz(idx - ivec3(0,1,0));
+    float x2 = cc_vy(idx + ivec3(0,0,1)) - cc_vy(idx - ivec3(0,0,1));
+    omega.x = (x1 - x2) / (2*cell_size);
+
+    float y1 = cc_vx(idx + ivec3(0,0,1)) - cc_vx(idx - ivec3(0,0,1));
+    float y2 = cc_vz(idx + ivec3(1,0,0)) - cc_vz(idx - ivec3(1,0,0));
+    omega.y = (y1 - y2) / (2*cell_size);
+
+    float z1 = cc_vy(idx + ivec3(1,0,0)) - cc_vy(idx - ivec3(1,0,0));
+    float z2 = cc_vx(idx + ivec3(0,1,0)) - cc_vx(idx - ivec3(0,1,0));
+    omega.z = (z1 - z2) / (2*cell_size);
+
+    imageStore(vorticity, idx, vec4(omega, 0.0f));
+}

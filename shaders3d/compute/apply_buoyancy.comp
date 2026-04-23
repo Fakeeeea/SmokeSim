@@ -1,0 +1,50 @@
+#version 460 core
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+layout(binding = 0) uniform sampler3D vx_read_tex;
+layout(binding = 1) uniform sampler3D vy_read_tex;
+layout(binding = 2) uniform sampler3D vz_read_tex;
+layout(binding = 3) uniform sampler3D smoke_read_tex;
+
+layout(binding = 0, r32f) writeonly uniform image3D vx_write_temp_image;
+layout(binding = 1, r32f) writeonly uniform image3D vy_write_temp_image;
+layout(binding = 2, r32f) writeonly uniform image3D vz_write_temp_image;
+layout(binding = 3, rgba16f) writeonly uniform image3D smoke_write_temp_image;
+
+layout(binding = 4, r32f) uniform image3D pressure_map;
+layout(binding = 5, rgba16f) uniform image3D solid_map;
+layout(binding = 6, rgba16f) uniform image3D vorticity;
+
+layout(std140, binding = 1) uniform constants {
+    vec4 grid_size;
+    vec4 wind;
+    float time_step;
+    float cell_size;
+    float density;
+    float t_ambient;
+    float t_weight_coeff;
+    float t_temp_coeff;
+    float vorticity_confinement;
+};
+
+float is_solid(ivec3 pos) {
+    if(pos.x < 0 || pos.y < 0 || pos.z < 0 ||
+    pos.x >= grid_size.x || pos.y >= grid_size.y || pos.z >= grid_size.z) return 0;
+    return imageLoad(solid_map, pos).a;
+}
+
+void main() {
+    ivec3 idx = ivec3(gl_GlobalInvocationID.xyz);
+    if(idx.x >= grid_size.x || idx.y >= (grid_size.y+1) || idx.z >= grid_size.z) return;
+    if(is_solid(idx) >= 1 || is_solid(idx + ivec3(0, -1, 0)) >= 1) return;
+
+    vec3 staggered_pos = (idx + vec3(0.5f, 0.0f, 0.5f)) / (grid_size.xyz);
+    vec4 smoke = texture(smoke_read_tex, staggered_pos);
+    float total_density = smoke.r + smoke.g + smoke.b;
+
+    float buoyancy = -t_weight_coeff * total_density + t_temp_coeff * (smoke.a - t_ambient);
+    float new_v = texelFetch(vy_read_tex, idx, 0).r + buoyancy * time_step + wind.y * time_step;
+
+    imageStore(vy_write_temp_image, idx, vec4(new_v));
+}
