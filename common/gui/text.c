@@ -104,6 +104,8 @@ static_text_mesh get_static_text_mesh(font_atlas* atlas, const char* text, vec2 
     m.hover_base_scale = 1.0f;
     m.hover_current_scale = 1.0f;
     m.hover_target_scale = 1.0f;
+    m.hidden_offset[0] = -1000.0f, m.hidden_offset[1] = 0.0f;
+    m.hidden = 0;
     glm_vec2_copy(pos, m.pivot);
     glm_vec3_copy(color, m.text_color);
 

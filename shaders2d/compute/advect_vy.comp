@@ -1,0 +1,75 @@
+#version 460 core
+
+layout(local_size_x = 8, local_size_y = 8) in;
+
+layout(binding = 0) uniform sampler2D vx_read_tex;
+layout(binding = 1) uniform sampler2D vy_read_tex;
+layout(binding = 3) uniform sampler2D smoke_read_tex;
+
+layout(binding = 0, r32f) writeonly uniform image2D vx_write_temp_image;
+layout(binding = 1, r32f) writeonly uniform image2D vy_write_temp_image;
+layout(binding = 3, rgba16f) writeonly uniform image2D smoke_write_temp_image;
+
+layout(binding = 4, r32f) uniform image2D pressure_map;
+layout(binding = 5, rgba16f) uniform image2D solid_map;
+layout(binding = 6, r32f) uniform image2D vorticity;
+
+layout(std140, binding = 1) uniform constants {
+    ivec4 grid_size;
+    vec4 wind;
+    float time_step;
+    float density;
+    float t_ambient;
+    float t_weight_coeff;
+    float t_temp_coeff;
+    float vorticity_confinement;
+    float _pad0;
+    float _pad1;
+    float cell_size;
+};
+
+
+vec2 get_interpolated_velocity(vec2 world_pos) {
+    vec2 v;
+
+    vec2 grid_space = world_pos / cell_size;
+    vec2 vx_uv = (grid_space + vec2(0.5, 0)) / (vec2(grid_size.xy) + vec2(1, 0));
+    vec2 vy_uv = (grid_space + vec2(0, 0.5)) / (vec2(grid_size.xy) + vec2(0, 1));
+
+    v.x = texture(vx_read_tex, vx_uv).r;
+    v.y = texture(vy_read_tex, vy_uv).r;
+
+    return v;
+}
+
+float is_solid(ivec2 pos) {
+    if(pos.x < 0 || pos.y < 0 ||
+    pos.x >= grid_size.x || pos.y >= grid_size.y) return 1;
+    return imageLoad(solid_map, pos).a;
+}
+
+void main() {
+    ivec2 idx = ivec2(gl_GlobalInvocationID.xy);
+    if(idx.x >= grid_size.x || idx.y >= (grid_size.y+1)) return;
+
+    if(idx.y == 0 && wind.y != 0) {
+        imageStore(vy_write_temp_image, idx, vec4(wind.y, vec3(0)));
+        return;
+    }
+
+    if(is_solid(idx) >= 1 || is_solid(idx + ivec2(0, -1)) >= 1) {
+        imageStore(vy_write_temp_image, idx, vec4(0));
+        return;
+    }
+
+    vec2 world_pos = vec2(idx.x + 0.5f, idx.y) * cell_size;
+    vec2 v = get_interpolated_velocity(world_pos);
+    vec2 comes_from = world_pos - (v * time_step);
+
+
+    vec2 grid_space = comes_from / cell_size;
+    vec2 vy_uv = (grid_space + vec2(0, 0.5)) / (vec2(grid_size.xy) + vec2(0, 1));
+    float new_vy = texture(vy_read_tex, vy_uv).r;
+
+    imageStore(vy_write_temp_image, idx, vec4(new_vy));
+}

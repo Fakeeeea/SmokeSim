@@ -34,7 +34,7 @@ void gen_grid_textures2d(grid2d *grid, const float t_ambient) {
     grid->smoke[0] = create_texture2((ivec2){grid->size[0],grid->size[1]}, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_LINEAR, init, GL_CLAMP_TO_BORDER, init);
     grid->smoke[1] = create_texture2((ivec2){grid->size[0],grid->size[1]}, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_LINEAR, init, GL_CLAMP_TO_BORDER, init);
 
-    grid->vorticity = create_texture2((ivec2){grid->size[0],grid->size[1]}, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_LINEAR, NULL, GL_CLAMP_TO_BORDER, NULL);
+    grid->vorticity = create_texture2((ivec2){grid->size[0],grid->size[1]}, GL_R32F, GL_RED, GL_FLOAT, GL_LINEAR, NULL, GL_CLAMP_TO_BORDER, NULL);
 
     gen_grid_pressure_solve_textures2d(grid);
 }
@@ -105,7 +105,7 @@ void bind_physics_buffers2d(const grid2d* grid) {
 
     glBindImageTexture(PRESSURE_MAP, grid->pressure_pyramid[0].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
     glBindImageTexture(SOLID_MAP, grid->solid_pyramid[0].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
-    glBindImageTexture(VORTICITY_MAP, grid->vorticity.ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
+    glBindImageTexture(VORTICITY_MAP, grid->vorticity.ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 }
 
 void bind_multigrid_textures2d(const grid2d* grid, const int current_level) {

@@ -1,0 +1,58 @@
+#version 460 core
+
+layout(local_size_x = 8, local_size_y = 8) in;
+
+layout(binding = 0) uniform sampler2D vx_read_tex;
+layout(binding = 1) uniform sampler2D vy_read_tex;
+layout(binding = 3) uniform sampler2D smoke_read_tex;
+
+layout(binding = 0, r32f) writeonly uniform image2D vx_write_temp_image;
+layout(binding = 1, r32f) writeonly uniform image2D vy_write_temp_image;
+layout(binding = 3, rgba16f) writeonly uniform image2D smoke_write_temp_image;
+
+layout(binding = 4, r32f) uniform image2D pressure_map;
+layout(binding = 5, rgba16f) uniform image2D solid_map;
+layout(binding = 6, r32f) uniform image2D vorticity;
+
+layout(std140, binding = 1) uniform constants {
+    ivec4 grid_size;
+    vec4 wind;
+    float time_step;
+    float density;
+    float t_ambient;
+    float t_weight_coeff;
+    float t_temp_coeff;
+    float vorticity_confinement;
+    float _pad0;
+    float _pad1;
+    float cell_size;
+};
+
+
+layout(std140, binding = 7) uniform time {
+    float current_time;
+};
+
+struct emitter {
+    ivec4 position_radius;
+    ivec4 density_temperature;
+    ivec4 emitter_settings; //x - delay; y - last_emit, z - emit or not, a - padding
+};
+
+layout(std430, binding = 4) buffer emitter_buffer {
+    int emitters_count;
+    emitter emitters[];
+};
+
+void main() {
+    int idx = int(gl_GlobalInvocationID.x);
+    if(idx >= emitters_count) return;
+
+    if(emitters[idx].emitter_settings.z == 1 && emitters[idx].emitter_settings.x != 0) {
+        emitters[idx].emitter_settings.z = 0;
+        emitters[idx].emitter_settings.y = int(current_time);
+        return;
+    }
+
+    if(current_time - emitters[idx].emitter_settings.y >= emitters[idx].emitter_settings.x) emitters[idx].emitter_settings.z = 1;
+}

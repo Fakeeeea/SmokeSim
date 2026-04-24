@@ -36,7 +36,7 @@ void draw_main_menu(gui_ctx* g_ctx) {
 }
 
 int is_in_main_menu(const gui_ctx* g_ctx) {
-    return (g_ctx->mm_info->state == MM_MAIN_SCREEN);
+    return (g_ctx->mm_info->state == MM_MAIN_SCREEN || g_ctx->mm_info->state == MM_SIMULATION_TYPE);
 }
 
 int is_in_grid_creation(const gui_ctx* g_ctx) {
@@ -69,9 +69,7 @@ int draw_grid_size_settings3d(gui_ctx* g_ctx) {
 
     draw_header(g_ctx->nk_ctx, "Grid Size");
     nk_layout_row_dynamic(g_ctx->nk_ctx, 30, 3);
-    change += nk_property_int(g_ctx->nk_ctx, "X", 3, &g_ctx->grid_data->grid3d_data.size[0], 1024, 1, 1);
-    change += nk_property_int(g_ctx->nk_ctx, "Y", 3, &g_ctx->grid_data->grid3d_data.size[1], 1024, 1, 1);
-    change += nk_property_int(g_ctx->nk_ctx, "Z", 3, &g_ctx->grid_data->grid3d_data.size[2], 1024, 1, 1);
+    change += draw_ivec3_property(g_ctx->nk_ctx, "", g_ctx->grid_data->grid3d_data.size, 3, 1024, 2);
 
     return change;
 }

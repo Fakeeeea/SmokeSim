@@ -11,7 +11,6 @@
 #include <cglm/cglm.h>
 #include "text.h"
 
-
 #define BUTTON_TEXT_SIZE 60
 #define BUTTONS_WIDTH_PERCENTAGE 0.3f
 #define BUTTONS_HEIGHT_PERCENTAGE 0.15f
@@ -20,15 +19,19 @@
 #define SCREEN_FOR_MM_X_PERCENTAGE 0.4f
 #define SCREEN_FOR_MM_Y_PERCENTAGE 0
 
-#define MENU_BUTTONS_COUNT 2
+#define MENU_BUTTONS_COUNT 5
 
 #define NEW_SIM_ID 0
 #define LOAD_ID 1
+#define GRID2D_ID 2
+#define GRID3D_ID 3
+#define BACK 4
 
 enum main_menu_state {
     MM_CLOSED = 0,
-    MM_MAIN_SCREEN = 1,
-    MM_OPTIONS = 2,
+    MM_SIMULATION_TYPE = 1,
+    MM_MAIN_SCREEN = 2,
+    MM_OPTIONS = 3,
 };
 
 struct main_menu_info;
@@ -51,7 +54,7 @@ typedef struct main_menu_info {
     int state;
 }main_menu_info;
 
-void init_main_menu(main_menu_info* mm_info, ivec2 screen_size);
+void init_main_menu(main_menu_info* mm_info, const ivec2 screen_size);
 static menu_button get_menu_button(main_menu_info* mm_info, char* text, vec2 min, vec2 max, vec3 color, vec2 hover_pad, float hover_scale);
 void draw_main_menu_text(main_menu_info* mm_info);
 void handle_hover(main_menu_info* mm_info, vec2 pos);
@@ -60,6 +63,12 @@ int check_hover(menu_button* mb, vec2 pos);
 void free_main_menu(main_menu_info* mm_info);
 void lerp_f(float current, float target, float* dest, float speed);
 void lerp_2f(vec2 current, vec2 target, vec2* dest, float speed);
+
+void to_simulation_type(main_menu_info* mm_info);
+
+int is_hidden(const main_menu_info* mm_info, int idx);
+void hide_button(main_menu_info* mm_info, int idx);
+void unhide_button(main_menu_info* mm_info, int idx);
 
 void get_viewport_data_mm(ivec2 screen_size, ivec4 out);
 

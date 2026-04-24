@@ -1,0 +1,131 @@
+#version 460 core
+
+layout(local_size_x = 8, local_size_y = 8) in;
+
+layout(binding = 0) uniform sampler2D vx_read_tex;
+layout(binding = 1) uniform sampler2D vy_read_tex;
+layout(binding = 3) uniform sampler2D smoke_read_tex;
+
+layout(binding = 0, r32f) writeonly uniform image2D vx_write_temp_image;
+layout(binding = 1, r32f) writeonly uniform image2D vy_write_temp_image;
+layout(binding = 3, rgba16f) writeonly uniform image2D smoke_write_temp_image;
+
+layout(binding = 4, r32f) uniform image2D pressure_map;
+layout(binding = 5, rgba16f) uniform image2D solid_map;
+layout(binding = 6, r32f) uniform image2D vorticity;
+
+layout(std140, binding = 1) uniform constants {
+    ivec4 grid_size;
+    vec4 wind;
+    float time_step;
+    float density;
+    float t_ambient;
+    float t_weight_coeff;
+    float t_temp_coeff;
+    float vorticity_confinement;
+    float _pad0;
+    float _pad1;
+    float cell_size;
+};
+
+
+struct obstacle {
+    vec4 pos_radius;
+    vec4 velocities_anchored;
+};
+
+layout(std430, binding = 5) buffer obstacle_in {
+    int obstacle_count_in;
+    obstacle obstacles_in[];
+};
+
+layout(std430, binding = 6) buffer obstacle_out {
+    int obstacle_count_out;
+    obstacle obstacles_out[];
+};
+
+shared obstacle shared_obs[128];
+
+void main() {
+    int idx = int(gl_GlobalInvocationID.x);
+
+    bool valid = idx < obstacle_count_in;
+    bool anchored_flag = false;
+
+    vec2 pos = vec2(0), vel = vec2(0);
+    float r = 0.0, anchored = 0.0, movable = 0.0;
+
+    if(valid) {
+        obstacle current = obstacles_in[idx];
+
+        pos = current.pos_radius.xy;
+        vel = current.velocities_anchored.xy;
+
+        r = current.pos_radius.a;
+        anchored = current.velocities_anchored.a;
+        movable = 1 - anchored;
+
+        anchored_flag = (anchored == 1);
+    }
+
+    if(valid && !anchored_flag) {
+        vel += vec2(0, -9.81) * time_step * movable;
+        pos += vel * time_step * movable;
+
+        vec2 min_bound = vec2(0);
+        vec2 max_bound = vec2(grid_size);
+
+        const float BOUNCE_FACTOR = 0.999f;
+
+        if(pos.x - r < min_bound.x) {pos.x = min_bound.x + r; vel.x *= -BOUNCE_FACTOR; }
+        if(pos.x + r > max_bound.x) {pos.x = max_bound.x - r; vel.x *= -BOUNCE_FACTOR; }
+        if(pos.y - r < min_bound.y) {pos.y = min_bound.y + r; vel.y *= -BOUNCE_FACTOR; }
+        if(pos.y + r > max_bound.y) {pos.y = max_bound.y - r; vel.y *= -BOUNCE_FACTOR; }
+    }
+
+    int num_tiles = (obstacle_count_in + 127) / 128;
+
+    for(int tile = 0; tile < num_tiles; tile++) {
+
+        int load_idx = tile * 128 + int(gl_LocalInvocationID.x);
+
+        if(load_idx < obstacle_count_in) {
+            shared_obs[gl_LocalInvocationID.x] = obstacles_in[load_idx];
+        } else {
+            shared_obs[gl_LocalInvocationID.x].pos_radius = vec4(0);
+            shared_obs[gl_LocalInvocationID.x].velocities_anchored = vec4(0);
+        }
+
+        barrier();
+
+        if(valid && !anchored_flag) {
+            for(int i = 0; i < 128; ++i) {
+                int other_idx = tile * 128 + i;
+                if(other_idx >= obstacle_count_in || other_idx == idx) continue;
+
+                obstacle other = shared_obs[i];
+                vec2 d = pos - other.pos_radius.xy;
+                float dist = length(d);
+                float min_dist = r + other.pos_radius.w;
+
+                if(dist < min_dist && dist > 0.0001) {
+                    vec2 n = d / dist;
+                    pos += n * (min_dist - dist) * 0.5f * movable;
+
+                    vec2 relative_vel = vel - other.velocities_anchored.xy;
+                    float vn = dot(relative_vel, n);
+
+                    if(vn < 0.0)
+                    vel -= vn * n * movable;
+                }
+            }
+        }
+        barrier();
+    }
+
+    if(valid) {
+        obstacles_out[idx].pos_radius = vec4(pos, 0, r);
+        obstacles_out[idx].velocities_anchored = vec4(vel * 0.999, 0, anchored);
+    }
+
+}

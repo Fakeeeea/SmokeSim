@@ -67,7 +67,7 @@ void main() {
         row_lenght = grid_size.x + 1;
     }
 
-    ivec2 arrow_id = ivec2(gl_InstanceID % int(row_lenght),
+    ivec2 line_id = ivec2(gl_InstanceID % int(row_lenght),
                             gl_InstanceID / int(row_lenght));
 
     vec3 spacing = scaled_grid_size;
@@ -75,11 +75,11 @@ void main() {
     spacing /= vec3(grid_size.xyz);
 
     if(direction == 0) {
-        traslated_pos += vec3(0.0f, spacing.y * arrow_id.x, spacing.z * arrow_id.y);
+        traslated_pos += vec3(0.0f, spacing.y * line_id.x, spacing.z * line_id.y);
     } else if (direction == 1) {
-        traslated_pos += vec3(spacing.x * arrow_id.x, 0.0f, spacing.z * arrow_id.y);
+        traslated_pos += vec3(spacing.x * line_id.x, 0.0f, spacing.z * line_id.y);
     } else {
-        traslated_pos += vec3(spacing.x * arrow_id.x, spacing.y * arrow_id.y, 0.0f);
+        traslated_pos += vec3(spacing.x * line_id.x, spacing.y * line_id.y, 0.0f);
     }
 
     gl_Position = projection * look_at * vec4(traslated_pos,1.0);

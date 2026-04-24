@@ -63,6 +63,8 @@ typedef struct static_text_mesh {
     vec2 base_offset;
     vec2 target_offset;
     vec2 current_offset;
+    vec2 hidden_offset;
+    int hidden;
     float hover_base_scale;
     float hover_current_scale;
     float hover_target_scale;

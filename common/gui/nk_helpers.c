@@ -36,6 +36,20 @@ int draw_vec3_property(struct nk_context* nk_ctx, const char* label, vec3 var, c
     return change;
 }
 
+//This function uses int* opposed to other functions using vec3, vec4, ivec3, ivec4 etc. Change other functions in future
+int draw_ivec3_property(struct nk_context* nk_ctx, const char* label, int* var, const int min, const int max, const int step) {
+    char buf[BUFFER_SIZE];
+
+    int change = 0;
+    sprintf(buf, "#%s X:", label);
+    change += nk_property_int(nk_ctx, buf, min, &var[0], max, step, step);
+    sprintf(buf, "#%s Y:", label);
+    change += nk_property_int(nk_ctx, buf, min, &var[1], max, step, step);
+    sprintf(buf, "#%s Z:", label);
+    change += nk_property_int(nk_ctx, buf, min, &var[2], max, step, step);
+    return change;
+}
+
 int draw_ivec3_property_xyz_id(struct nk_context* nk_ctx, const char* label, ivec4 var, const int id, const int min, const int max, const int step) {
     char buf[BUFFER_SIZE];
 

@@ -70,7 +70,8 @@ int main() {
 
     //nk_style_set_font(nk_ctx, &font->handle);
 
-    p_shaders = compile_physics_shaders();
+    p_shaders.shaders2d = compile_physics_shaders2d();
+    p_shaders.shaders3d = compile_physics_shaders3d();
     g_info = init_graphics_info();
 
     init_main_menu_grid3d(&menu_grid, get_default_p_settings().t_ambient);
@@ -83,14 +84,12 @@ int main() {
     bind_physics_buffers(&menu_grid);
     init_solid_map(&menu_grid, &menu_p_info.p_shaders);
 
-    g_info.g_info3d.cam.orbit.orbit_distance = 3;
-
     while(!glfwWindowShouldClose(window)) {
         process_input();
         nk_glfw3_new_frame(&glfw);
 
         if(is_orbiting(&g_info.g_info3d.cam)) {
-            if(mm_info.state == MM_MAIN_SCREEN)
+            if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE)
                 auto_orbit(&g_info.g_info3d.cam, menu_grid.grid3d_data.size, (float) glfwGetTime() * 0.3f);
             else if(ctx.g_ctx.grid_info.initialized == 1)
                 auto_orbit(&g_info.g_info3d.cam, sim_grid.grid3d_data.size, (float) glfwGetTime() * 0.3f);
@@ -101,18 +100,18 @@ int main() {
         else
             draw_area_reset(&g_info);
 
-        if(mm_info.state == MM_MAIN_SCREEN)
+        if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE)
             bind_physics_buffers(&menu_grid);
         else if(ctx.g_ctx.grid_info.created)
             bind_physics_buffers(&sim_grid);
 
-        if(mm_info.state == MM_MAIN_SCREEN) {
+        if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE) {
             run_physics_step(&menu_grid, &menu_p_info);
         } else if (ctx.g_ctx.grid_info.created == 1 && !p_info.paused){
             run_physics_step(&sim_grid, &p_info);
         }
 
-        if(mm_info.state == MM_MAIN_SCREEN) {
+        if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE) {
             draw_step(&menu_grid, &g_info, &menu_p_info);
         } else if(ctx.g_ctx.grid_info.initialized == 1){
             draw_step(&sim_grid, &g_info, &p_info);
@@ -125,7 +124,7 @@ int main() {
 
         nk_glfw3_render(&glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
 
-        if(mm_info.state == MM_MAIN_SCREEN)
+        if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE)
             update_time(menu_p_info.time_ubo, glfwGetTime());
         else if(ctx.g_ctx.grid_info.created == 1)
             update_time(p_info.time_ubo, glfwGetTime());

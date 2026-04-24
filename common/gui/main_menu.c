@@ -6,7 +6,7 @@
 
 #include "main_menu.h"
 
-void init_main_menu(main_menu_info* mm_info, ivec2 screen_size) {
+void init_main_menu(main_menu_info* mm_info, const ivec2 screen_size) {
 
     mm_info->ft = init_ft();
     mm_info->mm_face = get_font_face(mm_info->ft, "../fonts/ProggyClean.ttf");
@@ -16,16 +16,43 @@ void init_main_menu(main_menu_info* mm_info, ivec2 screen_size) {
 
     vec2 button_size = {screen_size[0] * BUTTONS_WIDTH_PERCENTAGE, screen_size[1] * BUTTONS_HEIGHT_PERCENTAGE};
     vec2 padding = {screen_size[0] * PADDING_FROM_LEFT_PERCENTAGE, screen_size[1] * PADDING_FROM_BOTTOM_PERCENTAGE};
+
     vec2 load_sim_pos = {padding[0], padding[1]};
     vec2 load_sim_max; glm_vec2_add(load_sim_pos, button_size, load_sim_max);
     vec2 new_sim_pos = {padding[0], padding[1]+button_size[1]};
     vec2 new_sim_max; glm_vec2_add(new_sim_pos, button_size, new_sim_max);
 
+    vec2 back_pos; glm_vec2_copy(load_sim_pos, back_pos);
+    vec2 back_max; glm_vec2_copy(load_sim_max, back_max);
+    vec2 grid2d_pos; glm_vec2_copy(new_sim_pos, grid2d_pos);
+    vec2 grid2d_max; glm_vec2_copy(new_sim_max, grid2d_max);
+    vec2 grid3d_pos = {padding[0], padding[1]+button_size[1]*2};
+    vec2 grid3d_max; glm_vec2_add(grid3d_pos, button_size, grid3d_max);
+
     mm_info->buttons = malloc(sizeof(menu_button) * MENU_BUTTONS_COUNT);
-    mm_info->buttons[0] = get_menu_button(mm_info, "New Simulation", new_sim_pos, new_sim_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
-    mm_info->buttons[1] = get_menu_button(mm_info, "Load Simulation", load_sim_pos, load_sim_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
+    mm_info->buttons[NEW_SIM_ID] = get_menu_button(mm_info, "New Simulation", new_sim_pos, new_sim_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
+    mm_info->buttons[LOAD_ID] = get_menu_button(mm_info, "Load Simulation", load_sim_pos, load_sim_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
+
+    mm_info->buttons[GRID2D_ID] = get_menu_button(mm_info, "New 2D Simulation", grid2d_pos, grid2d_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
+    mm_info->buttons[GRID3D_ID] = get_menu_button(mm_info, "New 3D Simulation", grid3d_pos, grid3d_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
+    mm_info->buttons[BACK] = get_menu_button(mm_info, "Go Back", back_pos, back_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
+
+    hide_button(mm_info, GRID2D_ID); hide_button(mm_info, GRID3D_ID); hide_button(mm_info, BACK);
 
     mm_info->state = MM_MAIN_SCREEN;
+}
+
+int is_hidden(const main_menu_info* mm_info, const int idx) {
+    return mm_info->t_renderer.text_meshes[idx].hidden;
+}
+
+void hide_button(main_menu_info* mm_info, const int idx) {
+    mm_info->t_renderer.text_meshes[idx].hidden = 1;
+    glm_vec2_copy(mm_info->t_renderer.text_meshes[idx].hidden_offset, mm_info->t_renderer.text_meshes[idx].current_offset);
+}
+
+void unhide_button(main_menu_info* mm_info, const int idx) {
+    mm_info->t_renderer.text_meshes[idx].hidden = 0;
 }
 
 static menu_button get_menu_button(main_menu_info* mm_info, char* text, vec2 min, vec2 max, vec3 color, vec2 hover_pad, float hover_scale) {
@@ -49,18 +76,21 @@ static menu_button get_menu_button(main_menu_info* mm_info, char* text, vec2 min
 }
 
 void draw_main_menu_text(main_menu_info* mm_info) {
-    if(mm_info->state != MM_MAIN_SCREEN) return;
+    if(mm_info->state != MM_MAIN_SCREEN && mm_info->state != MM_SIMULATION_TYPE) return;
 
     draw_all_text(&mm_info->t_renderer);
 }
 
 void handle_hover(main_menu_info* mm_info, vec2 pos) {
 
-    if(mm_info->state != MM_MAIN_SCREEN) return;
+    if(mm_info->state != MM_MAIN_SCREEN && mm_info->state != MM_SIMULATION_TYPE) return;
 
     const float lerp_speed = 0.1f;
 
     for(int i = 0; i < MENU_BUTTONS_COUNT; ++i) {
+
+        if(is_hidden(mm_info, i)) continue;
+
         menu_button* current = &mm_info->buttons[i];
 
         float hover_target;
@@ -133,4 +163,15 @@ void get_viewport_data_mm(ivec2 screen_size, ivec4 out) {
     (out)[1] = screen_size[1] * SCREEN_FOR_MM_Y_PERCENTAGE;
     (out)[2] = screen_size[0] - (out)[0];
     (out)[3] = screen_size[1] - (out)[1];
+}
+
+void to_simulation_type(main_menu_info* mm_info) {
+    mm_info->state = MM_SIMULATION_TYPE;
+
+    hide_button(mm_info, NEW_SIM_ID);
+    hide_button(mm_info, LOAD_ID);
+
+    unhide_button(mm_info, GRID2D_ID);
+    unhide_button(mm_info, GRID3D_ID);
+    unhide_button(mm_info, BACK);
 }

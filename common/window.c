@@ -161,11 +161,20 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     if(action == GLFW_PRESS) {
         switch(handle_click(ctx.g_ctx.mm_info, mouse_pos)) {
             case NEW_SIM_ID:
-                ctx.g_ctx.mm_info->state = MM_OPTIONS;
-                init_new_grid_screen();
+                //ctx.g_ctx.mm_info->state = MM_OPTIONS;
+                //init_new_grid_screen();
+                to_simulation_type(ctx.g_ctx.mm_info);
                 break;
             case LOAD_ID:
                 printf("Pressed load sim!");
+                break;
+            case GRID3D_ID:
+                printf("hit");
+                init_new_grid_screen();
+                break;
+            case GRID2D_ID:
+                break;
+            case BACK:
                 break;
         }
     }

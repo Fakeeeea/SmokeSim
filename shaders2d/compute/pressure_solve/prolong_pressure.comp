@@ -1,0 +1,51 @@
+#version 460 core
+
+layout(local_size_x = 8, local_size_y = 8) in;
+
+layout(binding = 5) uniform sampler2D prev_pressure_tex;
+
+layout(binding = 0, r32f) uniform image2D pressure_map;
+layout(binding = 1, rgba16f) uniform image2D solid_map;
+layout(binding = 2, r32f) uniform image2D residual_map;
+
+layout(binding = 3, r32f) uniform image2D next_pressure_map;
+layout(binding = 4, rgba16f) uniform image2D next_solid_map;
+layout(binding = 5, r32f) uniform image2D next_residual_map;
+
+layout(std140, binding = 1) uniform constants {
+    ivec4 grid_size;
+    vec4 wind;
+    float time_step;
+    float density;
+    float t_ambient;
+    float t_weight_coeff;
+    float t_temp_coeff;
+    float vorticity_confinement;
+    float _pad0;
+    float _pad1;
+    float cell_size;
+};
+
+layout(std140, binding = 2) uniform multigrid_constants {
+    ivec4 grid_sizes[16];
+    int grid_levels;
+};
+
+layout(std140, binding = 3) uniform multigrid_variables {
+    int current_level;
+    float current_cell_size;
+};
+
+void main() {
+    ivec2 idx = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 current_grid_size = grid_sizes[current_level].xy;
+
+    if(idx.x >= current_grid_size.x || idx.y >= current_grid_size.y) return;
+
+    vec2 tex_coords = (vec2(idx) + 0.5) / vec2(current_grid_size);
+
+    float current_p_fine = imageLoad(pressure_map, idx).r;
+    float new_p_fine = current_p_fine + texture(prev_pressure_tex, tex_coords).r;
+
+    imageStore(pressure_map, idx, vec4(new_p_fine));
+}

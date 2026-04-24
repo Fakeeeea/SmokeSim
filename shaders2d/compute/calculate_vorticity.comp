@@ -1,0 +1,71 @@
+#version 460 core
+
+layout(local_size_x = 8, local_size_y = 8) in;
+
+layout(binding = 0) uniform sampler2D vx_read_tex;
+layout(binding = 1) uniform sampler2D vy_read_tex;
+layout(binding = 3) uniform sampler2D smoke_read_tex;
+
+layout(binding = 0, r32f) writeonly uniform image2D vx_write_temp_image;
+layout(binding = 1, r32f) writeonly uniform image2D vy_write_temp_image;
+layout(binding = 3, rgba16f) writeonly uniform image2D smoke_write_temp_image;
+
+layout(binding = 4, r32f) uniform image2D pressure_map;
+layout(binding = 5, rgba16f) uniform image2D solid_map;
+layout(binding = 6, r32f) uniform image2D vorticity;
+
+layout(std140, binding = 1) uniform constants {
+    ivec4 grid_size;
+    vec4 wind;
+    float time_step;
+    float density;
+    float t_ambient;
+    float t_weight_coeff;
+    float t_temp_coeff;
+    float vorticity_confinement;
+    float _pad0;
+    float _pad1;
+    float cell_size;
+};
+
+
+float is_solid(ivec2 pos) {
+    if(pos.x < 0 || pos.y < 0 ||
+    pos.x >= grid_size.x || pos.y >= grid_size.y) return 1;
+    return imageLoad(solid_map, pos).a;
+}
+
+float get_vx(ivec2 pos) {
+    if(any(lessThan(pos, vec2(0))) || any(greaterThan(pos, vec2(grid_size.x+1, grid_size.y)))) return 0;
+    //ivec3 clamped_pos = clamp(pos, ivec3(0), ivec3(grid_size.x, grid_size.yz - 1));
+    return texelFetch(vx_read_tex, pos, 0).r;
+}
+
+float get_vy(ivec2 pos) {
+    if(any(lessThan(pos, vec2(0))) || any(greaterThan(pos, vec2(grid_size.x, grid_size.y + 1)))) return 0;
+    //ivec3 clamped_pos = clamp(pos, ivec3(0), ivec3(grid_size.x - 1, grid_size.y, grid_size.z - 1));
+    return texelFetch(vy_read_tex, pos, 0).r;
+}
+
+float cc_vx(ivec2 pos) { return (get_vx(pos) + get_vx(pos + ivec2(1, 0))) * 0.5;}
+float cc_vy(ivec2 pos) { return (get_vy(pos) + get_vy(pos + ivec2(0, 1))) * 0.5;}
+
+void main () {
+    ivec2 idx = ivec2(gl_GlobalInvocationID.xy);
+
+    if(idx.x >= grid_size.x || idx.y >= grid_size.y) return;
+
+    if(is_solid(idx) >= 1) {
+        imageStore(vorticity, idx, vec4(0));
+        return;
+    }
+
+
+    float omega;
+
+    float z1 = cc_vy(idx + ivec2(1,0)) - cc_vy(idx - ivec2(1,0));
+    float z2 = cc_vx(idx + ivec2(0,1)) - cc_vx(idx - ivec2(0,1));
+    omega = (z1 - z2) / (2*cell_size);
+
+    imageStore(vorticity, idx, vec4(omega));
+}

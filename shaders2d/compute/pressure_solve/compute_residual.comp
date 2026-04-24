@@ -1,0 +1,117 @@
+#version 460 core
+
+layout(local_size_x = 8, local_size_y = 8) in;
+
+layout(binding = 0) uniform sampler2D vx_read_tex;
+layout(binding = 1) uniform sampler2D vy_read_tex;
+layout(binding = 3) uniform sampler2D smoke_read_tex;
+
+layout(binding = 5) uniform sampler2D prev_pressure_tex;
+
+layout(binding = 0, r32f) uniform image2D pressure_map;
+layout(binding = 1, rgba16f) uniform image2D solid_map;
+layout(binding = 2, r32f) uniform image2D residual_map;
+
+layout(binding = 3, r32f) uniform image2D next_pressure_map;
+layout(binding = 4, rgba16f) uniform image2D next_solid_map;
+layout(binding = 5, r32f) uniform image2D next_residual_map;
+
+layout(std140, binding = 1) uniform constants {
+    ivec4 grid_size;
+    vec4 wind;
+    float time_step;
+    float density;
+    float t_ambient;
+    float t_weight_coeff;
+    float t_temp_coeff;
+    float vorticity_confinement;
+    float _pad0;
+    float _pad1;
+    float cell_size;
+};
+
+
+layout(std140, binding = 2) uniform multigrid_constants {
+    ivec4 grid_sizes[16];
+    int grid_levels;
+};
+
+layout(std140, binding = 3) uniform multigrid_variables {
+    int current_level;
+    float current_cell_size;
+};
+
+ivec2 current_grid_size;
+
+vec4 solid_data(ivec2 pos) {
+    if(pos.x < 0 || pos.y < 0 ||
+    pos.x >= current_grid_size.x || pos.y >= current_grid_size.y) return vec4(0,0,0,1);
+    return imageLoad(solid_map, pos);
+}
+
+float is_solid(ivec2 pos) {
+    if(pos.x < 0 || pos.y < 0 ||
+    pos.x >= current_grid_size.x || pos.y >= current_grid_size.y) return 1;
+    return imageLoad(solid_map, pos).a;
+}
+
+float get_pressure(ivec2 pos) {
+    if(pos.x < 0 || pos.y < 0 ||
+    pos.x >= current_grid_size.x || pos.y >= current_grid_size.y) return 0;
+    return imageLoad(pressure_map, pos).r;
+}
+
+float get_vx(ivec2 pos) {
+    return texelFetch(vx_read_tex, pos, 0).r;
+}
+
+float get_vy(ivec2 pos) {
+    return texelFetch(vy_read_tex, pos, 0).r;
+}
+
+void main() {
+    ivec2 idx = ivec2(gl_GlobalInvocationID.xy);
+    current_grid_size = grid_sizes[current_level].xy;
+
+    if(idx.x >= current_grid_size.x || idx.y >= current_grid_size.y) return;
+
+    float new_residual = 0;
+
+    if(is_solid(idx) >= 1)  {
+        imageStore(residual_map, idx, vec4(new_residual));
+        return;
+    };
+
+    vec4 solid_top = solid_data(idx + ivec2(0,1));
+    vec4 solid_bottom = solid_data(idx + ivec2(0,-1));
+    vec4 solid_right = solid_data(idx + ivec2(1,0));
+    vec4 solid_left = solid_data(idx + ivec2(-1,0));
+
+    float f_top = 1.0 - solid_top.a;
+    float f_bottom = 1.0 - solid_bottom.a;
+    float f_right = 1.0 - solid_right.a;
+    float f_left = 1.0 - solid_left.a;
+
+    float p_top = get_pressure(idx + ivec2(0,1)) * f_top;
+    float p_bottom = get_pressure(idx + ivec2(0,-1)) * f_bottom;
+    float p_right = get_pressure(idx + ivec2(1,0)) * f_right;
+    float p_left = get_pressure(idx + ivec2(-1,0)) * f_left;
+
+    float p_sum = p_top + p_bottom + p_right + p_left;
+    float f_sum = f_top + f_bottom + f_right + f_left;
+
+    float old_residual = imageLoad(residual_map, idx).r;
+
+    if(current_level == 0) {
+        float v_top = (solid_top.a >= 1.0) ? solid_top.y : get_vy(idx + ivec2(0,1));
+        float v_bottom = (solid_bottom.a >= 1.0) ? solid_bottom.y : get_vy(idx);
+        float v_right = (solid_right.a >= 1.0) ? solid_right.x : get_vx(idx + ivec2(1,0));
+        float v_left = (solid_left.a >= 1.0) ? solid_left.x : get_vx(idx);
+        float delta_v = v_right - v_left + v_top - v_bottom;
+        old_residual = density * delta_v / (time_step * current_cell_size);
+    }
+
+    new_residual = (old_residual) - (p_sum - f_sum * get_pressure(idx)) / (current_cell_size * current_cell_size);
+
+    imageStore(residual_map, idx, vec4(new_residual));
+}

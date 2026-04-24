@@ -18,6 +18,7 @@ typedef struct physics_step_settings {
 }physics_step_settings;
 
 //MANUALLY PADDED TO 48 FOR CLARITY
+
 typedef struct physics_settings {
     vec4 wind; // 16
     float time_step; // 20
@@ -34,6 +35,7 @@ typedef struct physics_info {
     int paused;
     physics_settings p_settings;
     physics_step_settings p_s_settings;
+
     physics_shaders p_shaders;
 
     obstacles_info o_info;
@@ -54,7 +56,7 @@ void free_p_info(physics_info* p_info);
 
 void run_physics_step(grid* grid, physics_info* p_info);
 
-physics_info get_mm_p_info(physics_shaders precompiled_p_shaders, const grid* grid);
+physics_info get_mm_p_info(physics_shaders precompiled_shaders, const grid* grid);
 
 unsigned int upload_physics_variables(const grid* grid, physics_settings settings);
 void update_physics_variables(unsigned int ubo, const grid* grid, physics_settings settings);

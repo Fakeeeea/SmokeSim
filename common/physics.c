@@ -40,6 +40,7 @@ physics_info init_physics_info(const physics_shaders precompiled_shaders) {
 
     p_info.p_s_settings = get_default_p_s_settings();
     p_info.p_settings = get_default_p_settings();
+
     p_info.p_shaders = precompiled_shaders;
 
     p_info.o_info = init_obstacles_info();
@@ -60,7 +61,7 @@ void run_physics_step(grid* grid, physics_info* p_info) {
     physics_shaders p_shaders = p_info->p_shaders;
 
     if(p_s_settings.handle_emitters) {
-        update_emitters_status(&p_shaders, p_info->e_info.emitters_count);
+        update_emitters_status(&p_shaders, p_info->e_info.emitters_count, grid->is_2d);
         handle_emitters(grid, &p_shaders);
     }
 
@@ -82,16 +83,16 @@ void run_physics_step(grid* grid, physics_info* p_info) {
 
     if(p_s_settings.advect_smoke) advect_smoke(grid, &p_shaders);
 
-    obstacle_update_step(&p_shaders, &p_info->o_info);
+    obstacle_update_step(&p_shaders, &p_info->o_info, grid->is_2d);
     update_solid_map(grid, &p_shaders);
 }
 
-physics_info get_mm_p_info(const physics_shaders precompiled_p_shaders, const grid* grid) {
+physics_info get_mm_p_info(const physics_shaders precompiled_shaders, const grid* grid) {
     const int EMITTERS_NUM = 3;
     const int OBSTACLES_NUM = 1;
 
     physics_info p_info;
-    p_info = init_physics_info(precompiled_p_shaders);
+    p_info = init_physics_info(precompiled_shaders);
 
     p_info.e_info.emitters_count = EMITTERS_NUM;
     p_info.o_info.obstacles_count = OBSTACLES_NUM;

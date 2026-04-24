@@ -1,0 +1,50 @@
+#version 460 core
+
+layout(local_size_x = 8, local_size_y = 8) in;
+
+layout(binding = 0) uniform sampler2D vx_read_tex;
+layout(binding = 1) uniform sampler2D vy_read_tex;
+layout(binding = 3) uniform sampler2D smoke_read_tex;
+
+layout(binding = 0, r32f) writeonly uniform image2D vx_write_temp_image;
+layout(binding = 1, r32f) writeonly uniform image2D vy_write_temp_image;
+layout(binding = 3, rgba16f) writeonly uniform image2D smoke_write_temp_image;
+
+layout(binding = 4, r32f) uniform image2D pressure_map;
+layout(binding = 5, rgba16f) uniform image2D solid_map;
+layout(binding = 6, r32f) uniform image2D vorticity;
+
+layout(std140, binding = 1) uniform constants {
+    ivec4 grid_size;
+    vec4 wind;
+    float time_step;
+    float density;
+    float t_ambient;
+    float t_weight_coeff;
+    float t_temp_coeff;
+    float vorticity_confinement;
+    float _pad0;
+    float _pad1;
+    float cell_size;
+};
+
+float is_solid(ivec2 pos) {
+    if(pos.x < 0 || pos.y < 0 ||
+    pos.x >= grid_size.x || pos.y >= grid_size.y) return 0;
+    return imageLoad(solid_map, pos).a;
+}
+
+void main() {
+    ivec2 idx = ivec2(gl_GlobalInvocationID.xy);
+    if(idx.x >= grid_size.x || idx.y >= (grid_size.y+1)) return;
+    if(is_solid(idx) >= 1 || is_solid(idx + ivec2(0, -1)) >= 1) return;
+
+    vec2 staggered_pos = (idx + vec2(0.5f, 0.0f)) / (grid_size.xy);
+    vec4 smoke = texture(smoke_read_tex, staggered_pos);
+    float total_density = smoke.r + smoke.g + smoke.b;
+
+    float buoyancy = -t_weight_coeff * total_density + t_temp_coeff * (smoke.a - t_ambient);
+    float new_v = texelFetch(vy_read_tex, idx, 0).r + buoyancy * time_step + wind.y * time_step;
+
+    imageStore(vy_write_temp_image, idx, vec4(new_v));
+}

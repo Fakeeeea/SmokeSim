@@ -33,6 +33,7 @@
 void draw_color_picker(struct nk_context* nk_ctx,  const char* label, vec3 var, float mul);
 void draw_header(struct nk_context* nk_ctx, const char* label);
 int draw_vec3_property(struct nk_context* nk_ctx, const char* label, vec3 var, float min, float max, float step);
+int draw_ivec3_property(struct nk_context* nk_ctx, const char* label, int* var, int min, int max, int step);
 
 int draw_ivec3_property_xyz_id(struct nk_context* nk_ctx, const char* label, ivec4 var, const int id, const int min, const int max, const int step);
 int draw_ivec3_property_rgb_id(struct nk_context* nk_ctx, const char* label, ivec4 var, const int id, const int min, const int max, const int step);

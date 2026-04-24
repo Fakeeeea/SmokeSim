@@ -130,8 +130,8 @@ void delete_shader(unsigned int computeID) {
     glDeleteShader(computeID);
 }
 
-physics_shaders compile_physics_shaders() {
-    physics_shaders shaders;
+physics_shaders3d compile_physics_shaders3d() {
+    physics_shaders3d shaders;
 
     shaders.update_vx = get_compute_program("../shaders3d/compute/update_vx.comp");
     shaders.update_vy = get_compute_program("../shaders3d/compute/update_vy.comp");
@@ -186,10 +186,45 @@ graphics_shaders3d compile_graphics_shaders3d() {
     return g_shaders;
 }
 
+physics_shaders2d compile_physics_shaders2d() {
+    physics_shaders2d shaders;
+
+    shaders.update_vx = get_compute_program("../shaders2d/compute/update_vx.comp");
+    shaders.update_vy = get_compute_program("../shaders2d/compute/update_vy.comp");
+
+    shaders.advect_vx = get_compute_program("../shaders2d/compute/advect_vx.comp");
+    shaders.advect_vy = get_compute_program("../shaders2d/compute/advect_vy.comp");
+
+    shaders.advect_smoke = get_compute_program("../shaders2d/compute/advect_smoke.comp");
+
+    shaders.apply_buoyancy = get_compute_program("../shaders2d/compute/apply_buoyancy.comp");
+
+    shaders.handle_emitters = get_compute_program("../shaders2d/compute/handle_emitters.comp");
+    shaders.update_emitters_status = get_compute_program("../shaders2d/compute/update_emitters_status.comp");
+
+    shaders.calculate_vorticity = get_compute_program("../shaders2d/compute/calculate_vorticity.comp");
+    shaders.apply_vorticity_x = get_compute_program("../shaders2d/compute/apply_vorticity_x.comp");
+    shaders.apply_vorticity_y = get_compute_program("../shaders2d/compute/apply_vorticity_y.comp");
+
+    shaders.init_solid_map = get_compute_program("../shaders2d/compute/init_solid_map.comp");
+
+    shaders.obstacle_update = get_compute_program("../shaders2d/compute/obstacle_update.comp");
+    shaders.update_solid_map = get_compute_program("../shaders2d/compute/update_solid_map.comp");
+
+    shaders.compute_residual = get_compute_program("../shaders2d/compute/pressure_solve/compute_residual.comp");
+    shaders.prolong_pressure = get_compute_program("../shaders2d/compute/pressure_solve/prolong_pressure.comp");
+    shaders.restrict_residual = get_compute_program("../shaders2d/compute/pressure_solve/restrict_residual.comp");
+    shaders.restrict_solid = get_compute_program("../shaders2d/compute/pressure_solve/restrict_solid.comp");
+    shaders.smooth = get_compute_program("../shaders2d/compute/pressure_solve/smooth.comp");
+
+    return shaders;
+}
+
 graphics_shaders2d compile_graphics_shaders2d() {
     graphics_shaders2d g_shaders;
 
-    g_shaders.smoke = 0;
+    g_shaders.draw_smoke = get_graphics_program("../shaders2d/graphics/draw_smoke.vert",
+                                                "../shaders2d/graphics/draw_smoke.frag");
 
     return g_shaders;
 }

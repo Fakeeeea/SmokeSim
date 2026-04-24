@@ -36,7 +36,7 @@ void update_velocities(grid* grid, const physics_shaders* shaders);
 void advect_velocities(grid* grid, const physics_shaders* shaders);
 
 void handle_emitters(grid* grid, const physics_shaders* shaders);
-void update_emitters_status(const physics_shaders* shaders, unsigned int emitters_count);
+void update_emitters_status(const physics_shaders* shaders, unsigned int emitters_count, unsigned int type);
 
 void advect_smoke(grid* grid, const physics_shaders* shaders);
 
@@ -47,7 +47,7 @@ void apply_buoyancy(grid* grid, const physics_shaders* shaders);
 
 void init_solid_map(const grid* grid, const physics_shaders* shaders);
 
-void obstacle_update_step(const physics_shaders* shaders, obstacles_info* o_info);
+void obstacle_update_step(const physics_shaders* shaders, obstacles_info* o_info, unsigned int type);
 void update_solid_map(const grid *grid, const physics_shaders* shaders);
 
 void swap_velocity_buffers(grid* grid);
