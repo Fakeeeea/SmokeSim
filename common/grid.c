@@ -115,7 +115,7 @@ void calculate_vorticity(const grid *grid, const physics_shaders* shaders) {
     get_grid_size(grid, grid_size);
 
     glUseProgram(shaders->calculate_vorticity);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 1 + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 7) / 8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 
@@ -190,7 +190,6 @@ void v_cycle(grid* grid, const physics_shaders* shaders, int current_level) {
         glClearTexImage(grid->grid3d_data.pressure_pyramid[current_level+1].ID, 0, GL_RED, GL_FLOAT, (void*)0);
     }
 
-
     v_cycle(grid, shaders, current_level+1);
 
     update_multigrid_variables(grid, current_level);
@@ -209,44 +208,47 @@ void smooth(const grid* grid, const physics_shaders* shaders, const int iteratio
 
     glUseProgram(shaders->smooth);
 
-    ivec3 grid_size;
-    get_pyramid_size(grid, current_level, grid_size);
+    ivec3 current_grid_size;
+    get_pyramid_size(grid, current_level, current_grid_size);
 
     int parity = 0;
     for(int i = 0; i < iterations * 2; ++i) {
         glUniform1i(parity_location, parity);
-        glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 7) / 8);
+        glDispatchCompute((current_grid_size[0] + 7) / 8, (current_grid_size[1] + 7) / 8, (current_grid_size[2] + 7) / 8);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
         parity = 1 - parity;
     }
 }
 void compute_residual(const grid *grid, const physics_shaders* shaders, const int current_level) {
-    ivec3 grid_size;
-    get_pyramid_size(grid, current_level, grid_size);
+    ivec3 current_grid_size;
+    get_pyramid_size(grid, current_level, current_grid_size);
 
     glUseProgram(shaders->compute_residual);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((current_grid_size[0] + 7) / 8, (current_grid_size[1] + 7) / 8, (current_grid_size[2] + 7) / 8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 void compute_restrict(const grid *grid, const physics_shaders* shaders, const int current_level) {
-    ivec3 grid_size;
-    get_pyramid_size(grid, current_level, grid_size);
+
+    int target_level = current_level + 1;
+
+    ivec3 target_grid_size;
+    get_pyramid_size(grid, target_level, target_grid_size);
 
     glUseProgram(shaders->restrict_residual);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((target_grid_size[0] + 7) / 8, (target_grid_size[1] + 7) / 8, (target_grid_size[2] + 7) / 8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     glUseProgram(shaders->restrict_solid);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((target_grid_size[0] + 7) / 8, (target_grid_size[1] + 7) / 8, (target_grid_size[2] + 7) / 8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 
 void prolong_and_add(const grid *grid, const physics_shaders* shaders, const int current_level) {
-    ivec3 grid_size;
-    get_pyramid_size(grid, current_level, grid_size);
+    ivec3 current_grid_size;
+    get_pyramid_size(grid, current_level, current_grid_size);
 
     glUseProgram(shaders->prolong_pressure);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((current_grid_size[0] + 7) / 8, (current_grid_size[1] + 7) / 8, (current_grid_size[2] + 7) / 8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 
@@ -269,6 +271,7 @@ void upload_multigrid_constants(grid* grid) {
             sizes[i][2] = grid->grid3d_data.pyramids_sizes[i][2];
             sizes[i][3] = grid->grid3d_data.pyramids_sizes[i][3];
         }
+
     }
 
     glBindBuffer(GL_UNIFORM_BUFFER, grid->multigrid_constants_ubo);
@@ -296,7 +299,7 @@ void upload_multigrid_variables(grid* grid, const int current_level) {
 
 void update_multigrid_variables(const grid* grid, const int current_level) {
 
-    float current_cell_size = grid->cell_size * powf(2, (float) current_level);
+    float current_cell_size = grid->cell_size * (float) (1 << current_level);
 
     glBindBuffer(GL_UNIFORM_BUFFER, grid->multigrid_variables_ubo);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(int), &current_level);

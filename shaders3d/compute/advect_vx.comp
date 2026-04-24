@@ -20,21 +20,21 @@ layout(std140, binding = 1) uniform constants {
     ivec4 grid_size;
     vec4 wind;
     float time_step;
-    float cell_size;
     float density;
     float t_ambient;
     float t_weight_coeff;
     float t_temp_coeff;
     float vorticity_confinement;
+    float cell_size;
 };
 
 vec3 get_interpolated_velocity(vec3 world_pos) {
     vec3 v;
 
     vec3 grid_space = world_pos / cell_size;
-    vec3 vx_uv = (grid_space + vec3(0.5, 0, 0)) / (grid_size.xyz + vec3(1, 0, 0));
-    vec3 vy_uv = (grid_space + vec3(0, 0.5, 0)) / (grid_size.xyz + vec3(0, 1, 0));
-    vec3 vz_uv = (grid_space + vec3(0, 0, 0.5)) / (grid_size.xyz + vec3(0, 0, 1));
+    vec3 vx_uv = (grid_space + vec3(0.5, 0, 0)) / (vec3(grid_size.xyz) + vec3(1, 0, 0));
+    vec3 vy_uv = (grid_space + vec3(0, 0.5, 0)) / (vec3(grid_size.xyz) + vec3(0, 1, 0));
+    vec3 vz_uv = (grid_space + vec3(0, 0, 0.5)) / (vec3(grid_size.xyz) + vec3(0, 0, 1));
 
     v.x = texture(vx_read_tex, vx_uv).r;
     v.y = texture(vy_read_tex, vy_uv).r;
@@ -68,7 +68,7 @@ void main() {
     vec3 comes_from = world_pos - (v * time_step);
 
     vec3 grid_space = comes_from / cell_size;
-    vec3 vx_uv = (grid_space + vec3(0.5, 0, 0)) / (grid_size.xyz + vec3(1, 0, 0));
+    vec3 vx_uv = (grid_space + vec3(0.5, 0, 0)) / (vec3(grid_size.xyz) + vec3(1, 0, 0));
     float new_vx = texture(vx_read_tex, vx_uv).r;
 
     imageStore(vx_write_temp_image, idx, vec4(new_vx));

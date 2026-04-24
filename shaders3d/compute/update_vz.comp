@@ -20,12 +20,12 @@ layout(std140, binding = 1) uniform constants {
     ivec4 grid_size;
     vec4 wind;
     float time_step;
-    float cell_size;
     float density;
     float t_ambient;
     float t_weight_coeff;
     float t_temp_coeff;
     float vorticity_confinement;
+    float cell_size;
 };
 
 float is_solid(ivec3 pos) {

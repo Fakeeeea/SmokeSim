@@ -57,6 +57,8 @@ void run_physics_step(grid* grid, physics_info* p_info) {
     physics_step_settings p_s_settings = p_info->p_s_settings;
     physics_shaders p_shaders = p_info->p_shaders;
 
+    bind_physics_buffers(grid);
+
     if(p_s_settings.handle_emitters) {
         update_emitters_status(&p_shaders, p_info->e_info.emitters_count);
         handle_emitters(grid, &p_shaders);
@@ -134,12 +136,13 @@ unsigned int upload_physics_variables(const grid* grid, const physics_settings s
         grid_size[0] = grid->grid3d_data.size[0], grid_size[1] = grid->grid3d_data.size[1], grid_size[2] = grid->grid3d_data.size[2], grid_size[3] = 0;
     }
 
-    size_t size = sizeof(ivec4) + sizeof(physics_settings);
+    size_t size = sizeof(ivec4) + sizeof(physics_settings) + sizeof(float);
 
     glBindBuffer(GL_UNIFORM_BUFFER, UBO);
     glBufferData(GL_UNIFORM_BUFFER, size, NULL, GL_STATIC_DRAW);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ivec4), grid_size);
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(ivec4), sizeof(physics_settings), &settings);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(ivec4)+sizeof(physics_settings), sizeof(float), &grid->cell_size);
 
     glBindBufferBase(GL_UNIFORM_BUFFER, PHYSICS_VARIABLES_UBO, UBO);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -159,6 +162,7 @@ void update_physics_variables(const unsigned int ubo, const grid* grid, const ph
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ivec4), grid_size);
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(ivec4), sizeof(physics_settings), &settings);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(ivec4)+sizeof(physics_settings), sizeof(float), &grid->cell_size);
 }
 
 unsigned int upload_time(const float time) {

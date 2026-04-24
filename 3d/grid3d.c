@@ -137,26 +137,26 @@ void swap_velocity_buffers3d(grid3d* grid) {
 
 void swap_vx_buffer3d(grid3d* grid) {
     grid->vx_idx = 1 - grid->vx_idx;
-    glBindTextureUnit(0, grid->vx[grid->vx_idx].ID);
-    glBindImageTexture(0, grid->vx[1-grid->vx_idx].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    glBindTextureUnit(VX_READ, grid->vx[grid->vx_idx].ID);
+    glBindImageTexture(VX_WRITE, grid->vx[1-grid->vx_idx].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 }
 
 void swap_vy_buffer3d(grid3d* grid) {
     grid->vy_idx = 1 - grid->vy_idx;
-    glBindTextureUnit(1, grid->vy[grid->vy_idx].ID);
-    glBindImageTexture(1, grid->vy[1-grid->vy_idx].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    glBindTextureUnit(VY_READ, grid->vy[grid->vy_idx].ID);
+    glBindImageTexture(VY_WRITE, grid->vy[1-grid->vy_idx].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 }
 
 void swap_vz_buffer3d(grid3d* grid) {
     grid->vz_idx = 1 - grid->vz_idx;
-    glBindTextureUnit(2, grid->vz[grid->vz_idx].ID);
-    glBindImageTexture(2, grid->vz[1-grid->vz_idx].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    glBindTextureUnit(VZ_READ, grid->vz[grid->vz_idx].ID);
+    glBindImageTexture(VZ_WRITE, grid->vz[1-grid->vz_idx].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
 }
 
 void swap_smoke_buffer3d(grid3d* grid) {
     grid->smoke_idx = 1 - grid->smoke_idx;
-    glBindTextureUnit(3, grid->smoke[grid->smoke_idx].ID);
-    glBindImageTexture(3, grid->smoke[1 - grid->smoke_idx].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
+    glBindTextureUnit(SMOKE_READ, grid->smoke[grid->smoke_idx].ID);
+    glBindImageTexture(SMOKE_WRITE, grid->smoke[1 - grid->smoke_idx].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
 }
 
 void clear_grid3d(const grid3d* grid, const float t_ambient) {
