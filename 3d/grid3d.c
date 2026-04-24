@@ -102,6 +102,7 @@ void free_grid3d(grid3d* grid) {
 }
 
 void bind_physics_buffers3d(const grid3d* grid) {
+
     glBindTextureUnit(VX_READ, grid->vx[grid->vx_idx].ID);
     glBindTextureUnit(VY_READ, grid->vy[grid->vy_idx].ID);
     glBindTextureUnit(VZ_READ, grid->vz[grid->vz_idx].ID);
@@ -121,6 +122,7 @@ void bind_multigrid_textures3d(const grid3d* grid, const int current_level) {
     int next = min(grid->pyramids_count-1, current_level+1);
 
     glBindTextureUnit(NEXT_PRESSURE_TEXTURE, grid->pressure_pyramid[next].ID);
+
     glBindImageTexture(CURRENT_PRESSURE, grid->pressure_pyramid[current_level].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
     glBindImageTexture(CURRENT_SOLID, grid->solid_pyramid[current_level].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
     glBindImageTexture(CURRENT_RESIDUAL, grid->residual_pyramid[current_level].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
@@ -175,4 +177,8 @@ void clear_grid3d(const grid3d* grid, const float t_ambient) {
     glClearTexImage(grid->smoke[1].ID, 0, GL_RGBA, GL_FLOAT, clear_smoke);
 
     glClearTexImage(grid->vorticity.ID, 0, GL_RGBA, GL_FLOAT, 0);
+
+    for(int i = 0; i < grid->pyramids_count; ++i) {
+        glClearTexImage(grid->pressure_pyramid[i].ID, 0, GL_RED, GL_FLOAT, 0);
+    }
 }

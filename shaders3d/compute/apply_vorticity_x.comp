@@ -25,8 +25,11 @@ layout(std140, binding = 1) uniform constants {
     float t_weight_coeff;
     float t_temp_coeff;
     float vorticity_confinement;
+    float _pad0;
+    float _pad1;
     float cell_size;
 };
+
 
 vec3 vorticity_at(ivec3 pos) {
     if(any(lessThan(pos, vec3(0))) || any(greaterThanEqual(pos, grid_size.xyz))) return vec3(0);

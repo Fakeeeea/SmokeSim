@@ -10,8 +10,6 @@
 #define MAX_LEN 1024
 
 typedef struct physics_shaders {
-    unsigned int resolve_pressure;
-
     unsigned int update_vx, update_vy, update_vz;
     unsigned int advect_vx, advect_vy, advect_vz;
 

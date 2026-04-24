@@ -25,6 +25,8 @@ layout(std140, binding = 1) uniform constants {
     float t_weight_coeff;
     float t_temp_coeff;
     float vorticity_confinement;
+    float _pad0;
+    float _pad1;
     float cell_size;
 };
 

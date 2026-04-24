@@ -17,14 +17,17 @@ typedef struct physics_step_settings {
     int handle_emitters;
 }physics_step_settings;
 
+//MANUALLY PADDED TO 48 FOR CLARITY
 typedef struct physics_settings {
-    vec4 wind;
-    float time_step;
-    float density;
-    float t_ambient;
-    float t_weight_coeff;
-    float t_temp_coeff;
-    float vorticity_confinement;
+    vec4 wind; // 16
+    float time_step; // 20
+    float density; //24
+    float t_ambient; //28
+    float t_weight_coeff; //32
+    float t_temp_coeff; //36
+    float vorticity_confinement; //40
+    float _pad0; //EXPLICIT PADDING FORCED BY vec4's aligned(16)
+    float _pad1; //EXPLICIT PADDING FORCED BY vec4's aligned(16)
 }physics_settings;
 
 typedef struct physics_info {

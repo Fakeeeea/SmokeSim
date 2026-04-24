@@ -13,6 +13,8 @@ physics_settings get_default_p_settings() {
             .t_temp_coeff = 1.0f,
             .t_weight_coeff = 0.07f,
             .vorticity_confinement = 1.0f,
+            ._pad0 = 0.0f,
+            ._pad1 = 0.0f,
     };
     return p_settings;
 }
@@ -57,8 +59,6 @@ void run_physics_step(grid* grid, physics_info* p_info) {
     physics_step_settings p_s_settings = p_info->p_s_settings;
     physics_shaders p_shaders = p_info->p_shaders;
 
-    bind_physics_buffers(grid);
-
     if(p_s_settings.handle_emitters) {
         update_emitters_status(&p_shaders, p_info->e_info.emitters_count);
         handle_emitters(grid, &p_shaders);
@@ -102,9 +102,9 @@ physics_info get_mm_p_info(const physics_shaders precompiled_p_shaders, const gr
     p_info.o_info.obstacles_array[0] = get_obstacle((vec3){(float) grid->grid3d_data.size[0] * 0.5f,
                                                            (float) grid->grid3d_data.size[1] * 0.5f,
                                                            (float) grid->grid3d_data.size[2] * 0.5f}, 3, (vec3){0,0,0}, 1);
-    p_info.e_info.emitters_array[0] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.5), 2, (int)(grid->grid3d_data.size[2] * 0.5)}, 1, (ivec3){30,10,10}, 100, 0, 1);
-    p_info.e_info.emitters_array[1] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.7), 2, (int)(grid->grid3d_data.size[2] * 0.5)}, 1, (ivec3){10,30,10}, 100, 0, 1);
-    p_info.e_info.emitters_array[2] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.5), 2, (int)(grid->grid3d_data.size[2] * 0.7)}, 1, (ivec3){10,10,30}, 100, 0, 1);
+    p_info.e_info.emitters_array[0] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.5), 2, (int)(grid->grid3d_data.size[2] * 0.5)}, 1, (ivec3){30,10,10}, 200, 0, 1);
+    p_info.e_info.emitters_array[1] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.7), 2, (int)(grid->grid3d_data.size[2] * 0.5)}, 1, (ivec3){10,30,10}, 200, 0, 1);
+    p_info.e_info.emitters_array[2] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.5), 2, (int)(grid->grid3d_data.size[2] * 0.7)}, 1, (ivec3){10,10,30}, 200, 0, 1);
 
     p_info_upload_data(&p_info, grid);
 

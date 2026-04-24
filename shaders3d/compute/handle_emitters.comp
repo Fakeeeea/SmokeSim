@@ -25,17 +25,20 @@ layout(std140, binding = 1) uniform constants {
     float t_weight_coeff;
     float t_temp_coeff;
     float vorticity_confinement;
+    float _pad0;
+    float _pad1;
     float cell_size;
 };
+
 
 layout(std140, binding = 7) uniform time {
     float current_time;
 };
 
 struct emitter {
-    vec4 position_radius;
-    vec4 density_temperature;
-    vec4 emitter_settings; //x - delay; y - last_emit, z - emit or not, a - padding
+    ivec4 position_radius;
+    ivec4 density_temperature;
+    ivec4 emitter_settings; //x - delay; y - last_emit, z - emit or not, a - padding
 };
 
 layout(std430, binding = 4) buffer emitter_buffer {
@@ -59,7 +62,7 @@ void main() {
             if(dist < e.position_radius.w) {
                 float falloff;
                 if(e.emitter_settings.a > 0)
-                    falloff = smoothstep(e.position_radius.w, 0.0, dist);
+                    falloff = smoothstep(float(e.position_radius.w), 0.0, dist);
                 else
                     falloff = 1;
 

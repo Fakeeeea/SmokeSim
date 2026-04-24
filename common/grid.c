@@ -38,15 +38,15 @@ void update_velocities(grid* grid, const physics_shaders* shaders) {
     get_grid_size(grid, grid_size);
 
     glUseProgram(shaders->update_vx);
-    glDispatchCompute((grid_size[0] + 1 + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 1 + 7) / 8), (int)ceilf((float)(grid_size[1] + 7) / 8), (int)ceilf((float)(grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     glUseProgram(shaders->update_vy);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 1 + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 7) / 8), (int)ceilf((float)(grid_size[1] + 1 + 7) / 8), (int)ceilf((float)(grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     glUseProgram(shaders->update_vz);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 1 + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 7) / 8), (int)ceilf((float)(grid_size[1] + 7) / 8), (int)ceilf((float)(grid_size[2] + 1 + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     swap_velocity_buffers(grid);
@@ -57,15 +57,15 @@ void advect_velocities(grid* grid, const physics_shaders* shaders) {
     get_grid_size(grid, grid_size);
 
     glUseProgram(shaders->advect_vx);
-    glDispatchCompute((grid_size[0] + 1 + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 1 + 7) / 8), (int)ceilf((float)(grid_size[1] + 7) / 8), (int)ceilf((float)(grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     glUseProgram(shaders->advect_vy);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 1 + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 7) / 8), (int)ceilf((float)(grid_size[1] + 1 + 7) / 8), (int)ceilf((float)(grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     glUseProgram(shaders->advect_vz);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 1 + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 7) / 8), (int)ceilf((float)(grid_size[1] + 7) / 8), (int)ceilf((float)(grid_size[2] + 1 + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     swap_velocity_buffers(grid);
@@ -76,7 +76,7 @@ void handle_emitters(grid* grid, const physics_shaders* shaders) {
     get_grid_size(grid, grid_size);
 
     glUseProgram(shaders->handle_emitters);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 7) / 8), (int)ceilf((float)(grid_size[1] + 7) / 8), (int)ceilf((float)(grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     swap_smoke_buffer(grid);
@@ -84,7 +84,7 @@ void handle_emitters(grid* grid, const physics_shaders* shaders) {
 
 void update_emitters_status(const physics_shaders* shaders, const unsigned int emitters_count) {
     glUseProgram(shaders->update_emitters_status);
-    glDispatchCompute((emitters_count + 127) / 128, 1, 1);
+    glDispatchCompute((int)ceilf((float)(emitters_count + 127) / 128), 1, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 
@@ -93,7 +93,7 @@ void advect_smoke(grid* grid, const physics_shaders* shaders) {
     get_grid_size(grid, grid_size);
 
     glUseProgram(shaders->advect_smoke);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 7) / 8), (int)ceilf((float)(grid_size[1] + 7) / 8), (int)ceilf((float)(grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     swap_smoke_buffer(grid);
@@ -104,7 +104,7 @@ void apply_buoyancy(grid* grid, const physics_shaders* shaders) {
     get_grid_size(grid, grid_size);
 
     glUseProgram(shaders->apply_buoyancy);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 1 + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 7) / 8), (int)ceilf((float)(grid_size[1] + 1 + 7) / 8), (int)ceilf((float)(grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     swap_vy_buffer(grid);
@@ -115,7 +115,7 @@ void calculate_vorticity(const grid *grid, const physics_shaders* shaders) {
     get_grid_size(grid, grid_size);
 
     glUseProgram(shaders->calculate_vorticity);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 7) / 8), (int)ceilf((float)(grid_size[1] + 7) / 8), (int)ceilf((float)(grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 
@@ -124,15 +124,15 @@ void apply_vorticity(grid *grid, const physics_shaders* shaders) {
     get_grid_size(grid, grid_size);
 
     glUseProgram(shaders->apply_vorticity_x);
-    glDispatchCompute((grid_size[0] + 1 + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 1 + 7) / 8), (int)ceilf((float)(grid_size[1] + 7) / 8), (int)ceilf((float)(grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     glUseProgram(shaders->apply_vorticity_y);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 1 + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 7) / 8), (int)ceilf((float)(grid_size[1] + 1 + 7) / 8), (int)ceilf((float)(grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     glUseProgram(shaders->apply_vorticity_z);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 1 + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 7) / 8), (int)ceilf((float)(grid_size[1] + 7) / 8), (int)ceilf((float)(grid_size[2] + 1 + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     swap_velocity_buffers(grid);
@@ -143,13 +143,13 @@ void init_solid_map(const grid* grid, const physics_shaders* shaders) {
     get_grid_size(grid, grid_size);
 
     glUseProgram(shaders->init_solid_map);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 7) / 8), (int)ceilf((float)(grid_size[1] + 7) / 8), (int)ceilf((float)(grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 
 void obstacle_update_step(const physics_shaders* shaders, obstacles_info* o_info) {
     glUseProgram(shaders->obstacle_update);
-    glDispatchCompute((o_info->obstacles_count + 127) / 128, 1, 1);
+    glDispatchCompute((int)ceilf((float)(o_info->obstacles_count + 127) / 128), 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     swap_obstacles_buffer(o_info);
@@ -160,7 +160,7 @@ void update_solid_map(const grid *grid, const physics_shaders* shaders) {
     get_grid_size(grid, grid_size);
 
     glUseProgram(shaders->update_solid_map);
-    glDispatchCompute((grid_size[0] + 7) / 8, (grid_size[1] + 7) / 8, (grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(grid_size[0] + 7) / 8), (int)ceilf((float)(grid_size[1] + 7) / 8), (int)ceilf((float)(grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 
@@ -214,7 +214,7 @@ void smooth(const grid* grid, const physics_shaders* shaders, const int iteratio
     int parity = 0;
     for(int i = 0; i < iterations * 2; ++i) {
         glUniform1i(parity_location, parity);
-        glDispatchCompute((current_grid_size[0] + 7) / 8, (current_grid_size[1] + 7) / 8, (current_grid_size[2] + 7) / 8);
+        glDispatchCompute((int)ceilf((float)(current_grid_size[0] + 7) / 8), (int)ceilf((float)(current_grid_size[1] + 7) / 8), (int)ceilf((float)(current_grid_size[2] + 7) / 8));
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
         parity = 1 - parity;
     }
@@ -224,7 +224,7 @@ void compute_residual(const grid *grid, const physics_shaders* shaders, const in
     get_pyramid_size(grid, current_level, current_grid_size);
 
     glUseProgram(shaders->compute_residual);
-    glDispatchCompute((current_grid_size[0] + 7) / 8, (current_grid_size[1] + 7) / 8, (current_grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(current_grid_size[0] + 7) / 8), (int)ceilf((float)(current_grid_size[1] + 7) / 8), (int)ceilf((float)(current_grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 void compute_restrict(const grid *grid, const physics_shaders* shaders, const int current_level) {
@@ -235,11 +235,11 @@ void compute_restrict(const grid *grid, const physics_shaders* shaders, const in
     get_pyramid_size(grid, target_level, target_grid_size);
 
     glUseProgram(shaders->restrict_residual);
-    glDispatchCompute((target_grid_size[0] + 7) / 8, (target_grid_size[1] + 7) / 8, (target_grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(target_grid_size[0] + 7) / 8), (int)ceilf((float)(target_grid_size[1] + 7) / 8), (int)ceilf((float)(target_grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     glUseProgram(shaders->restrict_solid);
-    glDispatchCompute((target_grid_size[0] + 7) / 8, (target_grid_size[1] + 7) / 8, (target_grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(target_grid_size[0] + 7) / 8), (int)ceilf((float)(target_grid_size[1] + 7) / 8), (int)ceilf((float)(target_grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 
@@ -248,7 +248,7 @@ void prolong_and_add(const grid *grid, const physics_shaders* shaders, const int
     get_pyramid_size(grid, current_level, current_grid_size);
 
     glUseProgram(shaders->prolong_pressure);
-    glDispatchCompute((current_grid_size[0] + 7) / 8, (current_grid_size[1] + 7) / 8, (current_grid_size[2] + 7) / 8);
+    glDispatchCompute((int)ceilf((float)(current_grid_size[0] + 7) / 8), (int)ceilf((float)(current_grid_size[1] + 7) / 8), (int)ceilf((float)(current_grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 

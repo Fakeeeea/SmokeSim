@@ -133,8 +133,6 @@ void delete_shader(unsigned int computeID) {
 physics_shaders compile_physics_shaders() {
     physics_shaders shaders;
 
-    shaders.resolve_pressure = get_compute_program("../shaders3d/compute/resolve_pressure.comp");
-
     shaders.update_vx = get_compute_program("../shaders3d/compute/update_vx.comp");
     shaders.update_vy = get_compute_program("../shaders3d/compute/update_vy.comp");
     shaders.update_vz = get_compute_program("../shaders3d/compute/update_vz.comp");
