@@ -149,7 +149,7 @@ static draw_object get_sphere(const float radius, const int sector_count, const 
     return sphere;
 }
 
-static draw_object get_arrow(const vec3 pointing_to) {
+static draw_object get_arrow3d(const vec3 pointing_to) {
     draw_object arrow;
 
     float vertices[] = {
@@ -253,13 +253,13 @@ static draw_object get_line(const vec3 start, const vec3 end) {
 graphics_objects3d get_graphics_objects3d() {
     graphics_objects3d g_objects;
 
-    g_objects.arrows[DIR_X] = get_arrow((vec3){1,0,0});
-    g_objects.arrows[DIR_Y] = get_arrow((vec3){0,1,0});
-    g_objects.arrows[DIR_Z] = get_arrow((vec3){0,0,1});
+    g_objects.arrows[DIR3D_X] = get_arrow3d((vec3) {1, 0, 0});
+    g_objects.arrows[DIR3D_Y] = get_arrow3d((vec3) {0, 1, 0});
+    g_objects.arrows[DIR3D_Z] = get_arrow3d((vec3) {0, 0, 1});
 
-    g_objects.lines[DIR_X] = get_line((vec3){0,0,0}, (vec3){1,0,0});
-    g_objects.lines[DIR_Y] = get_line((vec3){0,0,0}, (vec3){0,1,0});
-    g_objects.lines[DIR_Z] = get_line((vec3){0,0,0}, (vec3){0,0,1});
+    g_objects.lines[DIR3D_X] = get_line((vec3){0,0,0}, (vec3){1,0,0});
+    g_objects.lines[DIR3D_Y] = get_line((vec3){0,0,0}, (vec3){0,1,0});
+    g_objects.lines[DIR3D_Z] = get_line((vec3){0, 0, 0}, (vec3){0, 0, 1});
 
     g_objects.grid_box = get_box((vec3){0,0,0}, (vec3){1,1,1});
     g_objects.sphere = get_sphere(1, 16, 16);

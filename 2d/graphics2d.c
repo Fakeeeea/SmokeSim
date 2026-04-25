@@ -37,3 +37,22 @@ void draw_obstacles2d(const graphics_info2d* g_info, const unsigned int draw_obs
     glBindVertexArray(g_info->g_objects.circle.VAO);
     glDrawElementsInstanced(GL_TRIANGLES, g_info->g_objects.circle.index_count, GL_UNSIGNED_INT, 0, draw_obstacles);
 }
+
+void draw_velocities2d(const graphics_info2d* g_info, const ivec2 grid_size) {
+
+    static int direction_location = -1;
+
+    if(direction_location == -1) {
+        direction_location = glGetUniformLocation(g_info->shaders.draw_velocities, "direction");
+    }
+
+    glUseProgram(g_info->shaders.draw_velocities);
+
+    glUniform1i(direction_location, 0);
+    glBindVertexArray(g_info->g_objects.arrow[0].VAO);
+    glDrawElementsInstanced(GL_TRIANGLES, g_info->g_objects.arrow[0].index_count, GL_UNSIGNED_INT, 0, (grid_size[0] + 1) * grid_size[1]);
+
+    glUniform1i(direction_location, 1);
+    glBindVertexArray(g_info->g_objects.arrow[1].VAO);
+    glDrawElementsInstanced(GL_TRIANGLES, g_info->g_objects.arrow[1].index_count, GL_UNSIGNED_INT, 0, grid_size[0] * (grid_size[1] + 1));
+}

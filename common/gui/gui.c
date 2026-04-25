@@ -166,6 +166,7 @@ void draw_physics_settings(gui_ctx *g_ctx) {
     physics_settings* p_settings = &g_ctx->p_info->p_settings;
 
     if(nk_tree_push(g_ctx->nk_ctx, NK_TREE_TAB, "Physics Constants", NK_MINIMIZED)) {
+
         nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
         change += nk_property_float(g_ctx->nk_ctx, "#Time Step:", 0.0001f, &p_settings->time_step, 0.1f, 0.001f, 0.001f);
         change += nk_property_float(g_ctx->nk_ctx, "#Density:", 0.1f, &p_settings->density, 10.0f, 0.1f, 0.05f);
@@ -175,7 +176,11 @@ void draw_physics_settings(gui_ctx *g_ctx) {
         change += nk_property_float(g_ctx->nk_ctx, "#Weight Coefficient:", 0.0f, &p_settings->t_weight_coeff, 10.0f, 0.01f, 0.05f);
 
         if(!g_ctx->p_info->enclosed) {
-            change += draw_vec3_property(g_ctx->nk_ctx, "Wind", p_settings->wind, -5, 5, 1);
+            if(g_ctx->grid_data->is_2d) {
+                change += draw_vec2_property(g_ctx->nk_ctx, "Wind", p_settings->wind, -15, 15, 1);
+            } else {
+                change += draw_vec3_property(g_ctx->nk_ctx, "Wind", p_settings->wind, -15, 15, 1);
+            }
         }
 
         nk_tree_pop(g_ctx->nk_ctx);

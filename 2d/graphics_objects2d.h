@@ -7,10 +7,17 @@
 
 #include "../common/graphics_objects.h"
 
+enum DIRECTIONS2D {
+    DIR2D_X,
+    DIR2D_Y,
+};
+
 typedef struct graphics_objects2d {
     draw_object screen_rect;
 
     draw_object circle;
+
+    draw_object arrow[2];
 }graphics_objects2d;
 
 static draw_object get_rect(const vec2 size);

@@ -6,6 +6,67 @@
 
 #include <glad/glad.h>
 
+static draw_object get_arrow2d(const vec2 pointing_to) {
+    draw_object arrow;
+
+    float vertices[] = {
+            //TAIL
+            -0.05f, 0.0f,
+            0.05f, 0.0f,
+            -0.05f, 0.6f,
+            0.05f, 0.6f,
+
+            //HEAD
+            -0.2f, 0.6f,
+            0.2f, 0.6f,
+            0.0f, 0.8f,
+    };
+
+    unsigned int indices[] = {
+            //TAIL
+            0,1,2,
+            1,2,3,
+
+            //HEAD
+            4,5,6
+    };
+
+    vec2 dir;
+    glm_vec2_copy(pointing_to, dir); glm_vec2_normalize(dir);
+
+    float cos_tetha = dir[1];
+    float sin_tetha = -dir[0];
+
+    const int POINTS = 7;
+    for(int i = 0; i < POINTS * 2; i+=2) {
+
+        float px = vertices[i];
+        float py = vertices[i+1];
+
+        vertices[i] = px * cos_tetha - py * sin_tetha;
+        vertices[i+1] = py * sin_tetha + py * cos_tetha;
+    }
+
+    arrow.index_count = 9;
+
+    glGenBuffers(1, &arrow.VBO), glGenBuffers(1, &arrow.EBO), glGenVertexArrays(1, &arrow.VAO);
+    glBindVertexArray(arrow.VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, arrow.VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, arrow.EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    return arrow;
+}
+
 static draw_object get_rect(const vec2 size) {
     draw_object rect;
     float vertices[] = {
@@ -95,6 +156,9 @@ graphics_objects2d get_graphics_objects2d() {
 
     g_objects.screen_rect = get_rect((vec2){1,1});
     g_objects.circle = get_circle(1, 16);
+
+    g_objects.arrow[DIR2D_X] = get_arrow2d((vec2){1, 0});
+    g_objects.arrow[DIR2D_Y] = get_arrow2d((vec2){0, 1});
 
     return g_objects;
 }
