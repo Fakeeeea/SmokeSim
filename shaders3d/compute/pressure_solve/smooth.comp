@@ -34,7 +34,7 @@ layout(std140, binding = 1) uniform constants {
 };
 
 layout(std140, binding = 2) uniform multigrid_constants {
-    ivec4 grid_sizes[16];
+    ivec4 grid_sizes[31];
     int grid_levels;
 };
 

@@ -46,14 +46,16 @@ void draw_main_menu(gui_ctx* g_ctx);
 void draw_simulation_settings(gui_ctx* g_ctx);
 
 void draw_physics_settings(gui_ctx* g_ctx);
-void draw_graphics_settings(gui_ctx* g_ctx);
+void draw_graphics_settings2d(gui_ctx* g_ctx);
+void draw_graphics_settings3d(gui_ctx* g_ctx);
 void draw_physics_step_settings(gui_ctx* g_ctx);
-void draw_graphics_step_settings(gui_ctx* g_ctx);
+void draw_graphics_step_settings2d(gui_ctx* g_ctx);
+void draw_graphics_step_settings3d(gui_ctx* g_ctx);
 void draw_checkboxes(gui_ctx* g_ctx);
 
 void draw_creation_settings(gui_ctx* g_ctx);
 
-int draw_grid_size_settings3d(gui_ctx* g_ctx);
+int draw_grid_size_settings(gui_ctx* g_ctx);
 int draw_creation_physics_settings(gui_ctx* g_ctx);
 void draw_confirm_button(gui_ctx* g_ctx);
 void draw_discard_button(gui_ctx* g_ctx);

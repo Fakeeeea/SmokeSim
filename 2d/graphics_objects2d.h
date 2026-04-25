@@ -9,6 +9,8 @@
 
 typedef struct graphics_objects2d {
     draw_object screen_rect;
+
+    draw_object circle;
 }graphics_objects2d;
 
 static draw_object get_rect(const vec2 size);

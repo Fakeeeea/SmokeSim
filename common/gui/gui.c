@@ -53,7 +53,7 @@ void draw_creation_settings(gui_ctx* g_ctx) {
     struct nk_rect size = nk_rect(0,0, (float) g_ctx->g_info->screen_size[0] * SCREEN_FOR_MM_X_PERCENTAGE, (float)g_ctx->g_info->screen_size[1]);
 
     if(nk_begin(g_ctx->nk_ctx, "New grid", size, 0)) {
-        change += draw_grid_size_settings3d(g_ctx);
+        change += draw_grid_size_settings(g_ctx);
         change += draw_creation_physics_settings(g_ctx);
         draw_confirm_button(g_ctx);
         draw_discard_button(g_ctx);
@@ -65,13 +65,21 @@ void draw_creation_settings(gui_ctx* g_ctx) {
     }
 }
 
-int draw_grid_size_settings3d(gui_ctx* g_ctx) {
+int draw_grid_size_settings(gui_ctx* g_ctx) {
     int change = 0;
+    static int keep_ratio = 1;
 
     draw_header(g_ctx->nk_ctx, "Grid Size");
     if(g_ctx->grid_data->is_2d) {
         nk_layout_row_dynamic(g_ctx->nk_ctx, 30, 2);
-        change += draw_ivec2_property(g_ctx->nk_ctx, "", g_ctx->grid_data->grid2d_data.size, 3, 1024, 2);
+        if(keep_ratio) {
+            float ratio = (float) g_ctx->g_info->screen_size[0] / (float) g_ctx->g_info->screen_size[1];
+            change += draw_ivec2_property_keepratio(g_ctx->nk_ctx, "", g_ctx->grid_data->grid2d_data.size, 3, MAX_GRID_SIZE, 2, ratio);
+        } else {
+            change += draw_ivec2_property(g_ctx->nk_ctx, "", g_ctx->grid_data->grid2d_data.size, 3, MAX_GRID_SIZE, 2);
+        }
+        nk_checkbox_label(g_ctx->nk_ctx, "Lock to screen ratio", &keep_ratio);
+
     } else {
         nk_layout_row_dynamic(g_ctx->nk_ctx, 30, 3);
         change += draw_ivec3_property(g_ctx->nk_ctx, "", g_ctx->grid_data->grid3d_data.size, 3, 1024, 2);
@@ -128,9 +136,16 @@ void draw_simulation_settings(gui_ctx* g_ctx) {
                 NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
 
         draw_physics_settings(g_ctx);
-        draw_graphics_settings(g_ctx);
         draw_physics_step_settings(g_ctx);
-        draw_graphics_step_settings(g_ctx);
+
+        if(g_ctx->grid_data->is_2d) {
+            draw_graphics_settings2d(g_ctx);
+            draw_graphics_step_settings2d(g_ctx);
+        } else {
+            draw_graphics_settings3d(g_ctx);
+            draw_graphics_step_settings3d(g_ctx);
+        }
+
         draw_checkboxes(g_ctx);
 
         nk_end(g_ctx->nk_ctx);
@@ -171,7 +186,20 @@ void draw_physics_settings(gui_ctx *g_ctx) {
     }
 }
 
-void draw_graphics_settings(gui_ctx *g_ctx) {
+void draw_graphics_settings2d(gui_ctx *g_ctx) {
+    graphics_settings* g_settings = &g_ctx->g_info->g_settings;
+
+    if(nk_tree_push(g_ctx->nk_ctx, NK_TREE_TAB, "Graphics Settings", NK_MINIMIZED)) {
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
+        nk_property_float(g_ctx->nk_ctx, "#Smoke Density Factor:", 0.0f, &g_settings->smoke_density_factor, 200.0f, 1.0f, 1.0f);
+        draw_color_picker(g_ctx->nk_ctx, "Ambient Color: ", g_settings->ambient_color, 1.0f);
+        draw_color_picker(g_ctx->nk_ctx, "Object Color: ", g_settings->objects_color, 1.0f);
+
+        nk_tree_pop(g_ctx->nk_ctx);
+    }
+}
+
+void draw_graphics_settings3d(gui_ctx *g_ctx) {
     graphics_settings* g_settings = &g_ctx->g_info->g_settings;
 
     if(nk_tree_push(g_ctx->nk_ctx, NK_TREE_TAB, "Graphics Settings", NK_MINIMIZED)) {
@@ -195,7 +223,6 @@ void draw_graphics_settings(gui_ctx *g_ctx) {
     }
 }
 
-//TODO: ADD 2d CODE
 void draw_physics_step_settings(gui_ctx* g_ctx) {
     physics_step_settings* p_s_settings = &g_ctx->p_info->p_s_settings;
     if(nk_tree_push(g_ctx->nk_ctx, NK_TREE_TAB, "Simulation Steps", NK_MINIMIZED)) {
@@ -212,14 +239,24 @@ void draw_physics_step_settings(gui_ctx* g_ctx) {
     }
 }
 
-//TODO: ADD 2d CODE
-void draw_graphics_step_settings(gui_ctx* g_ctx) {
+void draw_graphics_step_settings3d(gui_ctx* g_ctx) {
     graphics_step_settings3d* g_s_settings = &g_ctx->g_info->g_info3d.g_s_settings;
     if(nk_tree_push(g_ctx->nk_ctx, NK_TREE_TAB, "Graphics Steps", NK_MINIMIZED)) {
         nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
         nk_checkbox_label(g_ctx->nk_ctx, "Draw Grid Lines", &g_s_settings->draw_grid_lines);
         nk_checkbox_label(g_ctx->nk_ctx, "Draw Velocities", &g_s_settings->draw_velocities);
         nk_checkbox_label(g_ctx->nk_ctx, "Draw Vorticity", &g_s_settings->draw_vorticity);
+        nk_checkbox_label(g_ctx->nk_ctx, "Draw Smoke", &g_s_settings->draw_smoke);
+        nk_checkbox_label(g_ctx->nk_ctx, "Draw Obstacles", &g_s_settings->draw_obstacles);
+
+        nk_tree_pop(g_ctx->nk_ctx);
+    }
+}
+
+void draw_graphics_step_settings2d(gui_ctx* g_ctx) {
+    graphics_step_settings2d* g_s_settings = &g_ctx->g_info->g_info2d.g_s_settings;
+    if(nk_tree_push(g_ctx->nk_ctx, NK_TREE_TAB, "Graphics Steps", NK_MINIMIZED)) {
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
         nk_checkbox_label(g_ctx->nk_ctx, "Draw Smoke", &g_s_settings->draw_smoke);
         nk_checkbox_label(g_ctx->nk_ctx, "Draw Obstacles", &g_s_settings->draw_obstacles);
 
@@ -236,7 +273,7 @@ void draw_checkboxes(gui_ctx* g_ctx) {
     }
 }
 
-//TODO update to use custom WIDH / HEIGHT ( add to defines)
+//TODO Add width / height to DEFINES to remove magic numbers for obstacles, main settings and emitters gui
 void draw_emitters_settings(gui_ctx* g_ctx) {
 
     int change = 0;
@@ -267,7 +304,7 @@ void draw_emitters_settings(gui_ctx* g_ctx) {
     nk_end(g_ctx->nk_ctx);
 }
 
-//TODO update to use custom WIDH / HEIGHT ( add to defines)
+//TODO Add width / height to DEFINES to remove magic numbers for obstacles, main settings and emitters gui
 void draw_obstacles_settings(gui_ctx* g_ctx) {
 
     int change = 0;

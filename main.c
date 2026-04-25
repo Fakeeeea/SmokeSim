@@ -50,6 +50,8 @@ graphics_info g_info;
 physics_info p_info;
 main_menu_info mm_info;
 
+//TODO: BEFORE SHIPPING REVERT MAX SIZE TO 2 ^ 16 BEFORE SOMEONE'S COMPUTER CRASHES
+
 int main() {
 
     init_glfw();

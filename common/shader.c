@@ -225,6 +225,8 @@ graphics_shaders2d compile_graphics_shaders2d() {
 
     g_shaders.draw_smoke = get_graphics_program("../shaders2d/graphics/draw_smoke.vert",
                                                 "../shaders2d/graphics/draw_smoke.frag");
+    g_shaders.draw_obstacles = get_graphics_program("../shaders2d/graphics/draw_obstacles.vert",
+                                                    "../shaders2d/graphics/draw_obstacles.frag");
 
     return g_shaders;
 }

@@ -30,3 +30,10 @@ void draw_smoke2d(const graphics_info2d* g_info) {
     glBindVertexArray(g_info->g_objects.screen_rect.VAO);
     glDrawElements(GL_TRIANGLES, g_info->g_objects.screen_rect.index_count, GL_UNSIGNED_INT, 0);
 }
+
+void draw_obstacles2d(const graphics_info2d* g_info, const unsigned int draw_obstacles) {
+    glUseProgram(g_info->shaders.draw_obstacles);
+
+    glBindVertexArray(g_info->g_objects.circle.VAO);
+    glDrawElementsInstanced(GL_TRIANGLES, g_info->g_objects.circle.index_count, GL_UNSIGNED_INT, 0, draw_obstacles);
+}

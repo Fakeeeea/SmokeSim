@@ -47,6 +47,32 @@ int draw_vec2_property(struct nk_context* nk_ctx, const char* label, float* var,
     return change;
 }
 
+int draw_ivec2_property_keepratio(struct nk_context* nk_ctx, const char* label, int* var, const int min, const int max, const int step, const float ratio) {
+    char buf[BUFFER_SIZE];
+
+    int old_x = var[0];
+
+    int change = 0;
+    sprintf(buf, "#%s X:", label);
+    change += nk_property_int(nk_ctx, buf, min, &var[0], max, step, (float) step);
+
+    if(var[0] != old_x) {
+        var[1] = (int)((float)var[0] / ratio);
+        change = 1;
+    }
+
+    int y_before_ui = var[1];
+
+    sprintf(buf, "#%s Y:", label);
+    change += nk_property_int(nk_ctx, buf, min, &var[1], max, step, (float) step);
+
+    if(var[1] != y_before_ui) {
+        var[0] = (int)((float)var[1] * ratio);
+        change = 1;
+    }
+    return change;
+}
+
 int draw_ivec2_property(struct nk_context* nk_ctx, const char* label, int* var, const int min, const int max, const int step) {
     char buf[BUFFER_SIZE];
 

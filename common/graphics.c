@@ -125,6 +125,8 @@ void draw_step(grid* grid, graphics_info* g_info, physics_info* p_info) {
         graphics_step_settings2d* g_s = &g_info->g_info2d.g_s_settings;
 
         if(g_s->draw_smoke) draw_smoke2d(&g_info->g_info2d);
+        if(g_s->draw_obstacles) draw_obstacles2d(&g_info->g_info2d, p_info->o_info.obstacles_count);
+
         blit_framebuffer(g_info);
     } else {
         graphics_step_settings3d* g_s = &g_info->g_info3d.g_s_settings;

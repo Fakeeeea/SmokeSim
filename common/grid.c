@@ -265,7 +265,7 @@ void prolong_and_add(const grid *grid, const physics_shaders* shaders, const int
 void upload_multigrid_constants(grid* grid) {
     glGenBuffers(1, &grid->multigrid_constants_ubo);
 
-    ivec4 sizes[16];
+    ivec4 sizes[MAX_GRID_SIZE_ARRAY];
 
     int pyramids_count = grid->is_2d ? grid->grid2d_data.pyramids_count : grid->grid3d_data.pyramids_count;
 
@@ -285,9 +285,9 @@ void upload_multigrid_constants(grid* grid) {
     }
 
     glBindBuffer(GL_UNIFORM_BUFFER, grid->multigrid_constants_ubo);
-    glBufferData(GL_UNIFORM_BUFFER, 16*sizeof(ivec4)+sizeof(int), NULL, GL_STATIC_DRAW);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, 16*sizeof(ivec4), sizes);
-    glBufferSubData(GL_UNIFORM_BUFFER, 16*sizeof(ivec4), sizeof(int), &pyramids_count);
+    glBufferData(GL_UNIFORM_BUFFER, MAX_GRID_SIZE_ARRAY*sizeof(ivec4)+sizeof(int), NULL, GL_STATIC_DRAW);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, MAX_GRID_SIZE_ARRAY*sizeof(ivec4), sizes);
+    glBufferSubData(GL_UNIFORM_BUFFER, MAX_GRID_SIZE_ARRAY*sizeof(ivec4), sizeof(int), &pyramids_count);
 
     glBindBufferBase(GL_UNIFORM_BUFFER, MULTIGRID_CONSTANTS_UBO, grid->multigrid_constants_ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -338,8 +338,8 @@ void init_placeholder_grid3d(grid* grid) {
 
 void init_placeholder_grid2d(grid* grid) {
     const float PLACEHOLDER_CELL_SIZE = 0.1f;
-    const int PLACEHOLDER_RESOLUTIONX = 64;
-    const int PLACEHOLDER_RESOLUTIONY = 64;
+    const int PLACEHOLDER_RESOLUTIONX = 1920;
+    const int PLACEHOLDER_RESOLUTIONY = 1080;
 
     grid->is_2d = 1;
     grid->grid2d_data = get_grid2d((ivec2){PLACEHOLDER_RESOLUTIONX, PLACEHOLDER_RESOLUTIONY});

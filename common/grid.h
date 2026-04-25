@@ -14,6 +14,9 @@
 #include "../3d/grid3d.h"
 #include "../2d/grid2d.h"
 
+#define MAX_GRID_SIZE_ARRAY 31
+#define MAX_GRID_SIZE 2147483647
+
 typedef struct grid {
     int is_2d;
 
@@ -24,7 +27,6 @@ typedef struct grid {
     unsigned int multigrid_variables_ubo;
     unsigned int multigrid_constants_ubo;
 }grid;
-
 
 void bind_physics_buffers(const grid* grid);
 void gen_grid_textures(grid *grid, float t_ambient);
