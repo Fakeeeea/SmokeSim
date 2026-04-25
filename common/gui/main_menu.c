@@ -143,9 +143,12 @@ int check_hover(menu_button* mb, vec2 pos) {
 }
 
 int handle_click(main_menu_info* mm_info, vec2 pos) {
-    if(mm_info->state != MM_MAIN_SCREEN) return -1;
+    if(mm_info->state != MM_MAIN_SCREEN && mm_info->state != MM_SIMULATION_TYPE) return -1;
 
     for(int i = 0; i < MENU_BUTTONS_COUNT; ++i) {
+
+        if(is_hidden(mm_info, i)) continue;
+
         menu_button* current = &mm_info->buttons[i];
 
         if(check_hover(current, pos)) return i;
@@ -174,4 +177,15 @@ void to_simulation_type(main_menu_info* mm_info) {
     unhide_button(mm_info, GRID2D_ID);
     unhide_button(mm_info, GRID3D_ID);
     unhide_button(mm_info, BACK);
+}
+
+void to_main_screen(main_menu_info* mm_info) {
+    mm_info->state = MM_MAIN_SCREEN;
+
+    unhide_button(mm_info, NEW_SIM_ID);
+    unhide_button(mm_info, LOAD_ID);
+
+    hide_button(mm_info, GRID2D_ID);
+    hide_button(mm_info, GRID3D_ID);
+    hide_button(mm_info, BACK);
 }

@@ -23,3 +23,10 @@ graphics_info2d init_graphics_info2d() {
 
     return g_info;
 }
+
+void draw_smoke2d(const graphics_info2d* g_info) {
+    glUseProgram(g_info->shaders.draw_smoke);
+
+    glBindVertexArray(g_info->g_objects.screen_rect.VAO);
+    glDrawElements(GL_TRIANGLES, g_info->g_objects.screen_rect.index_count, GL_UNSIGNED_INT, 0);
+}

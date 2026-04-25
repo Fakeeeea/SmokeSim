@@ -129,6 +129,8 @@ int main() {
         else if(ctx.g_ctx.grid_info.created == 1)
             update_time(p_info.time_ubo, glfwGetTime());
 
+        handle_pending_press();
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

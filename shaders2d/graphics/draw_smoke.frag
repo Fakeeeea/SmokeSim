@@ -42,11 +42,18 @@ layout(std140, binding = 0) uniform graphics_variables {
 
 void main() {
 
-    vec3 color;
     vec2 tex_coord = gl_FragCoord.xy / draw_area.zw;
-    vec3 smoke = texture(smoke_read_tex, tex_coord, 0).xyz;
+    vec3 smoke_raw = texture(smoke_read_tex, tex_coord, 0).xyz;
 
-    smoke *= smoke_density_factor;
+    float raw_density = max(smoke_raw.r, max(smoke_raw.g, smoke_raw.b));
+    float alpha = 1.0 - exp(-raw_density * smoke_density_factor);
 
-    FragColor = vec4(smoke, 1.0);
+    vec3 smoke_color = vec3(0.0);
+    if(raw_density > 0.001) {
+        smoke_color = smoke_raw / raw_density;
+    }
+
+    vec3 color = mix(ambient_color.rgb, smoke_color, alpha);
+
+    FragColor = vec4(color, 1.0);
 }

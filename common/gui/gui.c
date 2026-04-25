@@ -35,6 +35,7 @@ void draw_main_menu(gui_ctx* g_ctx) {
     draw_main_menu_text(g_ctx->mm_info);
 }
 
+//Move to main_menu.c,.h
 int is_in_main_menu(const gui_ctx* g_ctx) {
     return (g_ctx->mm_info->state == MM_MAIN_SCREEN || g_ctx->mm_info->state == MM_SIMULATION_TYPE);
 }
@@ -68,8 +69,14 @@ int draw_grid_size_settings3d(gui_ctx* g_ctx) {
     int change = 0;
 
     draw_header(g_ctx->nk_ctx, "Grid Size");
-    nk_layout_row_dynamic(g_ctx->nk_ctx, 30, 3);
-    change += draw_ivec3_property(g_ctx->nk_ctx, "", g_ctx->grid_data->grid3d_data.size, 3, 1024, 2);
+    if(g_ctx->grid_data->is_2d) {
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 30, 2);
+        change += draw_ivec2_property(g_ctx->nk_ctx, "", g_ctx->grid_data->grid2d_data.size, 3, 1024, 2);
+    } else {
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 30, 3);
+        change += draw_ivec3_property(g_ctx->nk_ctx, "", g_ctx->grid_data->grid3d_data.size, 3, 1024, 2);
+    }
+
 
     return change;
 }
@@ -152,7 +159,9 @@ void draw_physics_settings(gui_ctx *g_ctx) {
         change += nk_property_float(g_ctx->nk_ctx, "#Temp Coefficient:", 0.0f, &p_settings->t_temp_coeff, 10.0f, 0.01f, 0.05f);
         change += nk_property_float(g_ctx->nk_ctx, "#Weight Coefficient:", 0.0f, &p_settings->t_weight_coeff, 10.0f, 0.01f, 0.05f);
 
-        change += draw_vec3_property(g_ctx->nk_ctx, "Wind", p_settings->wind, -5, 5, 1);
+        if(!g_ctx->p_info->enclosed) {
+            change += draw_vec3_property(g_ctx->nk_ctx, "Wind", p_settings->wind, -5, 5, 1);
+        }
 
         nk_tree_pop(g_ctx->nk_ctx);
     }
@@ -307,7 +316,12 @@ int draw_emitter_info(gui_ctx* g_ctx, int index) {
         nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
 
         nk_label(g_ctx->nk_ctx, "Position:", NK_TEXT_LEFT);
-        change += draw_ivec3_property_xyz_id(g_ctx->nk_ctx, "", e->pos_radius, index, -9999, 9999, 1);
+        if(g_ctx->grid_data->is_2d) {
+            change += draw_ivec2_property_xy_id(g_ctx->nk_ctx, "", e->pos_radius, index, -9999, 9999, 1);
+        } else {
+            change += draw_ivec3_property_xyz_id(g_ctx->nk_ctx, "", e->pos_radius, index, -9999, 9999, 1);
+        }
+
         change += nk_property_int(g_ctx->nk_ctx, "#Radius", 1, &e->pos_radius[3], 9999, 1, 1);
 
         nk_label(g_ctx->nk_ctx, "Densities:", NK_TEXT_LEFT);
@@ -337,11 +351,19 @@ int draw_obstacle_info(gui_ctx* g_ctx, int index) {
         nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
 
         nk_label(g_ctx->nk_ctx, "Position:", NK_TEXT_LEFT);
-        change += draw_vec3_property_xyz_id(g_ctx->nk_ctx, "", o->pos_radius, index, -9999, 9999, 1);
+        if(g_ctx->grid_data->is_2d) {
+            change += draw_vec2_property_xy_id(g_ctx->nk_ctx, "", o->pos_radius, index, -9999, 9999, 1);
+        } else {
+            change += draw_vec3_property_xyz_id(g_ctx->nk_ctx, "", o->pos_radius, index, -9999, 9999, 1);
+        }
         change += nk_property_float(g_ctx->nk_ctx, "Radius", 1, &o->pos_radius[3], 9999, 1, 1);
 
         nk_label(g_ctx->nk_ctx, "Velocities:", NK_TEXT_LEFT);
-        change += draw_vec3_property_xyz_id(g_ctx->nk_ctx, "", o->velocities_anchored, index, 0, 100000, 1);
+        if(g_ctx->grid_data->is_2d) {
+            change += draw_vec2_property_xy_id(g_ctx->nk_ctx, "", o->velocities_anchored, index, 0, 100000, 1);
+        } else {
+            change += draw_vec3_property_xyz_id(g_ctx->nk_ctx, "", o->velocities_anchored, index, 0, 100000, 1);
+        }
         change += nk_checkbox_label(g_ctx->nk_ctx, "Anchored", &anchored_val);
 
         if(draw_delete_button(g_ctx->nk_ctx, "Delete Obstacle", 15)) {

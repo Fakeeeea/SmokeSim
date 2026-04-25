@@ -325,7 +325,7 @@ void bind_multigrid_textures(const grid* grid, const int current_level) {
     }
 }
 
-void init_placeholder_grid(grid* grid) {
+void init_placeholder_grid3d(grid* grid) {
     const float PLACEHOLDER_CELL_SIZE = 0.1f;
     const int PLACEHOLDER_RESOLUTIONX = 64;
     const int PLACEHOLDER_RESOLUTIONY = 64;
@@ -336,8 +336,23 @@ void init_placeholder_grid(grid* grid) {
     grid->cell_size = PLACEHOLDER_CELL_SIZE;
 }
 
+void init_placeholder_grid2d(grid* grid) {
+    const float PLACEHOLDER_CELL_SIZE = 0.1f;
+    const int PLACEHOLDER_RESOLUTIONX = 64;
+    const int PLACEHOLDER_RESOLUTIONY = 64;
+
+    grid->is_2d = 1;
+    grid->grid2d_data = get_grid2d((ivec2){PLACEHOLDER_RESOLUTIONX, PLACEHOLDER_RESOLUTIONY});
+    grid->cell_size = PLACEHOLDER_CELL_SIZE;
+}
+
+void init_main_menu_grid2d(grid* mm_grid, float t_ambient) {
+    init_placeholder_grid2d(mm_grid);
+    gen_grid_textures(mm_grid, t_ambient);
+}
+
 void init_main_menu_grid3d(grid* mm_grid, float t_ambient) {
-    init_placeholder_grid(mm_grid);
+    init_placeholder_grid3d(mm_grid);
     gen_grid_textures(mm_grid, t_ambient);
 }
 

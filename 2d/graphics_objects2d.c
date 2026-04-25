@@ -9,15 +9,15 @@
 static draw_object get_rect(const vec2 size) {
     draw_object rect;
     float vertices[] = {
-            0, 0,
-            size[0], 0,
-            0, size[1],
+            -size[0], -size[1],
+            size[0], -size[1],
+            -size[0], size[1],
             size[0], size[1]
     };
 
     unsigned int indices[] = {
             0,1,2,
-            0,2,3
+            1,2,3
     };
 
     rect.index_count = 6;

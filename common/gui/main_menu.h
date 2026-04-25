@@ -29,8 +29,8 @@
 
 enum main_menu_state {
     MM_CLOSED = 0,
-    MM_SIMULATION_TYPE = 1,
-    MM_MAIN_SCREEN = 2,
+    MM_MAIN_SCREEN = 1,
+    MM_SIMULATION_TYPE = 2,
     MM_OPTIONS = 3,
 };
 
@@ -65,6 +65,7 @@ void lerp_f(float current, float target, float* dest, float speed);
 void lerp_2f(vec2 current, vec2 target, vec2* dest, float speed);
 
 void to_simulation_type(main_menu_info* mm_info);
+void to_main_screen(main_menu_info* mm_info);
 
 int is_hidden(const main_menu_info* mm_info, int idx);
 void hide_button(main_menu_info* mm_info, int idx);

@@ -43,6 +43,8 @@ typedef struct window_context {
     mouse_info m_info;
 
     gui_ctx g_ctx;
+
+    int pending_press;
 }window_context;
 
 window_context ctx;
@@ -61,8 +63,10 @@ void key_press_callback(GLFWwindow *window, int key, int scancode, int action, i
 void scroll_wheel_callback(GLFWwindow *window, double xoffset, double yoffset);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+void handle_pending_press();
 
-void init_new_grid_screen();
+void init_new_grid_screen2d();
+void init_new_grid_screen3d();
 void get_swapped_y_pos(vec2 out);
 void handle_main_menu_events();
 

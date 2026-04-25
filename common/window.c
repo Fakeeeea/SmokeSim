@@ -53,6 +53,8 @@ void init_window_context(GLFWwindow* window, struct nk_context* nk_ctx, grid* gr
         .m_info = {{0,0}, {0,0}, 1},
 
         .g_ctx = init_gui_ctx(grid_data, p_info, mm_p_info, g_info, mm_info, nk_ctx),
+
+        .pending_press = -1,
         };
 }
 
@@ -159,26 +161,32 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     get_swapped_y_pos(mouse_pos);
 
     if(action == GLFW_PRESS) {
-        switch(handle_click(ctx.g_ctx.mm_info, mouse_pos)) {
-            case NEW_SIM_ID:
-                //ctx.g_ctx.mm_info->state = MM_OPTIONS;
-                //init_new_grid_screen();
-                to_simulation_type(ctx.g_ctx.mm_info);
-                break;
-            case LOAD_ID:
-                printf("Pressed load sim!");
-                break;
-            case GRID3D_ID:
-                printf("hit");
-                init_new_grid_screen();
-                break;
-            case GRID2D_ID:
-                break;
-            case BACK:
-                break;
-        }
+        ctx.pending_press = handle_click(ctx.g_ctx.mm_info, mouse_pos);
     }
+
     nk_glfw3_mouse_button_callback(window, button, action, mods);
+}
+
+void handle_pending_press() {
+    switch(ctx.pending_press) {
+        case NEW_SIM_ID:
+            to_simulation_type(ctx.g_ctx.mm_info);
+            break;
+        case LOAD_ID:
+            break;
+        case GRID3D_ID:
+            ctx.g_ctx.mm_info->state = MM_OPTIONS;
+            init_new_grid_screen3d();
+            break;
+        case GRID2D_ID:
+            ctx.g_ctx.mm_info->state = MM_OPTIONS;
+            init_new_grid_screen2d();
+            break;
+        case BACK:
+            to_main_screen(ctx.g_ctx.mm_info);
+            break;
+    }
+    ctx.pending_press = -1;
 }
 
 void handle_main_menu_events() {
@@ -188,11 +196,18 @@ void handle_main_menu_events() {
     handle_hover(ctx.g_ctx.mm_info, mouse_pos);
 }
 
-void init_new_grid_screen() {
-    init_placeholder_grid(ctx.g_ctx.grid_data);
+void init_new_grid_screen3d() {
+    init_placeholder_grid3d(ctx.g_ctx.grid_data);
     *ctx.g_ctx.p_info = init_physics_info(ctx.g_ctx.mm_p_info->p_shaders);
 
     ctx.g_ctx.g_info->g_info3d.g_s_settings.draw_grid_lines = 1;
+
+    ctx.g_ctx.grid_info.initialized = 1;
+}
+
+void init_new_grid_screen2d() {
+    init_placeholder_grid2d(ctx.g_ctx.grid_data);
+    *ctx.g_ctx.p_info = init_physics_info(ctx.g_ctx.mm_p_info->p_shaders);
 
     ctx.g_ctx.grid_info.initialized = 1;
 }

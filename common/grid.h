@@ -71,8 +71,11 @@ void upload_multigrid_constants(grid* grid);
 void upload_multigrid_variables(grid* grid, int current_level);
 void update_multigrid_variables(const grid* grid, int current_level);
 
-void init_placeholder_grid(grid* grid);
+void init_placeholder_grid2d(grid* grid);
+void init_placeholder_grid3d(grid* grid);
+
 void init_main_menu_grid3d(grid* mm_grid, float t_ambient);
+void init_main_menu_grid2d(grid* mm_grid, float t_ambient);
 
 void get_grid_size(const grid* grid_data, ivec3 out);
 void get_pyramid_size(const grid* grid_data, int level, ivec3 out);

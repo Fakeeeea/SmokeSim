@@ -122,7 +122,10 @@ void draw_step(grid* grid, graphics_info* g_info, physics_info* p_info) {
     graphics_clear(g_info);
 
     if(grid->is_2d) {
-        printf("somehow 2d?");
+        graphics_step_settings2d* g_s = &g_info->g_info2d.g_s_settings;
+
+        if(g_s->draw_smoke) draw_smoke2d(&g_info->g_info2d);
+        blit_framebuffer(g_info);
     } else {
         graphics_step_settings3d* g_s = &g_info->g_info3d.g_s_settings;
 
@@ -136,7 +139,6 @@ void draw_step(grid* grid, graphics_info* g_info, physics_info* p_info) {
 
         glBindTextureUnit(DEPTH_TEX, g_info->depth_tex.ID);
         if(g_s->draw_smoke) draw_smoke3d(&g_info->g_info3d);
-
     }
 }
 

@@ -25,6 +25,6 @@ typedef struct graphics_info2d {
 static graphics_step_settings2d get_default_g_s_settings2d();
 graphics_info2d init_graphics_info2d();
 
-void draw_step2d(const graphics_info2d* g_info);
+void draw_smoke2d(const graphics_info2d* g_info);
 
 #endif //SMOKESIM_GRAPHICS2D_H
