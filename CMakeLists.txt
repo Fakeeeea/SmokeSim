@@ -8,20 +8,20 @@ find_library(FREETYPE_LIB NAMES freetype PATHS "E:/Libraries/Lib" NO_DEFAULT_PAT
 
 add_executable(SmokeSim
         main.c
-        common/glad.c
-        common/shader.c
-        common/shader.h
+        common/graphics/glad.c
+        common/util/shader.c
+        common/util/shader.h
         3d/graphics3d.c
         3d/graphics3d.h
         3d/camera3d.c
         3d/camera3d.h
-        common/grid.c
-        common/grid.h
-        common/window.c
-        common/window.h
-        common/graphics_objects.h
-        common/texture.c
-        common/texture.h
+        common/physics/grid.c
+        common/physics/grid.h
+        common/util/window.c
+        common/util/window.h
+        common/graphics/graphics_objects.h
+        common/util/texture.c
+        common/util/texture.h
         nuklear/nuklear_glfw_gl3.h
         nuklear/nuklear.h
         common/gui/nk_styles.c
@@ -36,15 +36,15 @@ add_executable(SmokeSim
         2d/grid2d.h
         3d/grid3d.c
         3d/grid3d.h
-        common/opengl_bindings.h
-        common/emitters.c
-        common/emitters.h
-        common/obstacles.c
-        common/obstacles.h
-        common/physics.c
-        common/physics.h
-        common/graphics.c
-        common/graphics.h
+        common/graphics/opengl_bindings.h
+        common/physics/emitters.c
+        common/physics/emitters.h
+        common/physics/obstacles.c
+        common/physics/obstacles.h
+        common/physics/physics.c
+        common/physics/physics.h
+        common/graphics/graphics.c
+        common/graphics/graphics.h
         3d/graphics3d.c
         3d/graphics3d.h
         3d/graphics_objects3d.c

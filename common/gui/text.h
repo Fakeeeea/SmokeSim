@@ -8,7 +8,7 @@
 #include <cglm/cglm.h>
 #include <ft2build.h>
 
-#include "../texture.h"
+#include "../util/texture.h"
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO

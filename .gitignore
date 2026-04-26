@@ -5,4 +5,4 @@ cmake-build-debug/
 nuklear/
 
 #Ignore files
-common/glad.c
+common/graphics/glad.c

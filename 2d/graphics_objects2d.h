@@ -5,7 +5,7 @@
 #ifndef SMOKESIM_GRAPHICS_OBJECTS2D_H
 #define SMOKESIM_GRAPHICS_OBJECTS2D_H
 
-#include "../common/graphics_objects.h"
+#include "../common/graphics/graphics_objects.h"
 
 enum DIRECTIONS2D {
     DIR2D_X,

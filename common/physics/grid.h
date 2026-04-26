@@ -6,13 +6,13 @@
 #ifndef SMOKESIM_GRID_H
 #define SMOKESIM_GRID_H
 
-#include "opengl_bindings.h"
-#include "texture.h"
-#include "shader.h"
+#include "../graphics/opengl_bindings.h"
+#include "../util/texture.h"
+#include "../util/shader.h"
 #include "obstacles.h"
 #include "emitters.h"
-#include "../3d/grid3d.h"
-#include "../2d/grid2d.h"
+#include "../../3d/grid3d.h"
+#include "../../2d/grid2d.h"
 
 #define MAX_GRID_SIZE_ARRAY 16
 #define MAX_GRID_SIZE 65536

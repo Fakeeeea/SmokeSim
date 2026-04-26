@@ -7,8 +7,8 @@
 
 #include <cglm/cglm.h>
 
-#include "../physics.h"
-#include "../graphics.h"
+#include "../physics/physics.h"
+#include "../graphics/graphics.h"
 #include "main_menu.h"
 
 

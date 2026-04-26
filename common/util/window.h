@@ -7,9 +7,9 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "graphics.h"
-#include "physics.h"
-#include "gui/gui.h"
+#include "../graphics/graphics.h"
+#include "../physics/physics.h"
+#include "../gui/gui.h"
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -25,8 +25,8 @@
 #pragma warning(disable:4116)
 #endif
 
-#include "../nuklear/nuklear.h"
-#include "../nuklear/nuklear_glfw_gl3.h"
+#include "../../nuklear/nuklear.h"
+#include "../../nuklear/nuklear_glfw_gl3.h"
 
 #ifdef _MSC_VER
 #pragma warning(pop)

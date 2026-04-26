@@ -32,6 +32,7 @@
 
 void draw_color_picker(struct nk_context* nk_ctx,  const char* label, vec3 var, float mul);
 void draw_header(struct nk_context* nk_ctx, const char* label);
+void draw_subheader(struct nk_context* nk_ctx, const char* label);
 
 int draw_ivec2_property_keepratio(struct nk_context* nk_ctx, const char* label, int* var, int min, int max, int step, float ratio);
 

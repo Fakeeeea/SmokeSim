@@ -5,7 +5,7 @@
 #ifndef SMOKESIM_GRID3D_H
 #define SMOKESIM_GRID3D_H
 
-#include "../common/texture.h"
+#include "../common/util/texture.h"
 
 typedef struct grid3d {
     ivec3 size;

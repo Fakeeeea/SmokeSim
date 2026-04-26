@@ -69,7 +69,7 @@ int draw_grid_size_settings(gui_ctx* g_ctx) {
     int change = 0;
     static int keep_ratio = 1;
 
-    draw_header(g_ctx->nk_ctx, "Grid Size");
+    draw_header(g_ctx->nk_ctx, "Grid Settings");
     if(g_ctx->grid_data->is_2d) {
         nk_layout_row_dynamic(g_ctx->nk_ctx, 30, 2);
         if(keep_ratio) {
@@ -85,6 +85,8 @@ int draw_grid_size_settings(gui_ctx* g_ctx) {
         change += draw_ivec3_property(g_ctx->nk_ctx, "", g_ctx->grid_data->grid3d_data.size, 3, 1024, 2);
     }
 
+    nk_layout_row_dynamic(g_ctx->nk_ctx, 30, 1);
+    nk_property_float(g_ctx->nk_ctx, "Cell size: ", 0.0001f, &g_ctx->grid_data->cell_size, 10.0f, 0.01f, 0.01f);
 
     return change;
 }
@@ -115,6 +117,10 @@ void draw_confirm_button(gui_ctx* g_ctx) {
             init_solid_map(g_ctx->grid_data, &g_ctx->p_info->p_shaders);
         }
 
+        if(g_ctx->grid_data->is_2d) {
+            g_ctx->g_info->g_settings.smoke_density_factor = 1;
+        }
+
         g_ctx->mm_info->state = MM_CLOSED;
         g_ctx->g_info->g_info3d.g_s_settings.draw_grid_lines = 0;
         g_ctx->grid_info.created = 1;
@@ -126,6 +132,9 @@ void draw_discard_button(gui_ctx* g_ctx) {
     if(nk_button_text(g_ctx->nk_ctx, "Discard", 7)) {
         g_ctx->mm_info->state = MM_MAIN_SCREEN;
         g_ctx->g_info->g_info3d.g_s_settings.draw_grid_lines = 0;
+
+        free_grid(g_ctx->grid_data);
+        g_ctx->grid_info.initialized = 0;
     }
 }
 
@@ -175,10 +184,15 @@ void draw_physics_settings(gui_ctx *g_ctx) {
         change += nk_property_float(g_ctx->nk_ctx, "#Weight Coefficient:", 0.0f, &p_settings->t_weight_coeff, 10.0f, 0.01f, 0.05f);
 
         if(!g_ctx->p_info->enclosed) {
+
+            draw_subheader(g_ctx->nk_ctx, "Wind velocities");
+
             if(g_ctx->grid_data->is_2d) {
-                change += draw_vec2_property(g_ctx->nk_ctx, "Wind", p_settings->wind, -15, 15, 1);
+                nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 2);
+                change += draw_vec2_property(g_ctx->nk_ctx, "", p_settings->wind, -15, 15, 1);
             } else {
-                change += draw_vec3_property(g_ctx->nk_ctx, "Wind", p_settings->wind, -15, 15, 1);
+                nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 3);
+                change += draw_vec3_property(g_ctx->nk_ctx, "", p_settings->wind, -15, 15, 1);
             }
         }
 

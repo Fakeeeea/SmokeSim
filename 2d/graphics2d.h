@@ -5,7 +5,7 @@
 #ifndef SMOKESIM_GRAPHICS2D_H
 #define SMOKESIM_GRAPHICS2D_H
 
-#include "../common/shader.h"
+#include "../common/util/shader.h"
 #include "graphics_objects2d.h"
 
 typedef struct graphics_step_settings2d{

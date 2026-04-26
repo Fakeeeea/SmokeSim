@@ -5,7 +5,7 @@
 #ifndef SMOKESIM_GRAPHICS3D_H
 #define SMOKESIM_GRAPHICS3D_H
 
-#include "../common/shader.h"
+#include "../common/util/shader.h"
 #include "camera3d.h"
 #include "graphics_objects3d.h"
 

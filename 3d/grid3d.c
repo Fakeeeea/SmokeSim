@@ -3,7 +3,7 @@
 //
 
 #include "grid3d.h"
-#include "../common/opengl_bindings.h"
+#include "../common/graphics/opengl_bindings.h"
 
 #include <glad/glad.h>
 

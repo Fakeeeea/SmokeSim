@@ -5,7 +5,7 @@
 #ifndef SMOKESIM_GRAPHICS_OBJECTS3D_H
 #define SMOKESIM_GRAPHICS_OBJECTS3D_H
 
-#include "../common/graphics_objects.h"
+#include "../common/graphics/graphics_objects.h"
 #include <cglm/cglm.h>
 
 enum DIRECTIONS3D {

@@ -7,10 +7,10 @@
 
 #include <glad/glad.h>
 
-#include "common/shader.h"
-#include "common/graphics.h"
-#include "common/physics.h"
-#include "common/window.h"
+#include "common/util/shader.h"
+#include "common/graphics/graphics.h"
+#include "common/physics/physics.h"
+#include "common/util/window.h"
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO

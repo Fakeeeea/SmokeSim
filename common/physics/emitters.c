@@ -3,7 +3,7 @@
 //
 
 #include "emitters.h"
-#include "opengl_bindings.h"
+#include "../graphics/opengl_bindings.h"
 
 #include <glad/glad.h>
 

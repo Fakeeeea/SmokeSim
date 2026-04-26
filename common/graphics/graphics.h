@@ -11,12 +11,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../2d/graphics2d.h"
-#include "../3d/graphics3d.h"
+#include "../../2d/graphics2d.h"
+#include "../../3d/graphics3d.h"
 
-#include "../common/texture.h"
-#include "../common/physics.h"
-#include "../common/gui/main_menu.h"
+#include "../util/texture.h"
+#include "../physics/physics.h"
+#include "../gui/main_menu.h"
 
 #define INIT_SCREEN_SIZE_X 1600
 #define INIT_SCREEN_SIZE_Y 900
