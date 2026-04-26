@@ -112,7 +112,7 @@ void main() {
         else scaled_arrow.z *= -1.0f;
     }
 
-    const float ARROW_MIN = 0.001;
+    const float ARROW_MIN = 0.1;
 
     if(abs(velocity_value) < ARROW_MIN) {
         scaled_arrow = vec3(0);

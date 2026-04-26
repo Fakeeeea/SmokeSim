@@ -2,18 +2,6 @@
 
 layout (location = 0) in vec3 arrow_pos;
 
-layout(binding = 0) uniform sampler3D vx_read_tex;
-layout(binding = 1) uniform sampler3D vy_read_tex;
-layout(binding = 2) uniform sampler3D vz_read_tex;
-layout(binding = 3) uniform sampler3D smoke_read_tex;
-
-layout(binding = 0, r32f) writeonly uniform image3D vx_write_temp_image;
-layout(binding = 1, r32f) writeonly uniform image3D vy_write_temp_image;
-layout(binding = 2, r32f) writeonly uniform image3D vz_write_temp_image;
-layout(binding = 3, rgba16f) writeonly uniform image3D smoke_write_temp_image;
-
-layout(binding = 4, r32f) uniform image3D pressure_map;
-layout(binding = 5, rgba16f) uniform image3D solid_map;
 layout(binding = 6, rgba16f) uniform image3D vorticity;
 
 layout(std140, binding = 1) uniform constants {

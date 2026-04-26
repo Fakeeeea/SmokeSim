@@ -17,7 +17,7 @@ typedef struct graphics_objects2d {
 
     draw_object circle;
 
-    draw_object arrow[2];
+    draw_object arrows[2];
 }graphics_objects2d;
 
 static draw_object get_rect(const vec2 size);

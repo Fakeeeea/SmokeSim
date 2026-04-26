@@ -49,10 +49,17 @@ void draw_velocities2d(const graphics_info2d* g_info, const ivec2 grid_size) {
     glUseProgram(g_info->shaders.draw_velocities);
 
     glUniform1i(direction_location, 0);
-    glBindVertexArray(g_info->g_objects.arrow[0].VAO);
-    glDrawElementsInstanced(GL_TRIANGLES, g_info->g_objects.arrow[0].index_count, GL_UNSIGNED_INT, 0, (grid_size[0] + 1) * grid_size[1]);
+    glBindVertexArray(g_info->g_objects.arrows[0].VAO);
+    glDrawElementsInstanced(GL_TRIANGLES, g_info->g_objects.arrows[0].index_count, GL_UNSIGNED_INT, 0, (grid_size[0] + 1) * grid_size[1]);
 
     glUniform1i(direction_location, 1);
-    glBindVertexArray(g_info->g_objects.arrow[1].VAO);
-    glDrawElementsInstanced(GL_TRIANGLES, g_info->g_objects.arrow[1].index_count, GL_UNSIGNED_INT, 0, grid_size[0] * (grid_size[1] + 1));
+    glBindVertexArray(g_info->g_objects.arrows[1].VAO);
+    glDrawElementsInstanced(GL_TRIANGLES, g_info->g_objects.arrows[1].index_count, GL_UNSIGNED_INT, 0, grid_size[0] * (grid_size[1] + 1));
+}
+
+void draw_vorticity2d(const graphics_info2d* g_info, const ivec2 grid_size) {
+    glUseProgram(g_info->shaders.draw_vorticity);
+
+    glBindVertexArray(g_info->g_objects.arrows[DIR2D_X].VAO);
+    glDrawElementsInstanced(GL_TRIANGLES, g_info->g_objects.arrows[DIR2D_X].index_count, GL_UNSIGNED_INT, 0, (grid_size[0]) * (grid_size[1]));
 }

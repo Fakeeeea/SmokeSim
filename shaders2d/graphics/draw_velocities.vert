@@ -87,12 +87,14 @@ void main() {
         else scaled_arrow.y *= -1.0f;
     }
 
-    const float ARROW_MIN = 0.001;
+    const float ARROW_MIN = 0.1;
 
     if(abs(velocity_value) < ARROW_MIN) {
         scaled_arrow = vec2(0);
         world_pos = vec2(0);
     }
 
-    gl_Position = projection * look_at * vec4(scaled_arrow + world_pos, -1.0, 1.0);
+    vec2 clip_pos = (scaled_arrow + world_pos) * 2.0 - 1.0;
+
+    gl_Position =  vec4(clip_pos, -1.0, 1.0);
 }

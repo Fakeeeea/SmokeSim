@@ -127,6 +127,7 @@ void draw_step(grid* grid, graphics_info* g_info, physics_info* p_info) {
         if(g_s->draw_smoke) draw_smoke2d(&g_info->g_info2d);
         if(g_s->draw_obstacles) draw_obstacles2d(&g_info->g_info2d, p_info->o_info.obstacles_count);
         if(g_s->draw_velocities) draw_velocities2d(&g_info->g_info2d, grid->grid2d_data.size);
+        if(g_s->draw_vorticity) draw_vorticity2d(&g_info->g_info2d, grid->grid2d_data.size);
         blit_framebuffer(g_info);
     } else {
         graphics_step_settings3d* g_s = &g_info->g_info3d.g_s_settings;

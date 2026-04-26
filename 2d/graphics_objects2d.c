@@ -25,7 +25,7 @@ static draw_object get_arrow2d(const vec2 pointing_to) {
     unsigned int indices[] = {
             //TAIL
             0,1,2,
-            1,2,3,
+            1,3,2,
 
             //HEAD
             4,5,6
@@ -44,7 +44,7 @@ static draw_object get_arrow2d(const vec2 pointing_to) {
         float py = vertices[i+1];
 
         vertices[i] = px * cos_tetha - py * sin_tetha;
-        vertices[i+1] = py * sin_tetha + py * cos_tetha;
+        vertices[i+1] = px * sin_tetha + py * cos_tetha;
     }
 
     arrow.index_count = 9;
@@ -157,8 +157,8 @@ graphics_objects2d get_graphics_objects2d() {
     g_objects.screen_rect = get_rect((vec2){1,1});
     g_objects.circle = get_circle(1, 16);
 
-    g_objects.arrow[DIR2D_X] = get_arrow2d((vec2){1, 0});
-    g_objects.arrow[DIR2D_Y] = get_arrow2d((vec2){0, 1});
+    g_objects.arrows[DIR2D_X] = get_arrow2d((vec2){1, 0});
+    g_objects.arrows[DIR2D_Y] = get_arrow2d((vec2){0, 1});
 
     return g_objects;
 }

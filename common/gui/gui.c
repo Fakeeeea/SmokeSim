@@ -264,6 +264,8 @@ void draw_graphics_step_settings2d(gui_ctx* g_ctx) {
         nk_layout_row_dynamic(g_ctx->nk_ctx, 15, 1);
         nk_checkbox_label(g_ctx->nk_ctx, "Draw Smoke", &g_s_settings->draw_smoke);
         nk_checkbox_label(g_ctx->nk_ctx, "Draw Obstacles", &g_s_settings->draw_obstacles);
+        nk_checkbox_label(g_ctx->nk_ctx, "Draw Velocities", &g_s_settings->draw_velocities);
+        nk_checkbox_label(g_ctx->nk_ctx, "Draw Vorticity", &g_s_settings->draw_vorticity);
 
         nk_tree_pop(g_ctx->nk_ctx);
     }
