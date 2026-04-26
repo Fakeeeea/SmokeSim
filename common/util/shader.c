@@ -231,6 +231,8 @@ graphics_shaders2d compile_graphics_shaders2d() {
                                                      "../shaders2d/graphics/draw_velocities.frag");
     g_shaders.draw_vorticity = get_graphics_program("../shaders2d/graphics/draw_vorticity.vert",
                                                     "../shaders2d/graphics/draw_vorticity.frag");
+    g_shaders.draw_grid_lines = get_graphics_program("../shaders2d/graphics/draw_grid_lines.vert",
+                                                     "../shaders2d/graphics/draw_grid_lines.frag");
 
     return g_shaders;
 }

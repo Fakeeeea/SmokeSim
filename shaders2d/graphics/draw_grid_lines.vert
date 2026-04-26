@@ -36,9 +36,21 @@ layout(std140, binding = 0) uniform graphics_variables {
     float fov;
 };
 
+uniform int direction;
+
 void main() {
     int idx = gl_InstanceID;
 
+    vec2 cell_width = 1.0 / vec2(grid_size.xy);
+    vec2 new_pos;
 
+    if(direction == 0) {
+        new_pos = vec2(pos.x, pos.y + cell_width.y * idx);
+    } else {
+        new_pos = vec2(pos.x + cell_width.x * idx, pos.y);
+    }
 
+    vec2 clip_pos = new_pos * 2.0 - 1.0;
+
+    gl_Position = vec4(clip_pos, -1.0, 1.0);
 }

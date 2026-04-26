@@ -29,5 +29,6 @@ void draw_smoke2d(const graphics_info2d* g_info);
 void draw_velocities2d(const graphics_info2d* g_info, const ivec2 grid_size);
 void draw_obstacles2d(const graphics_info2d* g_info, unsigned int obstacle_count);
 void draw_vorticity2d(const graphics_info2d* g_info, const ivec2 grid_size);
+void draw_grid2d(const graphics_info2d* g_info, const ivec2 grid_size);
 
 #endif //SMOKESIM_GRAPHICS2D_H

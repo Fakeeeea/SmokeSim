@@ -279,6 +279,7 @@ void draw_graphics_step_settings2d(gui_ctx* g_ctx) {
         nk_checkbox_label(g_ctx->nk_ctx, "Draw Obstacles", &g_s_settings->draw_obstacles);
         nk_checkbox_label(g_ctx->nk_ctx, "Draw Velocities", &g_s_settings->draw_velocities);
         nk_checkbox_label(g_ctx->nk_ctx, "Draw Vorticity", &g_s_settings->draw_vorticity);
+        nk_checkbox_label(g_ctx->nk_ctx, "Draw Grid Lines", &g_s_settings->draw_grid_lines);
 
         nk_tree_pop(g_ctx->nk_ctx);
     }

@@ -63,3 +63,18 @@ void draw_vorticity2d(const graphics_info2d* g_info, const ivec2 grid_size) {
     glBindVertexArray(g_info->g_objects.arrows[DIR2D_X].VAO);
     glDrawElementsInstanced(GL_TRIANGLES, g_info->g_objects.arrows[DIR2D_X].index_count, GL_UNSIGNED_INT, 0, (grid_size[0]) * (grid_size[1]));
 }
+
+void draw_grid2d(const graphics_info2d* g_info, const ivec2 grid_size) {
+    glUseProgram(g_info->shaders.draw_grid_lines);
+
+    static int direction_location = -1;
+    if(direction_location == -1) direction_location = glGetUniformLocation(g_info->shaders.draw_grid_lines, "direction");
+
+    glBindVertexArray(g_info->g_objects.lines[DIR2D_X].VAO);
+    glUniform1i(direction_location, 0);
+    glDrawElementsInstanced(GL_LINES, g_info->g_objects.lines[DIR2D_X].index_count, GL_UNSIGNED_INT, 0, grid_size[1] + 1);
+
+    glBindVertexArray(g_info->g_objects.lines[DIR2D_Y].VAO);
+    glUniform1i(direction_location, 1);
+    glDrawElementsInstanced(GL_LINES, g_info->g_objects.lines[DIR2D_Y].index_count, GL_UNSIGNED_INT, 0, grid_size[0] + 1);
+}

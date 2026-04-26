@@ -46,6 +46,7 @@ typedef struct graphics_shaders2d {
     unsigned int draw_obstacles;
     unsigned int draw_velocities;
     unsigned int draw_vorticity;
+    unsigned int draw_grid_lines;
 }graphics_shaders2d;
 
 typedef struct physics_shaders2d {

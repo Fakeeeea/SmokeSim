@@ -151,6 +151,39 @@ static draw_object get_circle(const float radius, const int segment_count) {
     return circle;
 }
 
+static draw_object get_line2d(const vec2 start, const vec2 end) {
+
+    draw_object line;
+
+    float vertices[] = {
+            start[0], start[1],
+            end[0], end[1]
+    };
+
+    unsigned int indices[] = {
+            0, 1,
+    };
+
+    line.index_count = 2;
+
+    glGenBuffers(1, &line.VBO), glGenBuffers(1, &line.EBO), glGenVertexArrays(1, &line.VAO);
+    glBindVertexArray(line.VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, line.VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, line.EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2*sizeof(float), (void*) 0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    return line;
+}
+
 graphics_objects2d get_graphics_objects2d() {
     graphics_objects2d g_objects;
 
@@ -159,6 +192,9 @@ graphics_objects2d get_graphics_objects2d() {
 
     g_objects.arrows[DIR2D_X] = get_arrow2d((vec2){1, 0});
     g_objects.arrows[DIR2D_Y] = get_arrow2d((vec2){0, 1});
+
+    g_objects.lines[DIR2D_X] = get_line2d((vec2){0,0}, (vec2){1,0});
+    g_objects.lines[DIR2D_Y] = get_line2d((vec2){0,0}, (vec2){0,1});
 
     return g_objects;
 }
