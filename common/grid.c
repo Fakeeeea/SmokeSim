@@ -176,17 +176,20 @@ void multigrid_pressure_solve(grid* grid, const physics_shaders* shaders) {
 
 void v_cycle(grid* grid, const physics_shaders* shaders, int current_level) {
 
+    const int LAST_SMOOTH_ITERATIONS = 80;
+    const int SMOOTH_ITERATIONS = 16;
+
     int pyramids_count = grid->is_2d ? grid->grid2d_data.pyramids_count : grid->grid3d_data.pyramids_count;
 
     update_multigrid_variables(grid, current_level);
     bind_multigrid_textures(grid, current_level);
 
     if(current_level == pyramids_count - 1) {
-        smooth(grid, shaders, 80, current_level);
+        smooth(grid, shaders, LAST_SMOOTH_ITERATIONS, current_level);
         return;
     }
 
-    smooth(grid, shaders, 16, current_level);
+    smooth(grid, shaders, SMOOTH_ITERATIONS, current_level);
     compute_residual(grid, shaders, current_level);
     compute_restrict(grid, shaders, current_level);
 
@@ -202,7 +205,7 @@ void v_cycle(grid* grid, const physics_shaders* shaders, int current_level) {
     bind_multigrid_textures(grid, current_level);
 
     prolong_and_add(grid, shaders, current_level);
-    smooth(grid, shaders, 16, current_level);
+    smooth(grid, shaders, SMOOTH_ITERATIONS, current_level);
 }
 
 void smooth(const grid* grid, const physics_shaders* shaders, const int iterations, const int current_level) {
@@ -338,8 +341,8 @@ void init_placeholder_grid3d(grid* grid) {
 
 void init_placeholder_grid2d(grid* grid) {
     const float PLACEHOLDER_CELL_SIZE = 0.1f;
-    const int PLACEHOLDER_RESOLUTIONX = 1920;
-    const int PLACEHOLDER_RESOLUTIONY = 1080;
+    const int PLACEHOLDER_RESOLUTIONX = 400;
+    const int PLACEHOLDER_RESOLUTIONY = 225;
 
     grid->is_2d = 1;
     grid->grid2d_data = get_grid2d((ivec2){PLACEHOLDER_RESOLUTIONX, PLACEHOLDER_RESOLUTIONY});

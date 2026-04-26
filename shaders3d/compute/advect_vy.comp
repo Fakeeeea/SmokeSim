@@ -66,7 +66,7 @@ void main() {
         return;
     }
 
-    vec3 world_pos = vec3(idx.x + 0.5f, idx.y, idx.z + 0.5f) * cell_size;
+    vec3 world_pos = vec3(float(idx.x) + 0.5f, idx.y, float(idx.z) + 0.5f) * cell_size;
     vec3 v = get_interpolated_velocity(world_pos);
     vec3 comes_from = world_pos - (v * time_step);
 

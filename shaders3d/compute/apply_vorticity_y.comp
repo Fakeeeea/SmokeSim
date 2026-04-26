@@ -32,7 +32,7 @@ layout(std140, binding = 1) uniform constants {
 
 
 vec3 vorticity_at(ivec3 pos) {
-    if(any(lessThan(pos, vec3(0))) || any(greaterThanEqual(pos, grid_size.xyz))) return vec3(0);
+    if(any(lessThan(pos, ivec3(0))) || any(greaterThanEqual(pos, grid_size.xyz))) return vec3(0);
     return imageLoad(vorticity, pos).xyz;
 }
 

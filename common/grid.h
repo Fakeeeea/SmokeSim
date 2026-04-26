@@ -14,8 +14,8 @@
 #include "../3d/grid3d.h"
 #include "../2d/grid2d.h"
 
-#define MAX_GRID_SIZE_ARRAY 31
-#define MAX_GRID_SIZE 2147483647
+#define MAX_GRID_SIZE_ARRAY 16
+#define MAX_GRID_SIZE 65536
 
 typedef struct grid {
     int is_2d;

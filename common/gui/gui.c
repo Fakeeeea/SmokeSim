@@ -57,8 +57,8 @@ void draw_creation_settings(gui_ctx* g_ctx) {
         change += draw_creation_physics_settings(g_ctx);
         draw_confirm_button(g_ctx);
         draw_discard_button(g_ctx);
-        nk_end(g_ctx->nk_ctx);
     }
+    nk_end(g_ctx->nk_ctx);
 
     if(change > 0) {
         update_physics_variables(g_ctx->p_info->physics_variables_ubo, g_ctx->grid_data, g_ctx->p_info->p_settings);
@@ -147,9 +147,8 @@ void draw_simulation_settings(gui_ctx* g_ctx) {
         }
 
         draw_checkboxes(g_ctx);
-
-        nk_end(g_ctx->nk_ctx);
     }
+    nk_end(g_ctx->nk_ctx);
 
     if(g_ctx->s_info.emitters_window_open) {
         draw_emitters_settings(g_ctx);
@@ -292,7 +291,7 @@ void draw_emitters_settings(gui_ctx* g_ctx) {
         for(int i = 0; i < e_info_ptr->emitters_count; ++i) {
             int current_change = draw_emitter_info(g_ctx, i);
             if(current_change == -1) {
-                handle_emitter_creation(e_info_ptr->emitters_ssbo, &e_info_ptr->emitters_array, &e_info_ptr->emitters_count);
+                handle_emitter_deletion(e_info_ptr->emitters_ssbo, &e_info_ptr->emitters_array, &e_info_ptr->emitters_count, i);
             } else {
                 change += current_change;
             }
@@ -306,7 +305,6 @@ void draw_emitters_settings(gui_ctx* g_ctx) {
         if(draw_create_button(g_ctx->nk_ctx, "Create new emitter", 18)) {
             handle_emitter_creation(e_info_ptr->emitters_ssbo, &e_info_ptr->emitters_array, &e_info_ptr->emitters_count);
         }
-
     }
     nk_end(g_ctx->nk_ctx);
 }

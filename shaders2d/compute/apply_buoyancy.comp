@@ -39,7 +39,7 @@ void main() {
     if(idx.x >= grid_size.x || idx.y >= (grid_size.y+1)) return;
     if(is_solid(idx) >= 1 || is_solid(idx + ivec2(0, -1)) >= 1) return;
 
-    vec2 staggered_pos = (idx + vec2(0.5f, 0.0f)) / (grid_size.xy);
+    vec2 staggered_pos = (vec2(idx) + vec2(0.5f, 0.0f)) / (grid_size.xy);
     vec4 smoke = texture(smoke_read_tex, staggered_pos);
     float total_density = smoke.r + smoke.g + smoke.b;
 

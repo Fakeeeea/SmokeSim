@@ -39,7 +39,7 @@ layout(std430, binding = 5) buffer obstacle_in {
     obstacle obstacles_in[];
 };
 
-shared obstacle shared_obs[512];
+shared obstacle shared_obs[64];
 
 void main() {
     ivec2 idx = ivec2(gl_GlobalInvocationID.xy);
@@ -47,11 +47,11 @@ void main() {
     bool valid = !(idx.x <= 1 || idx.y <= 1 || idx.x >= (grid_size.x - 1) || idx.y >= (grid_size.y -1));
     vec4 new_val = vec4(0);
 
-    int num_tiles = (obstacle_count_in + 511) / 512;
+    int num_tiles = (obstacle_count_in + 63) / 64;
 
     for(int tile = 0; tile < num_tiles; tile++) {
 
-        int load_idx = tile * 512 + int(gl_LocalInvocationIndex);
+        int load_idx = tile * 64 + int(gl_LocalInvocationIndex);
 
         if(load_idx < obstacle_count_in) {
             shared_obs[gl_LocalInvocationIndex] = obstacles_in[load_idx];
@@ -63,8 +63,8 @@ void main() {
         barrier();
 
         if(valid) {
-            for(int i = 0; i < 512; ++i) {
-                int current_tile_idx = tile * 512 + i;
+            for(int i = 0; i < 64; ++i) {
+                int current_tile_idx = tile * 64 + i;
                 if(current_tile_idx >= obstacle_count_in) break;
 
                 obstacle current = shared_obs[i];

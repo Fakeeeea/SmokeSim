@@ -36,8 +36,8 @@ void main() {
 
     if(any(greaterThanEqual(pos, size))) return;
 
-    if(pos.x == 0 || pos.x == size.x -1 ||
-        pos.y == 0 || pos.y == size.y -1) {
+    if(pos.x == 0 || pos.x == (size.x -1) ||
+        pos.y == 0 || pos.y == (size.y -1)) {
 
         imageStore(solid_map, pos, vec4(0, 0, 0, 1));
     }
