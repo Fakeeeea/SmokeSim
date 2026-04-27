@@ -21,7 +21,7 @@ Featuring a [`nuklear.h`](https://github.com/Immediate-Mode-UI/Nuklear) GUI for 
 
 </div>
 
-## 🚀 Optimization Sidequest
+## Optimization Sidequest
 
 > **Test hardware:** Intel core i5-10500, NVIDIA RTX 3070, 32GB RAM
 
@@ -41,7 +41,7 @@ You might be tempted to call that a 100% performance improvement, which is alrea
 
 That is **8 times more cells** being simulated at the exact same framerate. It's an impressive leap in efficiency, an 800% performance increase.
 
-## 🛠️  Building
+## Building
 
 *(instructions coming soon)*
 
