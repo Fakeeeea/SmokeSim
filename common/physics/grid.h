@@ -70,6 +70,7 @@ void prolong_and_add(const grid *grid, const physics_shaders* shaders, int curre
 void bind_multigrid_textures(const grid* grid, int current_level);
 
 void upload_multigrid_constants(grid* grid);
+void update_multigrid_constants(const grid* grid);
 void upload_multigrid_variables(grid* grid, int current_level);
 void update_multigrid_variables(const grid* grid, int current_level);
 

@@ -199,8 +199,10 @@ void handle_main_menu_events() {
 void init_new_grid_screen3d() {
     init_placeholder_grid3d(ctx.g_ctx.grid_data);
     *ctx.g_ctx.p_info = init_physics_info(ctx.g_ctx.mm_p_info->p_shaders);
+    p_info_upload_data(ctx.g_ctx.p_info, ctx.g_ctx.grid_data);
 
     ctx.g_ctx.g_info->g_info3d.g_s_settings.draw_grid_lines = 1;
+    ctx.g_ctx.g_info->g_info3d.g_s_settings.draw_smoke = 0; //smoke cannot be drawn initially as the textures are not generated. Without this it's gonna use the menu's smoke texture.
 
     ctx.g_ctx.grid_info.initialized = 1;
 }
@@ -208,6 +210,10 @@ void init_new_grid_screen3d() {
 void init_new_grid_screen2d() {
     init_placeholder_grid2d(ctx.g_ctx.grid_data);
     *ctx.g_ctx.p_info = init_physics_info(ctx.g_ctx.mm_p_info->p_shaders);
+    p_info_upload_data(ctx.g_ctx.p_info, ctx.g_ctx.grid_data);
+
+    ctx.g_ctx.g_info->g_info2d.g_s_settings.draw_grid_lines = 1;
+    ctx.g_ctx.g_info->g_info2d.g_s_settings.draw_smoke = 0; //smoke cannot be drawn initially as the textures are not generated. Without this it's gonna use the menu's smoke texture.
 
     ctx.g_ctx.grid_info.initialized = 1;
 }

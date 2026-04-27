@@ -22,11 +22,6 @@ typedef struct graphics_objects2d {
     draw_object lines[2];
 }graphics_objects2d;
 
-draw_object get_rect(const vec2 size);
-draw_object get_arrow2d(const vec2 pointing_to);
-draw_object get_sphere(float radius, int segment_count);
-draw_object get_line2d(const vec2 start, const vec2 end);
-
 graphics_objects2d get_graphics_objects2d();
 
 #endif //SMOKESIM_GRAPHICS_OBJECTS2D_H

@@ -56,6 +56,12 @@ void p_info_upload_data(physics_info* p_info, const grid* grid) {
     p_info->time_ubo = upload_time(0);
 }
 
+void p_info_update_data_notime(physics_info* p_info, const grid* grid) {
+    update_obstacles(p_info->o_info.obstacles_array, p_info->o_info.obstacles_count, p_info->o_info.obstacles_ssbos);
+    update_emitters(p_info->e_info.emitters_ssbo, p_info->e_info.emitters_array, p_info->e_info.emitters_count);
+    update_physics_variables(p_info->physics_variables_ubo, grid, p_info->p_settings);
+}
+
 void run_physics_step(grid* grid, physics_info* p_info) {
     physics_step_settings p_s_settings = p_info->p_s_settings;
     physics_shaders p_shaders = p_info->p_shaders;

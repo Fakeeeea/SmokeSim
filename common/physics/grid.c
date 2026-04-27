@@ -296,6 +296,32 @@ void upload_multigrid_constants(grid* grid) {
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+void update_multigrid_constants(const grid* grid) {
+    ivec4 sizes[MAX_GRID_SIZE_ARRAY];
+
+    int pyramids_count = grid->is_2d ? grid->grid2d_data.pyramids_count : grid->grid3d_data.pyramids_count;
+
+    for(int i = 0; i < pyramids_count; ++i) {
+        if(grid->is_2d) {
+            sizes[i][0] = grid->grid2d_data.pyramids_sizes[i][0];
+            sizes[i][1] = grid->grid2d_data.pyramids_sizes[i][1];
+            sizes[i][2] = grid->grid2d_data.pyramids_sizes[i][2];
+            sizes[i][3] = grid->grid2d_data.pyramids_sizes[i][3];
+        } else {
+            sizes[i][0] = grid->grid3d_data.pyramids_sizes[i][0];
+            sizes[i][1] = grid->grid3d_data.pyramids_sizes[i][1];
+            sizes[i][2] = grid->grid3d_data.pyramids_sizes[i][2];
+            sizes[i][3] = grid->grid3d_data.pyramids_sizes[i][3];
+        }
+
+    }
+
+    glBindBuffer(GL_UNIFORM_BUFFER, grid->multigrid_constants_ubo);
+    glBufferData(GL_UNIFORM_BUFFER, MAX_GRID_SIZE_ARRAY*sizeof(ivec4)+sizeof(int), NULL, GL_STATIC_DRAW);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, MAX_GRID_SIZE_ARRAY*sizeof(ivec4), sizes);
+    glBufferSubData(GL_UNIFORM_BUFFER, MAX_GRID_SIZE_ARRAY*sizeof(ivec4), sizeof(int), &pyramids_count);
+}
+
 void upload_multigrid_variables(grid* grid, const int current_level) {
     glGenBuffers(1, &grid->multigrid_variables_ubo);
 

@@ -79,18 +79,18 @@ static draw_object get_sphere(const float radius, const int sector_count, const 
     sphere.index_count = stack_count * sector_count * 6;
     unsigned int* indices = malloc(sphere.index_count * sizeof(unsigned int));
 
-    float sector_step = (2 * M_PI) / sector_count;
+    float sector_step = (2 * GLM_PIf) / (float) sector_count;
     float stack_step = M_PI / stack_count;
 
     int k = 0;
 
     for(int i = 0; i <= stack_count; ++i) {
-        float stack_angle = M_PI_2 - i * stack_step;
+        float stack_angle = M_PI_2 - (float) i * stack_step;
         xy = radius * cosf(stack_angle);
         z = radius * sinf(stack_angle);
 
         for(int j = 0; j <= sector_count; ++j) {
-            float sector_angle = j * sector_step;
+            float sector_angle = (float) j * sector_step;
 
             x = xy * cosf(sector_angle);
             y = xy * sinf(sector_angle);
@@ -130,10 +130,10 @@ static draw_object get_sphere(const float radius, const int sector_count, const 
     glBindVertexArray(sphere.VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, sphere.VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices_float_count * sizeof(float), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr) (vertices_float_count * sizeof(float)), vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphere.EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphere.index_count * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr) (sphere.index_count * sizeof(unsigned int)), indices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*) 0);
     glEnableVertexAttribArray(0);
@@ -175,7 +175,7 @@ static draw_object get_arrow3d(const vec3 pointing_to) {
     };
 
     vec3 base_direction = {0.0f, 1.0f, 0.0f};
-    vec3 normalized_pointing; glm_vec3_copy(pointing_to, normalized_pointing); glm_normalize(normalized_pointing);
+    vec3 normalized_pointing; glm_vec3_copy((float*)pointing_to, normalized_pointing); glm_normalize(normalized_pointing);
 
     mat4 rot; glm_mat4_identity(rot);
 
@@ -186,7 +186,7 @@ static draw_object get_arrow3d(const vec3 pointing_to) {
         glm_vec3_cross(base_direction, normalized_pointing, axis);
         glm_normalize(axis);
 
-        float angle = acos(d);
+        float angle = acosf(d);
         glm_rotate(rot, angle, axis);
     }
 

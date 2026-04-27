@@ -61,7 +61,7 @@ void draw_creation_settings(gui_ctx* g_ctx) {
     nk_end(g_ctx->nk_ctx);
 
     if(change > 0) {
-        update_physics_variables(g_ctx->p_info->physics_variables_ubo, g_ctx->grid_data, g_ctx->p_info->p_settings);
+        p_info_update_data_notime(g_ctx->p_info, g_ctx->grid_data);
     }
 }
 
@@ -105,13 +105,18 @@ int draw_creation_physics_settings(gui_ctx* g_ctx) {
     change += nk_property_float(g_ctx->nk_ctx, "#Weight Coefficient:", 0.0f, &s->t_weight_coeff, 10.0f, 0.01f, 0.05f);
     nk_checkbox_label(g_ctx->nk_ctx, "Grid Borders", &g_ctx->p_info->enclosed);
 
+    if(g_ctx->grid_data->is_2d) {
+        nk_checkbox_label(g_ctx->nk_ctx, "Preview grid lines", &g_ctx->g_info->g_info2d.g_s_settings.draw_grid_lines);
+    } else {
+        nk_checkbox_label(g_ctx->nk_ctx, "Preview grid lines", &g_ctx->g_info->g_info3d.g_s_settings.draw_grid_lines);
+    }
+
     return change;
 }
 
 void draw_confirm_button(gui_ctx* g_ctx) {
     if(nk_button_text(g_ctx->nk_ctx, "Confirm creation", 16)) {
         gen_grid_textures(g_ctx->grid_data, g_ctx->p_info->p_settings.t_ambient);
-        p_info_upload_data(g_ctx->p_info, g_ctx->grid_data);
 
         if(g_ctx->p_info->enclosed) {
             init_solid_map(g_ctx->grid_data, &g_ctx->p_info->p_shaders);
@@ -119,10 +124,14 @@ void draw_confirm_button(gui_ctx* g_ctx) {
 
         if(g_ctx->grid_data->is_2d) {
             g_ctx->g_info->g_settings.smoke_density_factor = 1;
+            g_ctx->g_info->g_info2d.g_s_settings.draw_grid_lines = 0;
+            g_ctx->g_info->g_info2d.g_s_settings.draw_smoke = 1;
+        } else {
+            g_ctx->g_info->g_info3d.g_s_settings.draw_grid_lines = 0;
+            g_ctx->g_info->g_info3d.g_s_settings.draw_smoke = 1;
         }
 
         g_ctx->mm_info->state = MM_CLOSED;
-        g_ctx->g_info->g_info3d.g_s_settings.draw_grid_lines = 0;
         g_ctx->grid_info.created = 1;
         g_ctx->s_info.settings_open = 1;
     }
