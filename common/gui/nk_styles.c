@@ -60,3 +60,57 @@ struct nk_style_button get_menu_button_style(struct nk_context* ctx) {
 
     return menu_button_style;
 }
+
+void apply_custom_style_nuklear(struct nk_context* ctx) {
+    struct nk_color table[NK_COLOR_COUNT];
+
+    table[NK_COLOR_TEXT] = nk_rgba(210, 210, 210, 255);
+    table[NK_COLOR_WINDOW] = nk_rgba(25, 25, 28, 240);
+    table[NK_COLOR_HEADER] = nk_rgba(35, 35, 50, 255);
+    table[NK_COLOR_BUTTON] = nk_rgba(40, 40, 45, 255);
+    table[NK_COLOR_BUTTON_HOVER] = nk_rgba(55, 55, 60, 255);
+    table[NK_COLOR_BUTTON_ACTIVE] = nk_rgba(30, 30, 35, 255);
+    table[NK_COLOR_TOGGLE] = nk_rgba(40, 40, 45, 255);
+    table[NK_COLOR_TOGGLE_HOVER] = nk_rgba(55, 55, 60, 255);
+    table[NK_COLOR_TOGGLE_CURSOR] = nk_rgba(0, 255, 120, 255);
+    table[NK_COLOR_SELECT] = nk_rgba(40, 40, 45, 255);
+    table[NK_COLOR_SELECT_ACTIVE] = nk_rgba(0, 255, 120, 255);
+    table[NK_COLOR_SLIDER] = nk_rgba(40, 40, 45, 255);
+    table[NK_COLOR_SLIDER_CURSOR] = nk_rgba(100, 100, 105, 255);
+    table[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgba(130, 130, 135, 255);
+    table[NK_COLOR_SLIDER_CURSOR_ACTIVE] = nk_rgba(0, 255, 120, 255);
+    table[NK_COLOR_PROPERTY] = nk_rgba(30, 30, 35, 255);
+    table[NK_COLOR_EDIT] = nk_rgba(30, 30, 35, 255);
+    table[NK_COLOR_EDIT_CURSOR] = nk_rgba(210, 210, 210, 255);
+    table[NK_COLOR_COMBO] = nk_rgba(30, 30, 35, 255);
+    table[NK_COLOR_CHART] = nk_rgba(30, 30, 35, 255);
+    table[NK_COLOR_CHART_COLOR] = nk_rgba(0, 255, 120, 255);
+    table[NK_COLOR_CHART_COLOR_HIGHLIGHT] = nk_rgba(255, 0, 0, 255);
+    table[NK_COLOR_SCROLLBAR] = nk_rgba(30, 30, 35, 255);
+    table[NK_COLOR_SCROLLBAR_CURSOR] = nk_rgba(60, 60, 65, 255);
+    table[NK_COLOR_SCROLLBAR_CURSOR_HOVER] = nk_rgba(80, 80, 85, 255);
+    table[NK_COLOR_SCROLLBAR_CURSOR_ACTIVE] = nk_rgba(100, 100, 105, 255);
+    table[NK_COLOR_TAB_HEADER] = nk_rgba(40, 40, 45, 255);
+
+    nk_style_from_table(ctx, table);
+
+    ctx->style.window.rounding = 0.0f;
+    ctx->style.button.rounding = 0.0f;
+    ctx->style.slider.rounding = 0.0f;
+    ctx->style.property.rounding = 0.0f;
+    ctx->style.edit.rounding = 0.0f;
+    ctx->style.scrollh.rounding = 0.0f;
+    ctx->style.scrollv.rounding = 0.0f;
+    ctx->style.combo.rounding = 0.0f;
+    ctx->style.tab.rounding = 0.0f;
+
+    ctx->style.checkbox.normal = nk_style_item_color(nk_rgba(0, 0, 0, 0));
+    ctx->style.checkbox.hover = nk_style_item_color(nk_rgba(255, 255, 255, 15));
+    ctx->style.checkbox.active = nk_style_item_color(nk_rgba(0, 0, 0, 0));
+
+    ctx->style.checkbox.border = 1.0f;
+    ctx->style.checkbox.border_color = nk_rgba(100, 100, 105, 255);
+
+    ctx->style.checkbox.cursor_normal = nk_style_item_color(nk_rgba(0, 255, 120, 255));
+    ctx->style.checkbox.cursor_hover = nk_style_item_color(nk_rgba(50, 255, 150, 255));
+}

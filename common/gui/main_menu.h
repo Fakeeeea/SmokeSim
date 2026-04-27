@@ -58,9 +58,12 @@ typedef struct main_menu_info {
 void init_main_menu(main_menu_info* mm_info, const ivec2 screen_size);
 static menu_button get_menu_button(main_menu_info* mm_info, char* text, vec2 min, vec2 max, vec3 color, vec2 hover_pad, float hover_scale);
 void draw_main_menu_text(main_menu_info* mm_info);
+
 void handle_hover(main_menu_info* mm_info, vec2 pos);
+int check_button_hover(menu_button* mb, vec2 pos);
+
 int handle_click(main_menu_info* mm_info, vec2 pos);
-int check_hover(menu_button* mb, vec2 pos);
+
 void free_main_menu(main_menu_info* mm_info);
 void lerp_f(float current, float target, float* dest, float speed);
 void lerp_2f(vec2 current, vec2 target, vec2* dest, float speed);

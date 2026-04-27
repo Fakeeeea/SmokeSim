@@ -33,4 +33,6 @@ struct nk_style_button get_creation_style(struct nk_context* ctx);
 
 struct nk_style_button get_menu_button_style(struct nk_context* ctx);
 
+void apply_custom_style_nuklear(struct nk_context* ctx);
+
 #endif //SMOKESIM_NK_STYLES_H

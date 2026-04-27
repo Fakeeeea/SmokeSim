@@ -7,6 +7,7 @@
 
 #include <glad/glad.h>
 
+#include "common/gui/nk_styles.h"
 #include "common/util/shader.h"
 #include "common/graphics/graphics.h"
 #include "common/physics/physics.h"
@@ -40,8 +41,8 @@
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
 
-grid menu_grid;
-physics_info menu_p_info;
+grid menu_3d_grid;
+physics_info menu_3d_p_info;
 
 physics_shaders p_shaders;
 
@@ -70,21 +71,23 @@ int main() {
 
     nk_glfw3_font_stash_end(&glfw);
 
+    apply_custom_style_nuklear(nk_ctx);
+
     //nk_style_set_font(nk_ctx, &font->handle);
 
     p_shaders.shaders2d = compile_physics_shaders2d();
     p_shaders.shaders3d = compile_physics_shaders3d();
     g_info = init_graphics_info();
 
-    init_main_menu_grid3d(&menu_grid, get_default_p_settings().t_ambient);
-    menu_p_info = get_mm_p_info(p_shaders, &menu_grid);
+    init_main_menu_grid3d(&menu_3d_grid, get_default_p_settings().t_ambient);
+    menu_3d_p_info = get_mm_p_info(p_shaders, &menu_3d_grid);
 
     init_main_menu(&mm_info, (ivec2) {INIT_SCREEN_SIZE_X, INIT_SCREEN_SIZE_Y});
-    init_window_context(window, nk_ctx, &sim_grid, &g_info, &p_info, &menu_p_info, &mm_info);
+    init_window_context(window, nk_ctx, &sim_grid, &g_info, &p_info, &menu_3d_p_info, &mm_info);
     setup_callbacks();
 
-    bind_physics_buffers(&menu_grid);
-    init_solid_map(&menu_grid, &menu_p_info.p_shaders);
+    bind_physics_buffers(&menu_3d_grid);
+    init_solid_map(&menu_3d_grid, &menu_3d_p_info.p_shaders);
 
     while(!glfwWindowShouldClose(window)) {
         process_input();
@@ -92,7 +95,7 @@ int main() {
 
         if(is_orbiting(&g_info.g_info3d.cam)) {
             if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE)
-                auto_orbit(&g_info.g_info3d.cam, menu_grid.grid3d_data.size, (float) glfwGetTime() * 0.3f);
+                auto_orbit(&g_info.g_info3d.cam, menu_3d_grid.grid3d_data.size, (float) glfwGetTime() * 0.3f);
             else if(ctx.g_ctx.grid_info.initialized == 1)
                 auto_orbit(&g_info.g_info3d.cam, sim_grid.grid3d_data.size, (float) glfwGetTime() * 0.3f);
         }
@@ -103,18 +106,18 @@ int main() {
             draw_area_reset(&g_info);
 
         if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE)
-            bind_physics_buffers(&menu_grid);
+            bind_physics_buffers(&menu_3d_grid);
         else if(ctx.g_ctx.grid_info.created)
             bind_physics_buffers(&sim_grid);
 
         if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE) {
-            run_physics_step(&menu_grid, &menu_p_info);
+            run_physics_step(&menu_3d_grid, &menu_3d_p_info);
         } else if (ctx.g_ctx.grid_info.created == 1 && !p_info.paused){
             run_physics_step(&sim_grid, &p_info);
         }
 
         if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE) {
-            draw_step(&menu_grid, &g_info, &menu_p_info);
+            draw_step(&menu_3d_grid, &g_info, &menu_3d_p_info);
         } else if(ctx.g_ctx.grid_info.initialized == 1){
             draw_step(&sim_grid, &g_info, &p_info);
         }
@@ -127,7 +130,7 @@ int main() {
         nk_glfw3_render(&glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
 
         if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE)
-            update_time(menu_p_info.time_ubo, glfwGetTime());
+            update_time(menu_3d_p_info.time_ubo, glfwGetTime());
         else if(ctx.g_ctx.grid_info.created == 1)
             update_time(p_info.time_ubo, glfwGetTime());
 
@@ -137,8 +140,8 @@ int main() {
         glfwPollEvents();
     }
 
-    free_p_info(&menu_p_info);
-    free_grid(&menu_grid);
+    free_p_info(&menu_3d_p_info);
+    free_grid(&menu_3d_grid);
     nk_glfw3_shutdown(&glfw);
     free_main_menu(&mm_info);
     glfwTerminate();

@@ -92,7 +92,7 @@ void handle_hover(main_menu_info* mm_info, vec2 pos) {
         float hover_target;
         vec2* offset_target;
 
-        if(check_hover(current, pos)) {
+        if(check_button_hover(current, pos)) {
             hover_target = mm_info->t_renderer.text_meshes[current->text_idx].hover_target_scale;
             offset_target = &mm_info->t_renderer.text_meshes[current->text_idx].target_offset;
         } else {
@@ -132,7 +132,7 @@ void lerp_2f(vec2 current, vec2 target, vec2* dest, float speed) {
     }
 }
 
-int check_hover(menu_button* mb, vec2 pos) {
+int check_button_hover(menu_button* mb, vec2 pos) {
     if(pos[0] >= mb->min[0] && pos[0] <= mb->max[0] &&
     pos[1] >= mb->min[1] && pos[1] <= mb->max[1]) { return 1; }
     return 0;
@@ -147,7 +147,7 @@ int handle_click(main_menu_info* mm_info, vec2 pos) {
 
         menu_button* current = &mm_info->buttons[i];
 
-        if(check_hover(current, pos)) return i;
+        if(check_button_hover(current, pos)) return i;
     }
     return -1;
 }
