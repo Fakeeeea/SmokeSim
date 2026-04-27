@@ -11,7 +11,6 @@
 #include "../graphics/graphics.h"
 #include "main_menu.h"
 
-
 typedef struct settings_info {
     int settings_open;
     int obstacles_window_open;
