@@ -71,7 +71,7 @@ void main() {
     vec4 top_sum = cell_top_left_back + cell_top_left_front + cell_top_right_back + cell_top_right_front;
 
     vec4 restricted_solid = (bottom_sum + top_sum) / 8.0f;
-    int should_be_solid = (restricted_solid.a) > 0.5 ? 1 : 0;
+    int should_be_solid = (restricted_solid.a) >= 0.5 ? 1 : 0;
 
     imageStore(next_solid_map, coarse_idx, restricted_solid * should_be_solid);
 

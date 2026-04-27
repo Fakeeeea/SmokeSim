@@ -80,8 +80,8 @@ void main() {
 
     vec4 solid_top = solid_data(idx + ivec2(0,1));
     vec4 solid_bottom = solid_data(idx + ivec2(0,-1));
-    vec4 solid_right = solid_data(idx + ivec2(1,0));
     vec4 solid_left = solid_data(idx + ivec2(-1,0));
+    vec4 solid_right = solid_data(idx + ivec2(1,0));
 
     float f_top = 1.0 - solid_top.a;
     float f_bottom = 1.0 - solid_bottom.a;

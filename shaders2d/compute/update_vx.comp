@@ -45,7 +45,7 @@ void main() {
     if(idx.x >= grid_size.x + 1 || idx.y >= grid_size.y) return;
 
     if(is_solid(idx) >= 1 || is_solid(idx + ivec2(-1, 0)) >= 1) {
-        imageStore(vx_write_temp_image, idx, vec4(imageLoad(solid_map, idx).x, vec3(0.0f)));
+        imageStore(vx_write_temp_image, idx, vec4(imageLoad(solid_map, idx).x));
         return;
     }
 

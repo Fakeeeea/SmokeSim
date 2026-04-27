@@ -46,7 +46,7 @@ void main() {
     float total_density = smoke.r + smoke.g + smoke.b;
 
     float buoyancy = -t_weight_coeff * total_density + t_temp_coeff * (smoke.a - t_ambient);
-    float new_v = texelFetch(vy_read_tex, idx, 0).r + buoyancy * time_step + wind.y * time_step;
+    float new_v = texelFetch(vy_read_tex, idx, 0).r + buoyancy * time_step;
 
     imageStore(vy_write_temp_image, idx, vec4(new_v));
 }

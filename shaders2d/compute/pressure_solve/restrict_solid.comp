@@ -40,13 +40,13 @@ ivec2 coarse_grid_size;
 
 vec4 solid_data(ivec2 pos) {
     if(pos.x < 0 || pos.y < 0||
-    pos.x >= coarse_grid_size.x || pos.y >= coarse_grid_size.y) return vec4(0,0,0,0);
+    pos.x >= coarse_grid_size.x || pos.y >= coarse_grid_size.y) return vec4(0,0,0,1);
     return imageLoad(solid_map, pos);
 }
 
 float is_solid(ivec2 pos) {
     if(pos.x < 0 || pos.y < 0 ||
-    pos.x >= coarse_grid_size.x || pos.y >= coarse_grid_size.y) return 0;
+    pos.x >= coarse_grid_size.x || pos.y >= coarse_grid_size.y) return 1;
     return imageLoad(solid_map, pos).a;
 }
 
@@ -66,7 +66,7 @@ void main() {
     vec4 cell_sum = cell_bottom_left + cell_bottom_right + cell_top_left + cell_top_right;
 
     vec4 restricted_solid = (cell_sum) / 4.0f;
-    int should_be_solid = (restricted_solid.a) > 0.5 ? 1 : 0;
+    int should_be_solid = (restricted_solid.a) >= 0.5 ? 1 : 0;
 
     imageStore(next_solid_map, coarse_idx, restricted_solid * should_be_solid);
 

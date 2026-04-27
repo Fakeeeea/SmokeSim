@@ -66,7 +66,7 @@ void main() {
     vec2 comes_from = world_pos - (v * time_step);
 
     vec2 grid_space = comes_from / cell_size;
-    vec2 vx_uv = (grid_space + vec2(0.5, 0)) / (vec2(grid_size.xyz) + vec2(1, 0));
+    vec2 vx_uv = (grid_space + vec2(0.5, 0)) / (vec2(grid_size.xy) + vec2(1, 0));
     float new_vx = texture(vx_read_tex, vx_uv).r;
 
     imageStore(vx_write_temp_image, idx, vec4(new_vx));
