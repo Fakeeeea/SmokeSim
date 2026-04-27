@@ -55,6 +55,8 @@ add_executable(SmokeSim
         common/gui/gui.h
         common/gui/nk_helpers.c
         common/gui/nk_helpers.h
+        common/util/grid_parser.c
+        common/util/grid_parser.h
 )
 
 target_include_directories(SmokeSim PRIVATE

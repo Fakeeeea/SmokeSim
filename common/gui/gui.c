@@ -124,12 +124,9 @@ void draw_confirm_button(gui_ctx* g_ctx) {
 
         if(g_ctx->grid_data->is_2d) {
             g_ctx->g_info->g_settings.smoke_density_factor = 1;
-            g_ctx->g_info->g_info2d.g_s_settings.draw_grid_lines = 0;
-            g_ctx->g_info->g_info2d.g_s_settings.draw_smoke = 1;
-        } else {
-            g_ctx->g_info->g_info3d.g_s_settings.draw_grid_lines = 0;
-            g_ctx->g_info->g_info3d.g_s_settings.draw_smoke = 1;
         }
+
+        toggle_off_grid_creation_draw_settings(g_ctx);
 
         g_ctx->mm_info->state = MM_CLOSED;
         g_ctx->grid_info.created = 1;
@@ -140,7 +137,9 @@ void draw_confirm_button(gui_ctx* g_ctx) {
 void draw_discard_button(gui_ctx* g_ctx) {
     if(nk_button_text(g_ctx->nk_ctx, "Discard", 7)) {
         g_ctx->mm_info->state = MM_MAIN_SCREEN;
-        g_ctx->g_info->g_info3d.g_s_settings.draw_grid_lines = 0;
+
+        toggle_off_grid_creation_draw_settings(g_ctx);
+        rebind_p_info(g_ctx->mm_p_info);
 
         free_grid(g_ctx->grid_data);
         g_ctx->grid_info.initialized = 0;
@@ -449,4 +448,25 @@ void toggle_settings(gui_ctx* g_ctx) {
 
 void toggle_paused(gui_ctx* g_ctx) {
     g_ctx->p_info->paused = !g_ctx->p_info->paused;
+}
+
+void toggle_on_grid_creation_draw_settings(gui_ctx* g_ctx) {
+    g_ctx->g_info->g_info3d.g_s_settings.draw_grid_lines = 1;
+    g_ctx->g_info->g_info3d.g_s_settings.draw_smoke = 0;
+
+    if(g_ctx->grid_data->is_2d) {
+        g_ctx->g_info->g_info2d.g_s_settings.draw_grid_lines = 1;
+        g_ctx->g_info->g_info2d.g_s_settings.draw_smoke = 0;
+    }
+}
+
+void toggle_off_grid_creation_draw_settings(gui_ctx* g_ctx) {
+
+    g_ctx->g_info->g_info3d.g_s_settings.draw_grid_lines = 0;
+    g_ctx->g_info->g_info3d.g_s_settings.draw_smoke = 1;
+
+    if(g_ctx->grid_data->is_2d) {
+        g_ctx->g_info->g_info2d.g_s_settings.draw_grid_lines = 0;
+        g_ctx->g_info->g_info2d.g_s_settings.draw_smoke = 1;
+    }
 }

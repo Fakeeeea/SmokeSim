@@ -19,13 +19,14 @@
 #define SCREEN_FOR_MM_X_PERCENTAGE 0.4f
 #define SCREEN_FOR_MM_Y_PERCENTAGE 0
 
-#define MENU_BUTTONS_COUNT 5
+#define MENU_BUTTONS_COUNT 6
 
-#define NEW_SIM_ID 0
-#define LOAD_ID 1
-#define GRID2D_ID 2
-#define GRID3D_ID 3
-#define BACK 4
+#define QUIT 0
+#define NEW_SIM_ID 1
+#define LOAD_ID 2
+#define BACK 3
+#define GRID2D_ID 4
+#define GRID3D_ID 5
 
 enum main_menu_state {
     MM_CLOSED = 0,

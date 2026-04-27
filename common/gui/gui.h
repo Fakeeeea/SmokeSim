@@ -73,4 +73,7 @@ int draw_obstacle_info(gui_ctx* g_ctx, int index);
 void toggle_settings(gui_ctx* g_ctx);
 void toggle_paused(gui_ctx* g_ctx);
 
+void toggle_off_grid_creation_draw_settings(gui_ctx* g_ctx);
+void toggle_on_grid_creation_draw_settings(gui_ctx* g_ctx);
+
 #endif //SMOKESIM_GUI_H

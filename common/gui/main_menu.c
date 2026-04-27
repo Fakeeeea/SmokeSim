@@ -17,25 +17,21 @@ void init_main_menu(main_menu_info* mm_info, const ivec2 screen_size) {
     vec2 button_size = {screen_size[0] * BUTTONS_WIDTH_PERCENTAGE, screen_size[1] * BUTTONS_HEIGHT_PERCENTAGE};
     vec2 padding = {screen_size[0] * PADDING_FROM_LEFT_PERCENTAGE, screen_size[1] * PADDING_FROM_BOTTOM_PERCENTAGE};
 
-    vec2 load_sim_pos = {padding[0], padding[1]};
-    vec2 load_sim_max; glm_vec2_add(load_sim_pos, button_size, load_sim_max);
-    vec2 new_sim_pos = {padding[0], padding[1]+button_size[1]};
-    vec2 new_sim_max; glm_vec2_add(new_sim_pos, button_size, new_sim_max);
-
-    vec2 back_pos; glm_vec2_copy(load_sim_pos, back_pos);
-    vec2 back_max; glm_vec2_copy(load_sim_max, back_max);
-    vec2 grid2d_pos; glm_vec2_copy(new_sim_pos, grid2d_pos);
-    vec2 grid2d_max; glm_vec2_copy(new_sim_max, grid2d_max);
-    vec2 grid3d_pos = {padding[0], padding[1]+button_size[1]*2};
-    vec2 grid3d_max; glm_vec2_add(grid3d_pos, button_size, grid3d_max);
+    vec2 bottom_button_pos = {padding[0], padding[1]};
+    vec2 bottom_button_max; glm_vec2_add(bottom_button_pos, button_size, bottom_button_max);
+    vec2 middle_button_pos = {padding[0], padding[1]+button_size[1]};
+    vec2 middle_button_max; glm_vec2_add(middle_button_pos, button_size, middle_button_max);
+    vec2 top_button_pos = {padding[0], padding[1]+button_size[1]*2};
+    vec2 top_button_max; glm_vec2_add(top_button_pos, button_size, top_button_max);
 
     mm_info->buttons = malloc(sizeof(menu_button) * MENU_BUTTONS_COUNT);
-    mm_info->buttons[NEW_SIM_ID] = get_menu_button(mm_info, "New Simulation", new_sim_pos, new_sim_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
-    mm_info->buttons[LOAD_ID] = get_menu_button(mm_info, "Load Simulation", load_sim_pos, load_sim_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
+    mm_info->buttons[QUIT] = get_menu_button(mm_info, "Quit", bottom_button_pos, bottom_button_max, (vec3){0,0,0}, (vec2){30,0}, 1.2f);
+    mm_info->buttons[LOAD_ID] = get_menu_button(mm_info, "Load Simulation", middle_button_pos, middle_button_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
+    mm_info->buttons[NEW_SIM_ID] = get_menu_button(mm_info, "New Simulation", top_button_pos, top_button_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
 
-    mm_info->buttons[GRID2D_ID] = get_menu_button(mm_info, "New 2D Simulation", grid2d_pos, grid2d_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
-    mm_info->buttons[GRID3D_ID] = get_menu_button(mm_info, "New 3D Simulation", grid3d_pos, grid3d_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
-    mm_info->buttons[BACK] = get_menu_button(mm_info, "Go Back", back_pos, back_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
+    mm_info->buttons[BACK] = get_menu_button(mm_info, "Back", bottom_button_pos, bottom_button_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
+    mm_info->buttons[GRID2D_ID] = get_menu_button(mm_info, "New 2D Simulation", middle_button_pos, middle_button_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
+    mm_info->buttons[GRID3D_ID] = get_menu_button(mm_info, "New 3D Simulation", top_button_pos, top_button_max, (vec3){0,0,0}, (vec2){30, 0}, 1.2f);
 
     hide_button(mm_info, GRID2D_ID); hide_button(mm_info, GRID3D_ID); hide_button(mm_info, BACK);
 
@@ -171,6 +167,7 @@ void get_viewport_data_mm(ivec2 screen_size, ivec4 out) {
 void to_simulation_type(main_menu_info* mm_info) {
     mm_info->state = MM_SIMULATION_TYPE;
 
+    hide_button(mm_info, QUIT);
     hide_button(mm_info, NEW_SIM_ID);
     hide_button(mm_info, LOAD_ID);
 
@@ -182,6 +179,7 @@ void to_simulation_type(main_menu_info* mm_info) {
 void to_main_screen(main_menu_info* mm_info) {
     mm_info->state = MM_MAIN_SCREEN;
 
+    unhide_button(mm_info, QUIT);
     unhide_button(mm_info, NEW_SIM_ID);
     unhide_button(mm_info, LOAD_ID);
 

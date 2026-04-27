@@ -52,7 +52,8 @@ physics_step_settings get_default_p_s_settings();
 
 physics_info init_physics_info(physics_shaders precompiled_shaders);
 void p_info_upload_data(physics_info* p_info, const grid* grid);
-void p_info_update_data_notime(physics_info* p_info, const grid* grid);
+void p_info_update_data_notime(const physics_info* p_info, const grid* grid);
+void rebind_p_info(const physics_info* p_info);
 void free_p_info(physics_info* p_info);
 
 void run_physics_step(grid* grid, physics_info* p_info);

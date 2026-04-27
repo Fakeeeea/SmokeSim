@@ -56,10 +56,17 @@ void p_info_upload_data(physics_info* p_info, const grid* grid) {
     p_info->time_ubo = upload_time(0);
 }
 
-void p_info_update_data_notime(physics_info* p_info, const grid* grid) {
+void p_info_update_data_notime(const physics_info* p_info, const grid* grid) {
     update_obstacles(p_info->o_info.obstacles_array, p_info->o_info.obstacles_count, p_info->o_info.obstacles_ssbos);
     update_emitters(p_info->e_info.emitters_ssbo, p_info->e_info.emitters_array, p_info->e_info.emitters_count);
     update_physics_variables(p_info->physics_variables_ubo, grid, p_info->p_settings);
+}
+
+void rebind_p_info(const physics_info* p_info) {
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, OBSTACLES_SSBO_READ, p_info->o_info.obstacles_ssbos[p_info->o_info.obstacles_idx]);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, OBSTACLES_SSBO_WRITE, p_info->o_info.obstacles_ssbos[1 - p_info->o_info.obstacles_idx]);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, EMITTERS_SSBO, p_info->e_info.emitters_ssbo);
+    glBindBufferBase(GL_UNIFORM_BUFFER, PHYSICS_VARIABLES_UBO, p_info->physics_variables_ubo);
 }
 
 void run_physics_step(grid* grid, physics_info* p_info) {

@@ -169,6 +169,8 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 void handle_pending_press() {
     switch(ctx.pending_press) {
+        case QUIT:
+            glfwSetWindowShouldClose(ctx.window, GL_TRUE);
         case NEW_SIM_ID:
             to_simulation_type(ctx.g_ctx.mm_info);
             break;
@@ -184,6 +186,7 @@ void handle_pending_press() {
             break;
         case BACK:
             to_main_screen(ctx.g_ctx.mm_info);
+            toggle_off_grid_creation_draw_settings(&ctx.g_ctx);
             break;
     }
     ctx.pending_press = -1;
@@ -201,8 +204,7 @@ void init_new_grid_screen3d() {
     *ctx.g_ctx.p_info = init_physics_info(ctx.g_ctx.mm_p_info->p_shaders);
     p_info_upload_data(ctx.g_ctx.p_info, ctx.g_ctx.grid_data);
 
-    ctx.g_ctx.g_info->g_info3d.g_s_settings.draw_grid_lines = 1;
-    ctx.g_ctx.g_info->g_info3d.g_s_settings.draw_smoke = 0; //smoke cannot be drawn initially as the textures are not generated. Without this it's gonna use the menu's smoke texture.
+    toggle_on_grid_creation_draw_settings(&ctx.g_ctx);
 
     ctx.g_ctx.grid_info.initialized = 1;
 }
@@ -212,8 +214,7 @@ void init_new_grid_screen2d() {
     *ctx.g_ctx.p_info = init_physics_info(ctx.g_ctx.mm_p_info->p_shaders);
     p_info_upload_data(ctx.g_ctx.p_info, ctx.g_ctx.grid_data);
 
-    ctx.g_ctx.g_info->g_info2d.g_s_settings.draw_grid_lines = 1;
-    ctx.g_ctx.g_info->g_info2d.g_s_settings.draw_smoke = 0; //smoke cannot be drawn initially as the textures are not generated. Without this it's gonna use the menu's smoke texture.
+    toggle_on_grid_creation_draw_settings(&ctx.g_ctx);
 
     ctx.g_ctx.grid_info.initialized = 1;
 }
