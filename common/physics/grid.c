@@ -144,11 +144,19 @@ void apply_vorticity(grid *grid, const physics_shaders* shaders) {
     swap_velocity_buffers(grid);
 }
 
-void init_solid_map(const grid* grid, const physics_shaders* shaders) {
+void init_solid_map(const grid* grid, const physics_shaders* shaders, const int wind_tunnel) {
     ivec3 grid_size;
     get_grid_size(grid, grid_size);
 
+    static int wind_tunnel_location = -1;
+    if(wind_tunnel_location == -1) {
+        wind_tunnel_location = glGetUniformLocation(shaders->shaders2d.init_solid_map, "wind_tunnel");
+    }
+
     glUseProgram((grid->is_2d) ? shaders->shaders2d.init_solid_map : shaders->shaders3d.init_solid_map);
+
+    if(grid->is_2d) glUniform1i(wind_tunnel_location, wind_tunnel);
+
     glDispatchCompute((int)ceilf((float)(grid_size[0] + 7) / 8), (int)ceilf((float)(grid_size[1] + 7) / 8), (int)ceilf((float)(grid_size[2] + 7) / 8));
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }

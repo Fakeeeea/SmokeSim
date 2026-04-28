@@ -58,7 +58,7 @@ void gen_grid_pressure_solve_textures2d(grid2d* grid) {
     for(int i = 0; i < grid->pyramids_count; ++i) {
         grid->pyramids_sizes[i][0] = current_s[0], grid->pyramids_sizes[i][1] = current_s[1], grid->pyramids_sizes[i][2] = 0, grid->pyramids_sizes[i][3] = 0;
         grid->pressure_pyramid[i] = create_texture2(current_s, GL_R32F, GL_RED, GL_FLOAT, GL_LINEAR, NULL, GL_CLAMP_TO_EDGE, NULL);
-        grid->solid_pyramid[i] = create_texture2(current_s, GL_RGBA16, GL_RGBA, GL_FLOAT, GL_NEAREST, NULL, GL_CLAMP_TO_EDGE, NULL);
+        grid->solid_pyramid[i] = create_texture2(current_s, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_NEAREST, NULL, GL_CLAMP_TO_EDGE, NULL);
         grid->residual_pyramid[i] = create_texture2(current_s, GL_R32F, GL_RED, GL_FLOAT, GL_LINEAR, NULL, GL_CLAMP_TO_EDGE, NULL);
         current_s[0] /= 2, current_s[1] /= 2;
     }

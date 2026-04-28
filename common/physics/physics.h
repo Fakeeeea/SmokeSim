@@ -45,6 +45,7 @@ typedef struct physics_info {
     unsigned int time_ubo;
 
     int enclosed;
+    int wind_tunnel;
 }physics_info;
 
 physics_settings get_default_p_settings();

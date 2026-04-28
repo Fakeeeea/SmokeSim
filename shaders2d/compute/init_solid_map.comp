@@ -28,18 +28,20 @@ layout(std140, binding = 1) uniform constants {
     float cell_size;
 };
 
+uniform int wind_tunnel;
 
 void main() {
-    ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 idx = ivec2(gl_GlobalInvocationID.xy);
 
-    ivec2 size = ivec2(grid_size.xy);
+    if(idx.x >= grid_size.x || idx.y >= grid_size.y) return;
 
-    if(any(greaterThanEqual(pos, size))) return;
+    bool should_be_solid_x = idx.x == 0 || idx.x == (grid_size.x - 1);
+    bool should_be_solid_y = idx.y == 0 || idx.y == (grid_size.y - 1);
 
-    if(pos.x == 0 || pos.x == (size.x -1) ||
-        pos.y == 0 || pos.y == (size.y -1)) {
+    bool should_be_solid = wind_tunnel == 1 ? should_be_solid_y : should_be_solid_x || should_be_solid_y;
 
-        imageStore(solid_map, pos, vec4(0, 0, 0, 1));
+    if(should_be_solid) {
+        imageStore(solid_map, idx, vec4(0, 0, 0, 1));
     }
 
 }

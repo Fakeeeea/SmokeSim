@@ -103,7 +103,10 @@ int draw_creation_physics_settings(gui_ctx* g_ctx) {
     change += nk_property_float(g_ctx->nk_ctx, "#Vorticity Confinement:", 0.0f, &s->vorticity_confinement, 10.0f, 0.1f, 0.05f);
     change += nk_property_float(g_ctx->nk_ctx, "#Temp Coefficient:", 0.0f, &s->t_temp_coeff, 10.0f, 0.01f, 0.05f);
     change += nk_property_float(g_ctx->nk_ctx, "#Weight Coefficient:", 0.0f, &s->t_weight_coeff, 10.0f, 0.01f, 0.05f);
-    nk_checkbox_label(g_ctx->nk_ctx, "Grid Borders", &g_ctx->p_info->enclosed);
+    nk_checkbox_label(g_ctx->nk_ctx, "Enclosed grid", &g_ctx->p_info->enclosed);
+    if(g_ctx->grid_data->is_2d && !g_ctx->p_info->enclosed) {
+        nk_checkbox_label(g_ctx->nk_ctx, "Wind tunnel", &g_ctx->p_info->wind_tunnel);
+    }
 
     if(g_ctx->grid_data->is_2d) {
         nk_checkbox_label(g_ctx->nk_ctx, "Preview grid lines", &g_ctx->g_info->g_info2d.g_s_settings.draw_grid_lines);
@@ -118,8 +121,9 @@ void draw_confirm_button(gui_ctx* g_ctx) {
     if(nk_button_text(g_ctx->nk_ctx, "Confirm creation", 16)) {
         gen_grid_textures(g_ctx->grid_data, g_ctx->p_info->p_settings.t_ambient);
 
-        if(g_ctx->p_info->enclosed) {
-            init_solid_map(g_ctx->grid_data, &g_ctx->p_info->p_shaders);
+        if(g_ctx->p_info->enclosed || g_ctx->p_info->wind_tunnel) {
+            bind_physics_buffers(g_ctx->grid_data);
+            init_solid_map(g_ctx->grid_data, &g_ctx->p_info->p_shaders, g_ctx->p_info->wind_tunnel);
         }
 
         if(g_ctx->grid_data->is_2d) {
@@ -438,7 +442,7 @@ int draw_obstacle_info(gui_ctx* g_ctx, int index) {
         nk_tree_pop(g_ctx->nk_ctx);
     }
 
-    o->velocities_anchored[3] = anchored_val;
+    o->velocities_anchored[3] = (float) anchored_val;
     return change;
 }
 

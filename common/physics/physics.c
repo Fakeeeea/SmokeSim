@@ -37,6 +37,7 @@ physics_info init_physics_info(const physics_shaders precompiled_shaders) {
 
     p_info.paused = 0;
     p_info.enclosed = 1;
+    p_info.wind_tunnel = 0;
 
     p_info.p_s_settings = get_default_p_s_settings();
     p_info.p_settings = get_default_p_settings();

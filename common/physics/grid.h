@@ -47,7 +47,7 @@ void apply_vorticity(grid *grid, const physics_shaders* shaders);
 
 void apply_buoyancy(grid* grid, const physics_shaders* shaders);
 
-void init_solid_map(const grid* grid, const physics_shaders* shaders);
+void init_solid_map(const grid* grid, const physics_shaders* shaders, int wind_tunnel);
 
 void obstacle_update_step(const physics_shaders* shaders, obstacles_info* o_info, unsigned int type);
 void update_solid_map(const grid *grid, const physics_shaders* shaders);

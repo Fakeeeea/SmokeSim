@@ -87,7 +87,7 @@ int main() {
     setup_callbacks();
 
     bind_physics_buffers(&menu_3d_grid);
-    init_solid_map(&menu_3d_grid, &menu_3d_p_info.p_shaders);
+    init_solid_map(&menu_3d_grid, &menu_3d_p_info.p_shaders, 0);
 
     while(!glfwWindowShouldClose(window)) {
         process_input();
