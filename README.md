@@ -83,7 +83,7 @@ That is **8 times more cells** being simulated at the exact same framerate. It's
        sudo apt install cmake gcc libglfw3-dev libfreetype-dev libcglm-dev libgl1-mesa-dev
        
        #Arch
-       sudo pacman -S cmake gcc glfw freetype2 cglm
+       sudo pacman -S cmake gcc glfw freetype2 glad cglm
     ```
 
 2. **Clone the repository**

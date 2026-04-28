@@ -15,6 +15,8 @@ void init_glfw() {
 #endif
 }
 
+window_context ctx;
+
 GLFWwindow* create_window() {
     GLFWwindow* window = glfwCreateWindow(INIT_SCREEN_SIZE_X, INIT_SCREEN_SIZE_Y, "SmokeSim", NULL, NULL);
 

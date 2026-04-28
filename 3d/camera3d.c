@@ -3,6 +3,8 @@
 //
 
 #include "camera3d.h"
+#include "../common/util/math_compatibility.h"
+#include <math.h>
 
 camera get_camera() {
     camera cam = {
@@ -47,9 +49,9 @@ void mouse_movement(camera* cam, const vec2 offset) {
     }
 
     vec3 direction;
-    direction[0] = cos(glm_rad(cam->angle[0])) * cos(glm_rad(cam->angle[1]));
-    direction[1] = sin(glm_rad(cam->angle[1]));
-    direction[2] = sin(glm_rad(cam->angle[0])) * cos(glm_rad(cam->angle[1]));
+    direction[0] = cosf(glm_rad(cam->angle[0])) * cosf(glm_rad(cam->angle[1]));
+    direction[1] = sinf(glm_rad(cam->angle[1]));
+    direction[2] = sinf(glm_rad(cam->angle[0])) * cosf(glm_rad(cam->angle[1]));
     glm_normalize(direction);
     glm_vec3_copy(direction, cam->camera_front);
 }
@@ -60,11 +62,11 @@ void auto_orbit(camera* cam, const ivec3 grid_size, const float time) {
 
     if(cam->orbit.auto_orbit == 0) return;
 
-    int min_val = min(grid_size[0], min(grid_size[1], grid_size[2]));
+    int min_val = MIN(grid_size[0], MIN(grid_size[1], grid_size[2]));
     vec3 center; glm_vec3_divs((vec3){(float)grid_size[0], (float)grid_size[1],(float) grid_size[2]}, (float) min_val, center);
     glm_vec3_divs(center, 2, center);
 
-    rotate_camera_around_center(cam, center, glm_rad(70), time);
+    rotate_camera_around_center(cam, center, glm_rad(AUTO_ORBIT_ANGLE), time);
 }
 
 void mouse_movement_orbit(camera* cam, const ivec3 grid_size, const vec2 offset) {
@@ -78,12 +80,12 @@ void mouse_movement_orbit(camera* cam, const ivec3 grid_size, const vec2 offset)
     cam->angle[1] += y_offset_scaled;
 
     float min_pitch = 0.01f;
-    float max_pitch = M_PI - 0.01f;
+    float max_pitch = GLM_PIf - 0.01f;
 
     if(cam->angle[1] < min_pitch) cam->angle[1] = min_pitch;
     if(cam->angle[1] > max_pitch) cam->angle[1] = max_pitch;
 
-    int min_val = min(grid_size[0], min(grid_size[1], grid_size[2]));
+    int min_val = MIN(grid_size[0], MIN(grid_size[1], grid_size[2]));
     vec3 center; glm_vec3_divs((vec3){(float)grid_size[0], (float)grid_size[1],(float) grid_size[2]}, (float) min_val, center);
     glm_vec3_divs(center, 2, center);
 

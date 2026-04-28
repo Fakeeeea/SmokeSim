@@ -71,6 +71,7 @@ add_executable(SmokeSim
 
         nuklear/nuklear_glfw_gl3.h
         nuklear/nuklear.h
+        common/util/math_compatibility.h
 )
 
 target_include_directories(SmokeSim
@@ -84,6 +85,10 @@ target_link_libraries(SmokeSim
         glfw
         Freetype::Freetype
 )
+
+if(NOT WIN32)
+    target_link_libraries(SmokeSim PRIVATE m)
+endif()
 
 if(MSVC)
     target_compile_options(SmokeSim PRIVATE /W4)

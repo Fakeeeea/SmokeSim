@@ -47,7 +47,7 @@ typedef struct window_context {
     int pending_press;
 }window_context;
 
-window_context ctx;
+extern window_context ctx;
 
 void init_glfw();
 GLFWwindow* create_window();

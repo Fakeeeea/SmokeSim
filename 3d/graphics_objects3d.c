@@ -5,6 +5,7 @@
 #include "graphics_objects3d.h"
 
 #include <glad/glad.h>
+#include <math.h>
 
 static draw_object get_box(const vec3 bottom_left_back,const vec3 top_right_front) {
     draw_object box;
@@ -80,12 +81,12 @@ static draw_object get_sphere(const float radius, const int sector_count, const 
     unsigned int* indices = malloc(sphere.index_count * sizeof(unsigned int));
 
     float sector_step = (2 * GLM_PIf) / (float) sector_count;
-    float stack_step = M_PI / stack_count;
+    float stack_step = GLM_PIf / (float) stack_count;
 
     int k = 0;
 
     for(int i = 0; i <= stack_count; ++i) {
-        float stack_angle = M_PI_2 - (float) i * stack_step;
+        float stack_angle = GLM_PI_2f - (float) i * stack_step;
         xy = radius * cosf(stack_angle);
         z = radius * sinf(stack_angle);
 
