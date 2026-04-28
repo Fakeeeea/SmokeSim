@@ -9,7 +9,7 @@ texture2 create_texture2_buf(const ivec2 size, int internal_format, int format, 
     texture2 t;
 
     glGenTextures(1, &t.ID);
-    glm_ivec2_copy(size, t.size);
+    glm_ivec2_copy((int*)size, t.size);
     t.data_type = data_type, t.format = format, t.internal_format = internal_format;
 
     glBindTexture(GL_TEXTURE_2D, t.ID);
@@ -31,7 +31,7 @@ texture2 create_texture2(const ivec2 size, int internal_format, int format, unsi
     texture2 t;
 
     glGenTextures(1, &t.ID);
-    glm_ivec2_copy(size, t.size);
+    glm_ivec2_copy((int*)size, t.size);
     t.data_type = data_type, t.format = format, t.internal_format = internal_format;
 
     glBindTexture(GL_TEXTURE_2D, t.ID);
@@ -55,7 +55,7 @@ texture3 create_texture3(const ivec3 size, int internal_format, int format, unsi
     texture3 t;
 
     glGenTextures(1, &t.ID);
-    glm_ivec3_copy(size, t.size);
+    glm_ivec3_copy((int*)size, t.size);
     t.data_type = data_type, t.format = format, t.internal_format = internal_format;
 
     glBindTexture(GL_TEXTURE_3D, t.ID);

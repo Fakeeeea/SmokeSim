@@ -91,9 +91,9 @@ if(NOT WIN32)
 endif()
 
 if(MSVC)
-    target_compile_options(SmokeSim PRIVATE /W4)
+    target_compile_options(SmokeSim PRIVATE)
 else()
-    target_compile_options(SmokeSim PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(SmokeSim PRIVATE)
 endif()
 
 set_target_properties(SmokeSim PROPERTIES

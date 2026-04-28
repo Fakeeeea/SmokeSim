@@ -100,7 +100,7 @@ void rotate_camera_around_center(camera* cam, const vec3 center, const float ang
     glm_vec3_copy(new_pos, cam->camera_pos);
 
     vec3 direction;
-    glm_vec3_sub(center, new_pos, direction);
+    glm_vec3_sub((float*)center, new_pos, direction);
     glm_vec3_normalize(direction);
 
     glm_vec3_copy(direction, cam->camera_front);
