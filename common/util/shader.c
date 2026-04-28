@@ -51,6 +51,14 @@ unsigned int get_graphics_program(const char* vertex_path, const char* fragment_
 
 char* parse_file(const char* filename) {
     FILE *fptr = NULL;
+
+#ifdef _WIN32
+    if(fopen_s(&fptr, filename, "rb") != 0)
+        fptr = NULL;
+#else
+    fptr = fopen(filename, "rb");
+#endif
+
     if (fopen_s(&fptr, filename, "rb")) {
         printf("Cannot open %s for reading: %s (errno = %d)\n", filename, strerror(errno), errno);
         exit(errno);

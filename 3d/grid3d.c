@@ -4,8 +4,10 @@
 
 #include "grid3d.h"
 #include "../common/graphics/opengl_bindings.h"
+#include "../common/util/math_compatibility.h"
 
 #include <glad/glad.h>
+#include <math.h>
 
 grid3d get_grid3d(const ivec3 size) {
     grid3d out;
@@ -119,7 +121,7 @@ void bind_physics_buffers3d(const grid3d* grid) {
 }
 
 void bind_multigrid_textures3d(const grid3d* grid, const int current_level) {
-    int next = min(grid->pyramids_count-1, current_level+1);
+    int next = MIN(grid->pyramids_count-1, current_level+1);
 
     glBindTextureUnit(NEXT_PRESSURE_TEXTURE, grid->pressure_pyramid[next].ID);
 

@@ -4,6 +4,7 @@
 
 #include "grid2d.h"
 #include "../common/graphics/opengl_bindings.h"
+#include "../common/util/math_compatibility.h"
 
 #include <glad/glad.h>
 
@@ -109,7 +110,7 @@ void bind_physics_buffers2d(const grid2d* grid) {
 }
 
 void bind_multigrid_textures2d(const grid2d* grid, const int current_level) {
-    int next = min(grid->pyramids_count-1, current_level+1);
+    int next = MIN(grid->pyramids_count-1, current_level+1);
 
     glBindTextureUnit(NEXT_PRESSURE_TEXTURE, grid->pressure_pyramid[next].ID);
     glBindImageTexture(CURRENT_PRESSURE, grid->pressure_pyramid[current_level].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
