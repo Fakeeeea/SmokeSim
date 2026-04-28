@@ -1,5 +1,8 @@
 #include "shader.h"
 
+#include <errno.h>
+#include <string.h>
+
 unsigned int get_graphics_program(const char* vertex_path, const char* fragment_path) {
     unsigned int shader_program;
 
@@ -59,7 +62,7 @@ char* parse_file(const char* filename) {
     fptr = fopen(filename, "rb");
 #endif
 
-    if (fopen_s(&fptr, filename, "rb")) {
+    if (!fptr) {
         printf("Cannot open %s for reading: %s (errno = %d)\n", filename, strerror(errno), errno);
         exit(errno);
     }
