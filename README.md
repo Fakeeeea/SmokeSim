@@ -43,8 +43,57 @@ That is **8 times more cells** being simulated at the exact same framerate. It's
 
 ## Building
 
-*(instructions coming soon)*
+> **Warning:** You must have a OpenGL4.6 compatible graphics card to run this.
+
+### Prerequisites
+
+- [CMake](https://cmake.org/) 3.27+
+- A C11-compatible compiler (MSVC, GCC or Clang)
+- [GLFW3](https://www.glfw.org/download.html) (static library)
+- [FreeType](https://freetype.org/download.html)
+- [CGLM](https://github.com/recp/cglm)
 
 ### Windows
 
+1. **Install dependencies**
+
+    ```
+      vcpkg install glfw3 freetype cglm
+    ```
+   
+2. **Configure and build**
+
+    ```bash
+       git clone https://github.com/Fakeeeea/SmokeSim.git
+       cd SmokeSim
+   
+       cmake -B build `
+       -DCMAKE_BUILD_TYPE=Release `
+       -DCMAKE_TOOLCHAIN_FILE=[path-to-vcpkg]/scripts/buildsystems/vcpkg.cmake
+   
+      cmake --build build --config Release
+    ```
+
 ### Linux
+
+1. **Install dependecies**
+
+    ```bash
+       #Debian / Ubuntu
+       sudo apt install cmake gcc libglfw3-dev libfreetype-dev libcglm-dev libgl1-mesa-dev
+       
+       #Arch
+       sudo pacman -S cmake gcc glfw freetype2 cglm
+    ```
+
+2. **Clone the repository**
+    ```bash
+       git clone https://github.com/Fakeeeea/SmokeSim.git
+       cd SmokeSim
+    ```
+
+3. **Configure and build**
+    ```bash
+       cmake -B build -DCMAKE_BUILD_TYPE=Release
+       cmake --build build
+    ```
