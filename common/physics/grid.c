@@ -12,6 +12,9 @@ void free_grid(grid* grid) {
     } else {
         free_grid3d(&grid->grid3d_data);
     }
+
+    glDeleteBuffers(1, &grid->multigrid_constants_ubo);
+    glDeleteBuffers(1, &grid->multigrid_variables_ubo);
 }
 
 void bind_physics_buffers(const grid* grid) {
@@ -453,4 +456,9 @@ void clear_grid(const grid *grid, const float t_ambient) {
     } else {
         clear_grid3d(&grid->grid3d_data, t_ambient);
     }
+}
+
+void rebind_grid(const grid* grid) {
+    glBindBufferBase(GL_UNIFORM_BUFFER, MULTIGRID_VARIABLES_UBO, grid->multigrid_variables_ubo);
+    glBindBufferBase(GL_UNIFORM_BUFFER, MULTIGRID_CONSTANTS_UBO, grid->multigrid_constants_ubo);
 }

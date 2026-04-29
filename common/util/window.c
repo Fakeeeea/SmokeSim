@@ -48,13 +48,13 @@ void setup_callbacks() {
     glfwSetCharCallback(ctx.window, nk_glfw3_char_callback);
 }
 
-void init_window_context(GLFWwindow* window, struct nk_context* nk_ctx, grid* grid_data, graphics_info* g_info, physics_info* p_info, physics_info* mm_p_info, main_menu_info* mm_info) {
+void init_window_context(GLFWwindow* window, struct nk_context* nk_ctx, grid* grid_data, grid* mm_grid, graphics_info* g_info, physics_info* p_info, physics_info* mm_p_info, main_menu_info* mm_info) {
     ctx = (window_context){
         .window = window,
 
         .m_info = {{0,0}, {0,0}, 1},
 
-        .g_ctx = init_gui_ctx(grid_data, p_info, mm_p_info, g_info, mm_info, nk_ctx),
+        .g_ctx = init_gui_ctx(grid_data, mm_grid, p_info, mm_p_info, g_info, mm_info, nk_ctx),
 
         .pending_press = -1,
         };

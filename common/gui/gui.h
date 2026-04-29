@@ -29,6 +29,8 @@ typedef struct gui_ctx {
     grid* grid_data;
     grid_info grid_info;
 
+    grid* mm_grid;
+
     graphics_info* g_info;
     main_menu_info* mm_info;
 
@@ -42,7 +44,7 @@ typedef struct gui_ctx {
     struct nk_context* nk_ctx;
 }gui_ctx;
 
-gui_ctx init_gui_ctx(grid* grid_data, physics_info* p_info, physics_info* mm_p_info, graphics_info* g_info, main_menu_info* mm_info, struct nk_context* nk_ctx);
+gui_ctx init_gui_ctx(grid* grid_data, grid* mm_grid, physics_info* p_info, physics_info* mm_p_info, graphics_info* g_info, main_menu_info* mm_info, struct nk_context* nk_ctx);
 
 void draw_gui(gui_ctx* g_ctx);
 
@@ -85,5 +87,7 @@ void draw_export_button(gui_ctx* g_ctx);
 void draw_load_window(gui_ctx* g_ctx);
 
 void handle_grid_load(gui_ctx *g_ctx, int selected_file);
+
+void draw_back_to_mainmenu_button(gui_ctx* g_ctx);
 
 #endif //SMOKESIM_GUI_H

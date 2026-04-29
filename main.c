@@ -1,8 +1,5 @@
-// TODO: WORLD CENTER GRID CENTER;
 // TODO: CLEANUP CODE (PERMANENT TODO) MAIN.C MESS
 // TODO: ADD TO GRAPHICS SETTING VELOCITY ARROWS SETTINGS; VORTICITY ARROW SETTINGS; OBSTACLES SETTINGS;
-// TODO: STYLE NUKLEAR
-// TODO: MAIN MENU
 // TODO: ADD TO SETTINGS V CYCLE PASSES
 
 #include <glad/glad.h>
@@ -81,7 +78,7 @@ int main() {
     menu_3d_p_info = get_mm_p_info(p_shaders, &menu_3d_grid);
 
     init_main_menu(&mm_info, (ivec2) {INIT_SCREEN_SIZE_X, INIT_SCREEN_SIZE_Y});
-    init_window_context(window, nk_ctx, &sim_grid, &g_info, &p_info, &menu_3d_p_info, &mm_info);
+    init_window_context(window, nk_ctx, &sim_grid, &menu_3d_grid, &g_info, &p_info, &menu_3d_p_info, &mm_info);
     setup_callbacks();
 
     bind_physics_buffers(&menu_3d_grid);

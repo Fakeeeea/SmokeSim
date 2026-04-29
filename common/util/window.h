@@ -53,7 +53,7 @@ void init_glfw();
 GLFWwindow* create_window();
 int load_glad();
 
-void init_window_context(GLFWwindow* window, struct nk_context* nk_ctx, grid* grid_data, graphics_info* g_info, physics_info* p_info, physics_info* mm_p_info, main_menu_info* mm_info);
+void init_window_context(GLFWwindow* window, struct nk_context* nk_ctx, grid* grid_data, grid* mm_grid, graphics_info* g_info, physics_info* p_info, physics_info* mm_p_info, main_menu_info* mm_info);
 
 void setup_callbacks();
 

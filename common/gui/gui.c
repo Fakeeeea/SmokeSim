@@ -11,10 +11,11 @@
 
 #define BUFFER_SIZE 128
 
-gui_ctx init_gui_ctx(grid* grid_data,  physics_info* p_info,  physics_info* mm_p_info,  graphics_info* g_info, main_menu_info* mm_info, struct nk_context* nk_ctx) {
+gui_ctx init_gui_ctx(grid* grid_data, grid* mm_grid, physics_info* p_info,  physics_info* mm_p_info,  graphics_info* g_info, main_menu_info* mm_info, struct nk_context* nk_ctx) {
     gui_ctx g_ctx = (gui_ctx) {
         .nk_ctx = nk_ctx,
         .grid_data = grid_data,
+        .mm_grid = mm_grid,
         .p_info = p_info,
         .mm_p_info = mm_p_info,
         .mm_info = mm_info,
@@ -181,6 +182,7 @@ void draw_simulation_settings(gui_ctx* g_ctx) {
 
         draw_checkboxes(g_ctx);
         draw_export_button(g_ctx);
+        draw_back_to_mainmenu_button(g_ctx);
     }
     nk_end(g_ctx->nk_ctx);
 
@@ -563,4 +565,24 @@ void handle_grid_load(gui_ctx *g_ctx, int selected_file) {
     g_ctx->grid_info.created = g_ctx->grid_info.initialized = 1;
     g_ctx->mm_info->state = MM_CLOSED;
     g_ctx->s_info.settings_open = 1;
+}
+
+void draw_back_to_mainmenu_button(gui_ctx* g_ctx) {
+    if(nk_button_text(g_ctx->nk_ctx, "Quit", 4)) {
+        g_ctx->s_info.settings_open = 0;
+        g_ctx->s_info.emitters_window_open = 0;
+        g_ctx->s_info.obstacles_window_open = 0;
+
+        g_ctx->mm_info->state = MM_MAIN_SCREEN;
+
+        g_ctx->grid_info.initialized = g_ctx->grid_info.created = 0;
+
+        g_ctx->g_info->g_settings.smoke_density_factor = get_default_g_settings().smoke_density_factor;
+
+        clear_p_info(g_ctx->p_info);
+        free_grid(g_ctx->grid_data);
+
+        rebind_p_info(g_ctx->mm_p_info);
+        rebind_grid(g_ctx->mm_grid);
+    }
 }

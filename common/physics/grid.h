@@ -83,4 +83,6 @@ void init_main_menu_grid2d(grid* mm_grid, float t_ambient);
 void get_grid_size(const grid* grid_data, ivec3 out);
 void get_pyramid_size(const grid* grid_data, int level, ivec3 out);
 
+void rebind_grid(const grid* grid);
+
 #endif //SMOKESIM_GRID_H

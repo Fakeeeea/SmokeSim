@@ -68,6 +68,16 @@ void rebind_p_info(const physics_info* p_info) {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, OBSTACLES_SSBO_WRITE, p_info->o_info.obstacles_ssbos[1 - p_info->o_info.obstacles_idx]);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, EMITTERS_SSBO, p_info->e_info.emitters_ssbo);
     glBindBufferBase(GL_UNIFORM_BUFFER, PHYSICS_VARIABLES_UBO, p_info->physics_variables_ubo);
+    glBindBufferBase(GL_UNIFORM_BUFFER, TIME_UBO, p_info->time_ubo);
+}
+
+void clear_p_info(physics_info* p_info) {
+    free_p_info(p_info);
+
+    glDeleteBuffers(2, p_info->o_info.obstacles_ssbos);
+    glDeleteBuffers(1, &p_info->e_info.emitters_ssbo);
+    glDeleteBuffers(1, &p_info->physics_variables_ubo);
+    glDeleteBuffers(1, &p_info->time_ubo);
 }
 
 void run_physics_step(grid* grid, physics_info* p_info) {
