@@ -28,8 +28,6 @@
 
 #include <cglm/cglm.h>
 
-#define BUFFER_SIZE 32
-
 void draw_color_picker(struct nk_context* nk_ctx,  const char* label, vec3 var, float mul);
 void draw_header(struct nk_context* nk_ctx, const char* label);
 void draw_subheader(struct nk_context* nk_ctx, const char* label);

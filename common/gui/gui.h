@@ -11,10 +11,13 @@
 #include "../graphics/graphics.h"
 #include "main_menu.h"
 
+#include "../util/grid_parser.h"
+
 typedef struct settings_info {
     int settings_open;
     int obstacles_window_open;
     int emitters_window_open;
+    int load_window_open;
 }settings_info;
 
 typedef struct grid_info {
@@ -33,6 +36,8 @@ typedef struct gui_ctx {
     physics_info* mm_p_info;
 
     settings_info s_info;
+
+    save_folder_info s_f_info;
 
     struct nk_context* nk_ctx;
 }gui_ctx;
@@ -62,6 +67,7 @@ void draw_discard_button(gui_ctx* g_ctx);
 int is_in_main_menu(const gui_ctx* g_ctx);
 int is_in_grid_creation(const gui_ctx* g_ctx);
 int are_settings_open(const gui_ctx* g_ctx);
+int is_loading_simulation(const gui_ctx* g_ctx);
 
 void draw_emitters_settings(gui_ctx* g_ctx);
 void draw_obstacles_settings(gui_ctx* g_ctx);
@@ -74,5 +80,10 @@ void toggle_paused(gui_ctx* g_ctx);
 
 void toggle_off_grid_creation_draw_settings(gui_ctx* g_ctx);
 void toggle_on_grid_creation_draw_settings(gui_ctx* g_ctx);
+
+void draw_export_button(gui_ctx* g_ctx);
+void draw_load_window(gui_ctx* g_ctx);
+
+void handle_grid_load(gui_ctx *g_ctx, int selected_file);
 
 #endif //SMOKESIM_GUI_H

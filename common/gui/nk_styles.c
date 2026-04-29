@@ -74,7 +74,7 @@ void apply_custom_style_nuklear(struct nk_context* ctx) {
     table[NK_COLOR_TOGGLE_HOVER] = nk_rgba(55, 55, 60, 255);
     table[NK_COLOR_TOGGLE_CURSOR] = nk_rgba(0, 255, 120, 255);
     table[NK_COLOR_SELECT] = nk_rgba(40, 40, 45, 255);
-    table[NK_COLOR_SELECT_ACTIVE] = nk_rgba(0, 255, 120, 255);
+    table[NK_COLOR_SELECT_ACTIVE] = nk_rgba(0, 150, 60, 255);
     table[NK_COLOR_SLIDER] = nk_rgba(40, 40, 45, 255);
     table[NK_COLOR_SLIDER_CURSOR] = nk_rgba(100, 100, 105, 255);
     table[NK_COLOR_SLIDER_CURSOR_HOVER] = nk_rgba(130, 130, 135, 255);

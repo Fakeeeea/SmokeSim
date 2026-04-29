@@ -7,6 +7,10 @@
 #include "nk_helpers.h"
 #include "nk_styles.h"
 
+#include <time.h>
+
+#define BUFFER_SIZE 128
+
 gui_ctx init_gui_ctx(grid* grid_data,  physics_info* p_info,  physics_info* mm_p_info,  graphics_info* g_info, main_menu_info* mm_info, struct nk_context* nk_ctx) {
     gui_ctx g_ctx = (gui_ctx) {
         .nk_ctx = nk_ctx,
@@ -15,15 +19,19 @@ gui_ctx init_gui_ctx(grid* grid_data,  physics_info* p_info,  physics_info* mm_p
         .mm_p_info = mm_p_info,
         .mm_info = mm_info,
         .g_info = g_info,
-        .s_info = {0,0},
+        .s_info = {0,0,0,0},
         .grid_info = {0,0},
         };
+    g_ctx.s_f_info = init_save_folder_info();
     return g_ctx;
 }
 
 void draw_gui(gui_ctx* g_ctx) {
     if(is_in_main_menu(g_ctx)) {
         draw_main_menu(g_ctx);
+        if(is_loading_simulation(g_ctx)) {
+            draw_load_window(g_ctx);
+        }
     } else if(is_in_grid_creation(g_ctx)) {
         draw_creation_settings(g_ctx);
     } else if(are_settings_open(g_ctx)){
@@ -46,6 +54,10 @@ int is_in_grid_creation(const gui_ctx* g_ctx) {
 
 int are_settings_open(const gui_ctx* g_ctx) {
     return (g_ctx->s_info.settings_open);
+}
+
+int is_loading_simulation(const gui_ctx* g_ctx) {
+    return (g_ctx->s_info.load_window_open);
 }
 
 void draw_creation_settings(gui_ctx* g_ctx) {
@@ -168,6 +180,7 @@ void draw_simulation_settings(gui_ctx* g_ctx) {
         }
 
         draw_checkboxes(g_ctx);
+        draw_export_button(g_ctx);
     }
     nk_end(g_ctx->nk_ctx);
 
@@ -178,7 +191,6 @@ void draw_simulation_settings(gui_ctx* g_ctx) {
     if(g_ctx->s_info.obstacles_window_open) {
         draw_obstacles_settings(g_ctx);
     }
-
 }
 
 void draw_physics_settings(gui_ctx *g_ctx) {
@@ -473,4 +485,82 @@ void toggle_off_grid_creation_draw_settings(gui_ctx* g_ctx) {
         g_ctx->g_info->g_info2d.g_s_settings.draw_grid_lines = 0;
         g_ctx->g_info->g_info2d.g_s_settings.draw_smoke = 1;
     }
+}
+
+void draw_export_button(gui_ctx* g_ctx) {
+    if(nk_button_text(g_ctx->nk_ctx, "Export Sim", 10)) {
+
+        time_t rawtime;
+        struct tm * timeinfo;
+
+        char filename[MAX_SAVE_FILENAME];
+        char time_buffer[MAX_SAVE_FILENAME];
+
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+
+        strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d_%H-%M-%S", timeinfo);
+        snprintf(filename, sizeof(filename), "../saves/save_%s.dat", time_buffer);
+
+        export_simulation(g_ctx->grid_data, g_ctx->p_info, g_ctx->g_info, filename);
+    }
+}
+
+void draw_load_window(gui_ctx* g_ctx) {
+    static int selected_save = -1;
+
+    if(g_ctx->s_f_info.folders_loaded == NOT_LOADED) parse_save_folder(&g_ctx->s_f_info);
+
+    if(nk_begin(g_ctx->nk_ctx, "Load Save", nk_rect(50, 50, 400, 300), NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE )) {
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 25, 1);
+
+        for(int i = 0; i < g_ctx->s_f_info.save_files_count; ++i) {
+            int is_sel = (selected_save == i);
+            if(nk_selectable_label(g_ctx->nk_ctx, g_ctx->s_f_info.save_files[i], NK_TEXT_LEFT, &is_sel)) {
+                selected_save = i;
+            }
+        }
+
+        nk_layout_row_dynamic(g_ctx->nk_ctx, 30, 1);
+
+        if(nk_button_label(g_ctx->nk_ctx, "Load")) {
+            if(selected_save >= 0) {
+                handle_grid_load(g_ctx, selected_save);
+            }
+        }
+
+        if(nk_button_label(g_ctx->nk_ctx, "Refresh")) {
+            g_ctx->s_f_info.folders_loaded = NOT_LOADED;
+        }
+
+        if(nk_button_label(g_ctx->nk_ctx, "Close")) {
+            g_ctx->s_info.load_window_open = 0;
+        }
+    }
+    nk_end(g_ctx->nk_ctx);
+}
+
+void handle_grid_load(gui_ctx *g_ctx, int selected_file) {
+    char buf[MAX_SAVE_FILENAME];
+    snprintf(buf, MAX_SAVE_FILENAME, "../saves/%s", g_ctx->s_f_info.save_files[selected_file]);
+
+    *g_ctx->p_info = init_physics_info(g_ctx->mm_p_info->p_shaders);
+
+    load_simulation(g_ctx->grid_data, g_ctx->p_info, g_ctx->g_info, buf);
+    p_info_upload_data(g_ctx->p_info, g_ctx->grid_data);
+
+    gen_grid_textures(g_ctx->grid_data, g_ctx->p_info->p_settings.t_ambient);
+
+    if(g_ctx->p_info->enclosed || g_ctx->p_info->wind_tunnel) {
+        bind_physics_buffers(g_ctx->grid_data);
+        init_solid_map(g_ctx->grid_data, &g_ctx->p_info->p_shaders, g_ctx->p_info->wind_tunnel);
+    }
+
+    if(g_ctx->grid_data->is_2d) {
+        g_ctx->g_info->g_settings.smoke_density_factor = 1;
+    }
+
+    g_ctx->grid_info.created = g_ctx->grid_info.initialized = 1;
+    g_ctx->mm_info->state = MM_CLOSED;
+    g_ctx->s_info.settings_open = 1;
 }

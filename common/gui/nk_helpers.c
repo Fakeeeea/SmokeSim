@@ -5,6 +5,8 @@
 #include "nk_helpers.h"
 #include "nk_styles.h"
 
+#define BUFFER_SIZE 32
+
 void draw_header(struct nk_context* nk_ctx, const char* label) {
     nk_layout_row_dynamic(nk_ctx, 30, 1);
     nk_label(nk_ctx, label, NK_TEXT_LEFT);

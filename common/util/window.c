@@ -177,6 +177,7 @@ void handle_pending_press() {
             to_simulation_type(ctx.g_ctx.mm_info);
             break;
         case LOAD_ID:
+            ctx.g_ctx.s_info.load_window_open = 1;
             break;
         case GRID3D_ID:
             ctx.g_ctx.mm_info->state = MM_OPTIONS;
