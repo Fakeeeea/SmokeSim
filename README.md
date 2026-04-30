@@ -29,7 +29,7 @@ Featuring a [`nuklear.h`](https://github.com/Immediate-Mode-UI/Nuklear) GUI for 
 
 ## Usage
 
-> **⚠** Smoke simulation is not a lightweight software. It requires a decent GPU.
+> **⚠** Smoke simulation requires decent hardware.
 
 ### Keybinds
 
@@ -41,7 +41,7 @@ Featuring a [`nuklear.h`](https://github.com/Immediate-Mode-UI/Nuklear) GUI for 
 - `SCROLL_WHEEL_DOWN` Move backwards / Zoom out
 - `MOUSE_MOVEMENT` Camera movement / Orbit panning
 
-> **⚠**  Settings marked with a warning symbol (⚠) are advanced — change only if you know what you're doing.
+> **⚠**  Settings marked with a warning symbol `⚠` are advanced — change only if you know what you're doing.
 
 ### Grid Settings
 
