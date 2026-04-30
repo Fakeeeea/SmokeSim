@@ -367,9 +367,9 @@ void bind_multigrid_textures(const grid* grid, const int current_level) {
 
 void init_placeholder_grid3d(grid* grid) {
     const float PLACEHOLDER_CELL_SIZE = 0.1f;
-    const int PLACEHOLDER_RESOLUTIONX = 64;
-    const int PLACEHOLDER_RESOLUTIONY = 64;
-    const int PLACEHOLDER_RESOLUTIONZ = 64;
+    const int PLACEHOLDER_RESOLUTIONX = 32;
+    const int PLACEHOLDER_RESOLUTIONY = 32;
+    const int PLACEHOLDER_RESOLUTIONZ = 32;
 
     grid->is_2d = 0;
     grid->grid3d_data = get_grid3d((ivec3){PLACEHOLDER_RESOLUTIONX, PLACEHOLDER_RESOLUTIONY, PLACEHOLDER_RESOLUTIONZ});

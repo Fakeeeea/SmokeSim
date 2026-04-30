@@ -1,6 +1,7 @@
 #Ignore directories
 .idea/
 cmake-build-debug/
+cmake-build-release/
 
 #Files
 CLAUDE.md
