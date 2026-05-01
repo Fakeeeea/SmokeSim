@@ -30,7 +30,7 @@ Featuring a [`nuklear.h`](https://github.com/Immediate-Mode-UI/Nuklear) GUI for 
 ## Usage
 
 > [!NOTE]
-> **⚠** Smoke simulation requires decent hardware.
+> Smoke simulation requires decent hardware.
 
 ### Keybinds
 
@@ -121,7 +121,6 @@ While it is rare for a simulation to feature more than ~5 obstacles, this optimi
 
 1. **Install dependencies**
 
-    >[!NOTE]
     >You might need to copy `freetype.dll` `glfw.dll` next to `SmokeSim.exe`.
 
     ```powershell
