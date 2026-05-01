@@ -29,6 +29,7 @@ Featuring a [`nuklear.h`](https://github.com/Immediate-Mode-UI/Nuklear) GUI for 
 
 ## Usage
 
+> [!NOTE]
 > **⚠** Smoke simulation requires decent hardware.
 
 ### Keybinds
@@ -41,7 +42,9 @@ Featuring a [`nuklear.h`](https://github.com/Immediate-Mode-UI/Nuklear) GUI for 
 - `SCROLL_WHEEL_DOWN` Move backwards / Zoom out
 - `MOUSE_MOVEMENT` Camera movement / Orbit panning
 
-> **⚠**  Settings marked with a warning symbol `⚠` are advanced — change only if you know what you're doing.
+
+> [!IMPORTANT]
+> Settings marked with a warning symbol `⚠` are advanced — change only if you know what you're doing.
 
 ### Grid Settings
 
@@ -77,6 +80,7 @@ Featuring a [`nuklear.h`](https://github.com/Immediate-Mode-UI/Nuklear) GUI for 
 
 ## [Flavortown](https://flavortown.hackclub.com/kitchen)'s Optimization Sidequest
 
+> [!NOTE]
 > **Test hardware:** Intel core i5-10500, NVIDIA RTX 3070, 32GB RAM
 
 The most significant optimization in this project was the transition from a standard Gauss-Seidel solver to a **multigrid V-cycle** solver.
@@ -102,7 +106,8 @@ While it is rare for a simulation to feature more than ~5 obstacles, this optimi
 
 ## Building
 
-> **Warning:** You must have an OpenGL 4.6 compatible graphics card to run this.
+> [!CAUTION]
+> You must have an OpenGL 4.6 compatible graphics card to run this.
 
 ### Prerequisites
 
@@ -116,7 +121,8 @@ While it is rare for a simulation to feature more than ~5 obstacles, this optimi
 
 1. **Install dependencies**
 
-    > **Warning:** You might need to copy `freetype.dll` `glfw.dll` next to `SmokeSim.exe`.
+    >[!NOTE]
+    >You might need to copy `freetype.dll` `glfw.dll` next to `SmokeSim.exe`.
 
     ```powershell
       vcpkg install glfw3 freetype cglm
@@ -145,7 +151,8 @@ While it is rare for a simulation to feature more than ~5 obstacles, this optimi
    
 ### Linux
 
-> **Arch:** [CGLM](https://github.com/recp/cglm) must be manually installed.
+>[!WARNING]
+> **Arch Users:** [CGLM](https://github.com/recp/cglm) must be manually installed.
 
 1. **Install dependencies**
 
