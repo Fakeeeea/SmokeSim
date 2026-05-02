@@ -443,9 +443,9 @@ int draw_obstacle_info(gui_ctx* g_ctx, int index) {
 
         nk_label(g_ctx->nk_ctx, "Velocities:", NK_TEXT_LEFT);
         if(g_ctx->grid_data->is_2d) {
-            change += draw_vec2_property_xy_id(g_ctx->nk_ctx, "", o->velocities_anchored, index, 0, 100000, 1);
+            change += draw_vec2_property_xy_id(g_ctx->nk_ctx, "", o->velocities_anchored, index, -100000, 100000, 1);
         } else {
-            change += draw_vec3_property_xyz_id(g_ctx->nk_ctx, "", o->velocities_anchored, index, 0, 100000, 1);
+            change += draw_vec3_property_xyz_id(g_ctx->nk_ctx, "", o->velocities_anchored, index, -100000, 100000, 1);
         }
         change += nk_checkbox_label(g_ctx->nk_ctx, "Anchored", &anchored_val);
 
