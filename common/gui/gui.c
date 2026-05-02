@@ -257,7 +257,7 @@ void draw_graphics_settings3d(gui_ctx *g_ctx) {
         nk_property_float(g_ctx->nk_ctx, "#Z Near:", 0.001f, &g_settings->z_near, 1000.0f, 1.0f, 1.0f);
         nk_property_float(g_ctx->nk_ctx, "#Fov:", glm_rad(1), &g_settings->fov, glm_rad(90), glm_rad(1), glm_rad(1));
 
-        draw_vec3_property(g_ctx->nk_ctx, "Light Direction", g_settings->light_direction, 0.0f, 1.0f, 0.05f);
+        draw_vec3_property(g_ctx->nk_ctx, "Light Direction", g_settings->light_direction, -1.0f, 1.0f, 0.05f);
 
         draw_color_picker(g_ctx->nk_ctx, "Ambient Color: ", g_settings->ambient_color, 1.0f);
         draw_color_picker(g_ctx->nk_ctx, "Light Color: ", g_settings->light_color, 1.5f);
