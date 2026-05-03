@@ -113,7 +113,7 @@ While it is rare for a simulation to feature more than ~5 obstacles, this optimi
 
 - [CMake](https://cmake.org/) 3.27+
 - A C11-compatible compiler (MSVC, GCC or Clang)
-- [GLFW3](https://www.glfw.org/download.html) (static library)
+- [GLFW3](https://www.glfw.org/download.html)
 - [FreeType](https://freetype.org/download.html)
 - [CGLM](https://github.com/recp/cglm)
 
