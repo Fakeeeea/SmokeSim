@@ -396,6 +396,18 @@ void init_main_menu_grid3d(grid* mm_grid, float t_ambient) {
     gen_grid_textures(mm_grid, t_ambient);
 }
 
+void init_benchmark_grid3d(grid* grid, float t_ambient) {
+    const float BENCHMARK_CELL_SIZE = 0.1f;
+    const int BENCHMARK_RESOLUTIONX = 128;
+    const int BENCHMARK_RESOLUTIONY = 128;
+    const int BENCHMARK_RESOLUTIONZ = 128;
+
+    grid->is_2d = 0;
+    grid->grid3d_data = get_grid3d((ivec3){BENCHMARK_RESOLUTIONX, BENCHMARK_RESOLUTIONY, BENCHMARK_RESOLUTIONZ});
+    grid->cell_size = BENCHMARK_CELL_SIZE;
+    gen_grid_textures(grid, t_ambient);
+}
+
 void get_grid_size(const grid* grid_data, ivec3 out) {
     out[0] = grid_data->is_2d ? grid_data->grid2d_data.size[0] : grid_data->grid3d_data.size[0];
     out[1] = grid_data->is_2d ? grid_data->grid2d_data.size[1] : grid_data->grid3d_data.size[1];

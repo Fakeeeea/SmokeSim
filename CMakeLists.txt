@@ -36,6 +36,7 @@ add_executable(SmokeSim
         common/util/texture.h
         common/util/grid_parser.c
         common/util/grid_parser.h
+        common/util/math_compatibility.h
 
         common/gui/nk_styles.c
         common/gui/nk_styles.h
@@ -57,6 +58,9 @@ add_executable(SmokeSim
         common/physics/physics.c
         common/physics/physics.h
 
+        common/benchmark/benchmark.h
+        common/benchmark/benchmark.c
+
         3d/camera3d.c
         3d/camera3d.h
         3d/grid3d.c
@@ -75,7 +79,6 @@ add_executable(SmokeSim
 
         nuklear/nuklear_glfw_gl3.h
         nuklear/nuklear.h
-        common/util/math_compatibility.h
 )
 
 target_include_directories(SmokeSim

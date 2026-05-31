@@ -3,6 +3,13 @@
 //
 
 #include "physics.h"
+#include "../benchmark/benchmark.h"
+
+extern benchmark_info b_info;
+
+#define BENCH_START do { if(b_info.benchmarking) benchmark(&b_info, START); } while(0);
+#define BENCH_END do { if(b_info.benchmarking) { benchmark(&b_info, END); save_current(&b_info); } } while(0);
+#define BENCH_FRAME_END do { if(b_info.benchmarking) benchmark_end_frame(&b_info); } while(0);
 
 physics_settings get_default_p_settings() {
     physics_settings p_settings = {
@@ -85,30 +92,45 @@ void run_physics_step(grid* grid, physics_info* p_info) {
     physics_shaders p_shaders = p_info->p_shaders;
 
     if(p_s_settings.handle_emitters) {
+        BENCH_START
         update_emitters_status(&p_shaders, p_info->e_info.emitters_count, grid->is_2d);
+        BENCH_END
+        BENCH_START
         handle_emitters(grid, &p_shaders);
+        BENCH_END
     }
 
-    if(p_s_settings.advect_velocities) advect_velocities(grid, &p_shaders);
+    if(p_s_settings.advect_velocities) {BENCH_START advect_velocities(grid, &p_shaders); BENCH_END}
 
-    if(p_s_settings.apply_buoyancy) apply_buoyancy(grid, &p_shaders);
+    if(p_s_settings.apply_buoyancy) {BENCH_START apply_buoyancy(grid, &p_shaders); BENCH_END}
 
 
     if(p_s_settings.apply_vorticity) {
+        BENCH_START
         calculate_vorticity(grid, &p_shaders);
+        BENCH_END
+        BENCH_START
         apply_vorticity(grid, &p_shaders);
+        BENCH_END
     }
 
-    if(p_s_settings.resolve_pressure) multigrid_pressure_solve(grid, &p_shaders);
+    if(p_s_settings.resolve_pressure) {BENCH_START multigrid_pressure_solve(grid, &p_shaders); BENCH_END}
 
     bind_physics_buffers(grid);
 
-    if(p_s_settings.update_velocities) update_velocities(grid, &p_shaders);
+    if(p_s_settings.update_velocities) {BENCH_START update_velocities(grid, &p_shaders); BENCH_END}
 
-    if(p_s_settings.advect_smoke) advect_smoke(grid, &p_shaders);
+    if(p_s_settings.advect_smoke) {BENCH_START advect_smoke(grid, &p_shaders); BENCH_END}
 
+    BENCH_START
     obstacle_update_step(&p_shaders, &p_info->o_info, grid->is_2d);
+    BENCH_END
+
+    BENCH_START
     update_solid_map(grid, &p_shaders);
+    BENCH_END
+
+    BENCH_FRAME_END
 }
 
 physics_info get_mm_p_info(const physics_shaders precompiled_shaders, const grid* grid) {
@@ -130,6 +152,29 @@ physics_info get_mm_p_info(const physics_shaders precompiled_shaders, const grid
     p_info.e_info.emitters_array[0] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.5), 2, (int)(grid->grid3d_data.size[2] * 0.5)}, 1, (ivec3){30,10,10}, 200, 0, 1);
     p_info.e_info.emitters_array[1] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.7), 2, (int)(grid->grid3d_data.size[2] * 0.5)}, 1, (ivec3){10,30,10}, 200, 0, 1);
     p_info.e_info.emitters_array[2] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.5), 2, (int)(grid->grid3d_data.size[2] * 0.7)}, 1, (ivec3){10,10,30}, 200, 0, 1);
+
+    p_info_upload_data(&p_info, grid);
+
+    return p_info;
+}
+
+physics_info get_benchmark_p_info(physics_shaders precompiled_shaders, const grid* grid) {
+    const int EMITTERS_NUM = 1;
+    const int OBSTACLES_NUM = 1;
+
+    physics_info p_info;
+    p_info = init_physics_info(precompiled_shaders);
+
+    p_info.e_info.emitters_count = EMITTERS_NUM;
+    p_info.o_info.obstacles_count = OBSTACLES_NUM;
+
+    p_info.e_info.emitters_array = malloc(sizeof(emitter) * EMITTERS_NUM);
+    p_info.o_info.obstacles_array = malloc(sizeof(obstacle) * OBSTACLES_NUM);
+
+    p_info.o_info.obstacles_array[0] = get_obstacle((vec3){(float) grid->grid3d_data.size[0] * 0.5f,
+                                                           (float) grid->grid3d_data.size[1] * 0.5f,
+                                                           (float) grid->grid3d_data.size[2] * 0.5f}, 3, (vec3){0,0,0}, 1);
+    p_info.e_info.emitters_array[0] = get_emitter((ivec3){(int) (grid->grid3d_data.size[0] * 0.5), 2, (int)(grid->grid3d_data.size[2] * 0.5)}, 1, (ivec3){150,150,150}, 400, 0, 1);
 
     p_info_upload_data(&p_info, grid);
 

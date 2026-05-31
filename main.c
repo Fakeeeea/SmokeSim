@@ -13,6 +13,7 @@
 #include "common/graphics/graphics.h"
 #include "common/physics/physics.h"
 #include "common/util/window.h"
+#include "common/benchmark/benchmark.h"
 
 #define NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_STANDARD_IO
@@ -52,7 +53,9 @@ graphics_info g_info;
 physics_info p_info;
 main_menu_info mm_info;
 
-int main() {
+benchmark_info b_info;
+
+int main(int argc, char* argv[]) {
 
     init_glfw();
     GLFWwindow* window = create_window();
@@ -64,19 +67,19 @@ int main() {
     struct nk_glfw glfw = {0};
     struct nk_context *nk_ctx = nk_glfw3_init(&glfw, window, 0);
     struct nk_font_atlas* atlas;
-    nk_glfw3_font_stash_begin(&glfw, &atlas);
-
-    //struct nk_font *font = nk_font_atlas_add_default(atlas, 24, NULL);
-
-    nk_glfw3_font_stash_end(&glfw);
+    nk_glfw3_font_stash_begin(&glfw, &atlas); nk_glfw3_font_stash_end(&glfw);
 
     apply_custom_style_nuklear(nk_ctx);
-
-    //nk_style_set_font(nk_ctx, &font->handle);
 
     p_shaders.shaders2d = compile_physics_shaders2d();
     p_shaders.shaders3d = compile_physics_shaders3d();
     g_info = init_graphics_info();
+
+    if(argc > 1 && !strcmp(argv[1], "--bench")) {
+        b_info = init_benchmark_info(1);
+    } else {
+        b_info = init_benchmark_info(0);
+    }
 
     init_main_menu_grid3d(&menu_3d_grid, get_default_p_settings().t_ambient);
     menu_3d_p_info = get_mm_p_info(p_shaders, &menu_3d_grid);
@@ -85,62 +88,88 @@ int main() {
     init_window_context(window, nk_ctx, &sim_grid, &menu_3d_grid, &g_info, &p_info, &menu_3d_p_info, &mm_info);
     setup_callbacks();
 
-    bind_physics_buffers(&menu_3d_grid);
-    init_solid_map(&menu_3d_grid, &menu_3d_p_info.p_shaders, 0);
+    if(b_info.benchmarking != 1) {
+        bind_physics_buffers(&menu_3d_grid);
+        init_solid_map(&menu_3d_grid, &menu_3d_p_info.p_shaders, 0);
 
-    while(!glfwWindowShouldClose(window)) {
-        process_input();
-        nk_glfw3_new_frame(&glfw);
+        while (!glfwWindowShouldClose(window)) {
+            process_input();
+            nk_glfw3_new_frame(&glfw);
 
-        if(is_orbiting(&g_info.g_info3d.cam)) {
-            if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE)
-                auto_orbit(&g_info.g_info3d.cam, menu_3d_grid.grid3d_data.size, (float) glfwGetTime() * 0.3f);
-            else if(ctx.g_ctx.grid_info.initialized == 1)
-                auto_orbit(&g_info.g_info3d.cam, sim_grid.grid3d_data.size, (float) glfwGetTime() * 0.3f);
+            if (is_orbiting(&g_info.g_info3d.cam)) {
+                if (mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE)
+                    auto_orbit(&g_info.g_info3d.cam, menu_3d_grid.grid3d_data.size, (float) glfwGetTime() * 0.3f);
+                else if (ctx.g_ctx.grid_info.initialized == 1)
+                    auto_orbit(&g_info.g_info3d.cam, sim_grid.grid3d_data.size, (float) glfwGetTime() * 0.3f);
+            }
+
+            if (mm_info.state != MM_CLOSED)
+                get_viewport_data_mm((ivec2) {g_info.screen_size[0], g_info.screen_size[1]}, g_info.draw_area);
+            else
+                draw_area_reset(&g_info);
+
+            if (mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE)
+                bind_physics_buffers(&menu_3d_grid);
+            else if (ctx.g_ctx.grid_info.created)
+                bind_physics_buffers(&sim_grid);
+
+            if (mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE) {
+                run_physics_step(&menu_3d_grid, &menu_3d_p_info);
+            } else if (ctx.g_ctx.grid_info.created == 1 && !p_info.paused) {
+                run_physics_step(&sim_grid, &p_info);
+            }
+
+            if (mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE) {
+                draw_step(&menu_3d_grid, &g_info, &menu_3d_p_info);
+            } else if (ctx.g_ctx.grid_info.initialized == 1) {
+                draw_step(&sim_grid, &g_info, &p_info);
+            }
+
+            viewport_reset(&g_info);
+
+            handle_main_menu_events();
+            draw_gui(&ctx.g_ctx);
+
+            nk_glfw3_render(&glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
+
+            if (mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE)
+                update_time(menu_3d_p_info.time_ubo, glfwGetTime());
+            else if (ctx.g_ctx.grid_info.created == 1)
+                update_time(p_info.time_ubo, glfwGetTime());
+
+            handle_pending_press();
+
+            glfwSwapBuffers(window);
+            glfwPollEvents();
         }
 
-        if(mm_info.state != MM_CLOSED)
-            get_viewport_data_mm((ivec2){g_info.screen_size[0], g_info.screen_size[1]}, g_info.draw_area);
-        else
-            draw_area_reset(&g_info);
+        free_p_info(&menu_3d_p_info);
+        free_grid(&menu_3d_grid);
 
-        if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE)
-            bind_physics_buffers(&menu_3d_grid);
-        else if(ctx.g_ctx.grid_info.created)
+    } else {
+
+        init_benchmark_grid3d(&sim_grid, get_default_p_settings().t_ambient);
+        p_info = get_benchmark_p_info(p_shaders, &sim_grid);
+
+        bind_physics_buffers(&sim_grid);
+        init_solid_map(&sim_grid, &menu_3d_p_info.p_shaders, 0);
+
+        while (!glfwWindowShouldClose(window)) {
+            process_input();
+
             bind_physics_buffers(&sim_grid);
-
-        if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE) {
-            run_physics_step(&menu_3d_grid, &menu_3d_p_info);
-        } else if (ctx.g_ctx.grid_info.created == 1 && !p_info.paused){
             run_physics_step(&sim_grid, &p_info);
-        }
-
-        if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE) {
-            draw_step(&menu_3d_grid, &g_info, &menu_3d_p_info);
-        } else if(ctx.g_ctx.grid_info.initialized == 1){
             draw_step(&sim_grid, &g_info, &p_info);
-        }
-
-        viewport_reset(&g_info);
-
-        handle_main_menu_events();
-        draw_gui(&ctx.g_ctx);
-
-        nk_glfw3_render(&glfw, NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
-
-        if(mm_info.state == MM_MAIN_SCREEN || mm_info.state == MM_SIMULATION_TYPE)
-            update_time(menu_3d_p_info.time_ubo, glfwGetTime());
-        else if(ctx.g_ctx.grid_info.created == 1)
             update_time(p_info.time_ubo, glfwGetTime());
 
-        handle_pending_press();
+            glfwSwapBuffers(window);
+            glfwPollEvents();
+        }
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        free_grid(&sim_grid);
+        free_p_info(&p_info);
     }
 
-    free_p_info(&menu_3d_p_info);
-    free_grid(&menu_3d_grid);
     nk_glfw3_shutdown(&glfw);
     free_main_menu(&mm_info);
     glfwTerminate();

@@ -61,6 +61,7 @@ void clear_p_info(physics_info* p_info);
 void run_physics_step(grid* grid, physics_info* p_info);
 
 physics_info get_mm_p_info(physics_shaders precompiled_shaders, const grid* grid);
+physics_info get_benchmark_p_info(physics_shaders precompiled_shaders, const grid* grid);
 
 unsigned int upload_physics_variables(const grid* grid, physics_settings settings);
 void update_physics_variables(unsigned int ubo, const grid* grid, physics_settings settings);
