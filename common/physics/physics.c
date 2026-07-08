@@ -8,7 +8,7 @@
 extern benchmark_info b_info;
 
 #define BENCH_START do { if(b_info.benchmarking) benchmark(&b_info, START); } while(0);
-#define BENCH_END do { if(b_info.benchmarking) { benchmark(&b_info, END); save_current(&b_info); } } while(0);
+#define BENCH_END(L) do { if(b_info.benchmarking) { benchmark(&b_info, END); save_current(&b_info, L); } } while(0);
 #define BENCH_FRAME_END do { if(b_info.benchmarking) benchmark_end_frame(&b_info); } while(0);
 
 physics_settings get_default_p_settings() {
@@ -94,41 +94,41 @@ void run_physics_step(grid* grid, physics_info* p_info) {
     if(p_s_settings.handle_emitters) {
         BENCH_START
         update_emitters_status(&p_shaders, p_info->e_info.emitters_count, grid->is_2d);
-        BENCH_END
+        BENCH_END(EMITTERS_UPDATE)
         BENCH_START
         handle_emitters(grid, &p_shaders);
-        BENCH_END
+        BENCH_END(HANDLE_EMITTERS)
     }
 
-    if(p_s_settings.advect_velocities) {BENCH_START advect_velocities(grid, &p_shaders); BENCH_END}
+    if(p_s_settings.advect_velocities) {BENCH_START advect_velocities(grid, &p_shaders); BENCH_END(ADVECT_VELOCITIES)}
 
-    if(p_s_settings.apply_buoyancy) {BENCH_START apply_buoyancy(grid, &p_shaders); BENCH_END}
+    if(p_s_settings.apply_buoyancy) {BENCH_START apply_buoyancy(grid, &p_shaders); BENCH_END(APPLY_BUOYANCY)}
 
 
     if(p_s_settings.apply_vorticity) {
         BENCH_START
         calculate_vorticity(grid, &p_shaders);
-        BENCH_END
+        BENCH_END(CALCULATE_VORTICITY)
         BENCH_START
         apply_vorticity(grid, &p_shaders);
-        BENCH_END
+        BENCH_END(APPLY_VORTICITY)
     }
 
-    if(p_s_settings.resolve_pressure) {BENCH_START multigrid_pressure_solve(grid, &p_shaders); BENCH_END}
+    if(p_s_settings.resolve_pressure) {BENCH_START multigrid_pressure_solve(grid, &p_shaders); BENCH_END(PRESSURE_SOLVE)}
 
     bind_physics_buffers(grid);
 
-    if(p_s_settings.update_velocities) {BENCH_START update_velocities(grid, &p_shaders); BENCH_END}
+    if(p_s_settings.update_velocities) {BENCH_START update_velocities(grid, &p_shaders); BENCH_END(UPDATE_VELOCITIES)}
 
-    if(p_s_settings.advect_smoke) {BENCH_START advect_smoke(grid, &p_shaders); BENCH_END}
+    if(p_s_settings.advect_smoke) {BENCH_START advect_smoke(grid, &p_shaders); BENCH_END(ADVECT_SMOKE)}
 
     BENCH_START
     obstacle_update_step(&p_shaders, &p_info->o_info, grid->is_2d);
-    BENCH_END
+    BENCH_END(UPDATE_OBSTACLES)
 
     BENCH_START
     update_solid_map(grid, &p_shaders);
-    BENCH_END
+    BENCH_END(UPDATE_SOLID_MAP)
 
     BENCH_FRAME_END
 }
