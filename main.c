@@ -154,7 +154,7 @@ int main(int argc, char* argv[]) {
         bind_physics_buffers(&sim_grid);
         init_solid_map(&sim_grid, &menu_3d_p_info.p_shaders, 0);
 
-        while (!glfwWindowShouldClose(window)) {
+        while (!glfwWindowShouldClose(window) && b_info.frame_count < BENCHMARKING_FRAMES) {
             process_input();
 
             bind_physics_buffers(&sim_grid);
@@ -164,6 +164,8 @@ int main(int argc, char* argv[]) {
 
             glfwSwapBuffers(window);
             glfwPollEvents();
+
+            b_info.frame_count++;
         }
 
         free_grid(&sim_grid);

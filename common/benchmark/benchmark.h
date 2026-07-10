@@ -9,6 +9,7 @@
 #include <glad/glad.h>
 
 #define LABELS_COUNT 17
+#define BENCHMARKING_FRAMES 500
 
 enum BENCHMARK_STATE_ENUM {
     START = 0,
@@ -39,7 +40,6 @@ extern const char* labels[];
 
 typedef struct save_file_info {
     FILE* fptr_save;
-    int current_column;
 }save_file_info;
 
 typedef struct benchmark_info {
@@ -49,6 +49,7 @@ typedef struct benchmark_info {
     unsigned int query_IDs[2];
 
     double run_time[LABELS_COUNT];
+    int frame_count;
 
     save_file_info svf_info;
 }benchmark_info;

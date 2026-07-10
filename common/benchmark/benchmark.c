@@ -39,6 +39,8 @@ benchmark_info init_benchmark_info(const int benchmarking) {
     b_info.svf_info.fptr_save = NULL;
     b_info.benchmarking = (benchmarking) ? 1 : 0;
 
+    b_info.frame_count = 0;
+
     memset(&b_info.run_time, 0, sizeof(b_info.run_time));
 
     if(b_info.benchmarking) {

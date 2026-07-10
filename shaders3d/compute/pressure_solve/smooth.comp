@@ -1,6 +1,7 @@
 #version 460 core
 
 //SMOOTH SHADER
+//Could dropping the mixed approach with a fully shared memory using approach increase performance even if there will be a huge amount of branching?
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 
@@ -47,6 +48,9 @@ uniform int parity;
 
 ivec3 current_grid_size;
 
+shared float s_p[8][8][8];
+shared vec4 s_solid[8][8][8];
+
 vec4 solid_data(ivec3 pos) {
     if(pos.x < 0 || pos.y < 0 || pos.z < 0 ||
     pos.x >= current_grid_size.x || pos.y >= current_grid_size.y || pos.z >= current_grid_size.z) return vec4(0,0,0,0);
@@ -78,17 +82,24 @@ float get_vz(ivec3 pos) {
 
 void main() {
     ivec3 idx = ivec3(gl_GlobalInvocationID.xyz);
+    ivec3 lid = ivec3(gl_LocalInvocationID.xyz);
     current_grid_size = grid_sizes[current_level].xyz;
 
-    if(idx.x >= current_grid_size.x || idx.y >= current_grid_size.y || idx.z >= current_grid_size.z || (idx.x+idx.y+idx.z) % 2 != parity) return;
-    if(is_solid(idx) >= 1) return;
+    bool in_bounds = idx.x < current_grid_size.x && idx.y < current_grid_size.y && idx.z < current_grid_size.z;
 
-    vec4 solid_top = solid_data(idx + ivec3(0,1,0));
-    vec4 solid_bottom = solid_data(idx + ivec3(0,-1,0));
-    vec4 solid_right = solid_data(idx + ivec3(1,0,0));
-    vec4 solid_left = solid_data(idx + ivec3(-1,0,0));
-    vec4 solid_front = solid_data(idx + ivec3(0,0,1));
-    vec4 solid_back = solid_data(idx + ivec3(0,0,-1));
+    s_p[lid.z][lid.y][lid.x] = in_bounds ? imageLoad(pressure_map, idx).r : 0.0;
+    s_solid[lid.z][lid.y][lid.x] = in_bounds ? imageLoad(solid_map, idx) : vec4(0,0,0,1);
+    barrier();
+
+    if(idx.x >= current_grid_size.x || idx.y >= current_grid_size.y || idx.z >= current_grid_size.z || (idx.x+idx.y+idx.z) % 2 != parity) return;
+    if(s_solid[lid.z][lid.y][lid.x].a >= 1.0) return;
+
+    vec4 solid_top = ((lid.y + 1 < 8) ? s_solid[lid.z][lid.y+1][lid.x] : solid_data(idx + ivec3(0,1,0)));
+    vec4 solid_bottom = ((lid.y - 1 >= 0) ? s_solid[lid.z][lid.y-1][lid.x] : solid_data(idx + ivec3(0,-1,0)));
+    vec4 solid_right = ((lid.x + 1 < 8) ? s_solid[lid.z][lid.y][lid.x+1] : solid_data(idx + ivec3(1,0,0)));
+    vec4 solid_left = ((lid.x - 1 >= 0) ? s_solid[lid.z][lid.y][lid.x-1] : solid_data(idx + ivec3(-1,0,0)));
+    vec4 solid_front = ((lid.z + 1 < 8) ? s_solid[lid.z+1][lid.y][lid.x] : solid_data(idx + ivec3(0,0,1)));
+    vec4 solid_back = ((lid.z - 1 >= 0) ? s_solid[lid.z-1][lid.y][lid.x] : solid_data(idx + ivec3(0,0,-1)));
 
     float f_top = 1.0 - solid_top.a;
     float f_bottom = 1.0 - solid_bottom.a;
@@ -115,12 +126,12 @@ void main() {
         delta_v = imageLoad(residual_map, idx).r;
     }
 
-    float p_top = get_pressure(idx + ivec3(0,1,0)) * f_top;
-    float p_bottom = get_pressure(idx + ivec3(0,-1,0)) * f_bottom;
-    float p_right = get_pressure(idx + ivec3(1,0,0)) * f_right;
-    float p_left = get_pressure(idx + ivec3(-1,0,0)) * f_left;
-    float p_front = get_pressure(idx + ivec3(0,0,1)) * f_front;
-    float p_back = get_pressure(idx + ivec3(0,0,-1)) * f_back;
+    float p_top = ((lid.y + 1 < 8) ? s_p[lid.z][lid.y+1][lid.x] : get_pressure(idx + ivec3(0,1,0))) * f_top;
+    float p_bottom = ((lid.y - 1 >= 0) ? s_p[lid.z][lid.y-1][lid.x] : get_pressure(idx + ivec3(0,-1,0))) * f_bottom;
+    float p_right = ((lid.x + 1 < 8) ? s_p[lid.z][lid.y][lid.x+1] : get_pressure(idx + ivec3(1,0,0))) * f_right;
+    float p_left = ((lid.x - 1 >= 0) ? s_p[lid.z][lid.y][lid.x-1] : get_pressure(idx + ivec3(-1,0,0))) * f_left;
+    float p_front = ((lid.z + 1 < 8) ? s_p[lid.z+1][lid.y][lid.x] : get_pressure(idx + ivec3(0,0,1))) * f_front;
+    float p_back = ((lid.z - 1 >= 0) ? s_p[lid.z-1][lid.y][lid.x] : get_pressure(idx + ivec3(0,0,-1))) * f_back;
 
     float p_sum = p_top + p_bottom + p_right + p_left + p_front + p_back;
     float p;
