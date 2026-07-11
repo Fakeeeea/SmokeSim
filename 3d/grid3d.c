@@ -62,9 +62,9 @@ void gen_grid_pressure_solve_textures3d(grid3d* grid) {
     ivec3 current_s = {grid->size[0], grid->size[1], grid->size[2]};
     for(int i = 0; i < grid->pyramids_count; ++i) {
         grid->pyramids_sizes[i][0] = current_s[0], grid->pyramids_sizes[i][1] = current_s[1], grid->pyramids_sizes[i][2] = current_s[2], grid->pyramids_sizes[i][3] = 0;
-        grid->pressure_pyramid[i] = create_texture3(current_s, GL_R32F, GL_RED, GL_FLOAT, GL_LINEAR, NULL, GL_CLAMP_TO_EDGE, NULL);
+        grid->pressure_pyramid[i] = create_texture3(current_s, GL_R16F, GL_RED, GL_FLOAT, GL_LINEAR, NULL, GL_CLAMP_TO_EDGE, NULL);
         grid->solid_pyramid[i] = create_texture3(current_s, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_NEAREST, NULL, GL_CLAMP_TO_EDGE, NULL);
-        grid->residual_pyramid[i] = create_texture3(current_s, GL_R32F, GL_RED, GL_FLOAT, GL_LINEAR, NULL, GL_CLAMP_TO_EDGE, NULL);
+        grid->residual_pyramid[i] = create_texture3(current_s, GL_R16F, GL_RED, GL_FLOAT, GL_LINEAR, NULL, GL_CLAMP_TO_EDGE, NULL);
         current_s[0] /= 2, current_s[1] /= 2, current_s[2] /= 2;
     }
 }
@@ -115,7 +115,7 @@ void bind_physics_buffers3d(const grid3d* grid) {
     glBindImageTexture(VZ_WRITE, grid->vz[1-grid->vz_idx].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
     glBindImageTexture(SMOKE_WRITE, grid->smoke[1-grid->smoke_idx].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
 
-    glBindImageTexture(PRESSURE_MAP, grid->pressure_pyramid[0].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    glBindImageTexture(PRESSURE_MAP, grid->pressure_pyramid[0].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R16F);
     glBindImageTexture(SOLID_MAP, grid->solid_pyramid[0].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
     glBindImageTexture(VORTICITY_MAP, grid->vorticity.ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
 }
@@ -125,12 +125,12 @@ void bind_multigrid_textures3d(const grid3d* grid, const int current_level) {
 
     glBindTextureUnit(NEXT_PRESSURE_TEXTURE, grid->pressure_pyramid[next].ID);
 
-    glBindImageTexture(CURRENT_PRESSURE, grid->pressure_pyramid[current_level].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    glBindImageTexture(CURRENT_PRESSURE, grid->pressure_pyramid[current_level].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R16F);
     glBindImageTexture(CURRENT_SOLID, grid->solid_pyramid[current_level].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
-    glBindImageTexture(CURRENT_RESIDUAL, grid->residual_pyramid[current_level].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
-    glBindImageTexture(NEXT_PRESSURE, grid->pressure_pyramid[next].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    glBindImageTexture(CURRENT_RESIDUAL, grid->residual_pyramid[current_level].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R16F);
+    glBindImageTexture(NEXT_PRESSURE, grid->pressure_pyramid[next].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R16F);
     glBindImageTexture(NEXT_SOLID, grid->solid_pyramid[next].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
-    glBindImageTexture(NEXT_RESIDUAL, grid->residual_pyramid[next].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    glBindImageTexture(NEXT_RESIDUAL, grid->residual_pyramid[next].ID, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R16F);
 }
 
 void swap_velocity_buffers3d(grid3d* grid) {
