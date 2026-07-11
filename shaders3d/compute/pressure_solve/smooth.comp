@@ -44,7 +44,8 @@ layout(std140, binding = 3) uniform multigrid_variables {
     float current_cell_size;
 };
 
-uniform int parity;
+//uniform int parity;
+uniform int iterations;
 
 ivec3 current_grid_size;
 
@@ -85,13 +86,7 @@ void main() {
     ivec3 lid = ivec3(gl_LocalInvocationID.xyz);
     current_grid_size = grid_sizes[current_level].xyz;
 
-    bool in_bounds = idx.x < current_grid_size.x && idx.y < current_grid_size.y && idx.z < current_grid_size.z;
-    s_p[lid.z][lid.y][lid.x] = in_bounds ? imageLoad(pressure_map, idx).r : 0.0;
-    s_solid[lid.z][lid.y][lid.x] = in_bounds ? imageLoad(solid_map, idx) : vec4(0,0,0,1);
-    barrier();
-
-
-    if(idx.x >= current_grid_size.x || idx.y >= current_grid_size.y || idx.z >= current_grid_size.z || (idx.x+idx.y+idx.z) % 2 != parity) return;
+    /*if(idx.x >= current_grid_size.x || idx.y >= current_grid_size.y || idx.z >= current_grid_size.z || (idx.x+idx.y+idx.z) % 2 != parity) return;
     if(s_solid[lid.z][lid.y][lid.x].a >= 1.0) return;
 
     vec4 solid_top = ((lid.y + 1 < 8) ? s_solid[lid.z][lid.y+1][lid.x] : solid_data(idx + ivec3(0,1,0)));
@@ -101,12 +96,12 @@ void main() {
     vec4 solid_front = ((lid.z + 1 < 8) ? s_solid[lid.z+1][lid.y][lid.x] : solid_data(idx + ivec3(0,0,1)));
     vec4 solid_back = ((lid.z - 1 >= 0) ? s_solid[lid.z-1][lid.y][lid.x] : solid_data(idx + ivec3(0,0,-1)));
 
-    /*vec4 solid_top = solid_data(idx + ivec3(0,1,0));
-    vec4 solid_bottom = solid_data(idx + ivec3(0,-1,0));
-    vec4 solid_right = solid_data(idx + ivec3(1,0,0));
-    vec4 solid_left = solid_data(idx + ivec3(-1,0,0));
-    vec4 solid_front = solid_data(idx + ivec3(0,0,1));
-    vec4 solid_back = solid_data(idx + ivec3(0,0,-1));*/
+    //vec4 solid_top = solid_data(idx + ivec3(0,1,0));
+    //vec4 solid_bottom = solid_data(idx + ivec3(0,-1,0));
+    //vec4 solid_right = solid_data(idx + ivec3(1,0,0));
+    //vec4 solid_left = solid_data(idx + ivec3(-1,0,0));
+    //vec4 solid_front = solid_data(idx + ivec3(0,0,1));
+    //vec4 solid_back = solid_data(idx + ivec3(0,0,-1));
 
     float f_top = 1.0 - solid_top.a;
     float f_bottom = 1.0 - solid_bottom.a;
@@ -140,29 +135,95 @@ void main() {
     float p_front = ((lid.z + 1 < 8) ? s_p[lid.z+1][lid.y][lid.x] : get_pressure(idx + ivec3(0,0,1))) * f_front;
     float p_back = ((lid.z - 1 >= 0) ? s_p[lid.z-1][lid.y][lid.x] : get_pressure(idx + ivec3(0,0,-1))) * f_back;
 
-    /*float p_top = s_p[lid.z][lid.y+1][lid.x] * f_top;
-    float p_bottom = s_p[lid.z][lid.y-1][lid.x] * f_bottom;
-    float p_right = s_p[lid.z][lid.y][lid.x+1] * f_right;
-    float p_left = s_p[lid.z][lid.y][lid.x-1] * f_left;
-    float p_front = s_p[lid.z+1][lid.y][lid.x] * f_front;
-    float p_back = s_p[lid.z-1][lid.y][lid.x] * f_back;*/
+    //float p_top = s_p[lid.z][lid.y+1][lid.x] * f_top;
+    //float p_bottom = s_p[lid.z][lid.y-1][lid.x] * f_bottom;
+    //float p_right = s_p[lid.z][lid.y][lid.x+1] * f_right;
+    //float p_left = s_p[lid.z][lid.y][lid.x-1] * f_left;
+    //float p_front = s_p[lid.z+1][lid.y][lid.x] * f_front;
+    //float p_back = s_p[lid.z-1][lid.y][lid.x] * f_back;*/
 
-    /*float p_top = get_pressure(idx + ivec3(0,1,0)) * f_top;
-    float p_bottom = get_pressure(idx + ivec3(0,-1,0)) * f_bottom;
-    float p_right = get_pressure(idx + ivec3(1,0,0)) * f_right;
-    float p_left = get_pressure(idx + ivec3(-1,0,0)) * f_left;
-    float p_front = get_pressure(idx + ivec3(0,0,1)) * f_front;
-    float p_back = get_pressure(idx + ivec3(0,0,-1)) * f_back;*/
+    //float p_top = get_pressure(idx + ivec3(0,1,0)) * f_top;
+    //float p_bottom = get_pressure(idx + ivec3(0,-1,0)) * f_bottom;
+    //float p_right = get_pressure(idx + ivec3(1,0,0)) * f_right;
+    //float p_left = get_pressure(idx + ivec3(-1,0,0)) * f_left;
+    //float p_front = get_pressure(idx + ivec3(0,0,1)) * f_front;
+    //float p_back = get_pressure(idx + ivec3(0,0,-1)) * f_back;*/
 
-    float p_sum = p_top + p_bottom + p_right + p_left + p_front + p_back;
-    float p;
+    int parity = 0;
+    for(int i = 0; i < iterations; ++i) {
 
-    if(current_level == 0) {
-        p = (p_sum - density * current_cell_size * delta_v / time_step) / f_sum;
-    } else {
-        p = (p_sum - delta_v * (current_cell_size * current_cell_size)) / f_sum;
+        bool in_bounds = idx.x < current_grid_size.x && idx.y < current_grid_size.y && idx.z < current_grid_size.z;
+        s_p[lid.z][lid.y][lid.x] = in_bounds ? imageLoad(pressure_map, idx).r : 0.0;
+        s_solid[lid.z][lid.y][lid.x] = in_bounds ? imageLoad(solid_map, idx) : vec4(0,0,0,1);
+        barrier();
+
+        if(in_bounds && (idx.x+idx.y+idx.z) % 2 == parity) {
+            if (s_solid[lid.z][lid.y][lid.x].a < 1.0) {
+                vec4 solid_top = ((lid.y + 1 < 8) ? s_solid[lid.z][lid.y+1][lid.x] : solid_data(idx + ivec3(0,1,0)));
+                vec4 solid_bottom = ((lid.y - 1 >= 0) ? s_solid[lid.z][lid.y-1][lid.x] : solid_data(idx + ivec3(0,-1,0)));
+                vec4 solid_right = ((lid.x + 1 < 8) ? s_solid[lid.z][lid.y][lid.x+1] : solid_data(idx + ivec3(1,0,0)));
+                vec4 solid_left = ((lid.x - 1 >= 0) ? s_solid[lid.z][lid.y][lid.x-1] : solid_data(idx + ivec3(-1,0,0)));
+                vec4 solid_front = ((lid.z + 1 < 8) ? s_solid[lid.z+1][lid.y][lid.x] : solid_data(idx + ivec3(0,0,1)));
+                vec4 solid_back = ((lid.z - 1 >= 0) ? s_solid[lid.z-1][lid.y][lid.x] : solid_data(idx + ivec3(0,0,-1)));
+
+                float f_top = 1.0 - solid_top.a;
+                float f_bottom = 1.0 - solid_bottom.a;
+                float f_right = 1.0 - solid_right.a;
+                float f_left = 1.0 - solid_left.a;
+                float f_front = 1.0 - solid_front.a;
+                float f_back = 1.0 - solid_back.a;
+
+                float f_sum = f_top + f_bottom + f_right + f_left + f_front + f_back;
+
+                if (f_sum == 0) continue;
+
+                float delta_v;
+                if (current_level == 0) {
+                    float v_top = (solid_top.a >= 1.0) ? solid_top.y : get_vy(idx + ivec3(0, 1, 0));
+                    float v_bottom = (solid_bottom.a >= 1.0) ? solid_bottom.y : get_vy(idx);
+                    float v_right = (solid_right.a >= 1.0) ? solid_right.x : get_vx(idx + ivec3(1, 0, 0));
+                    float v_left = (solid_left.a >= 1.0) ? solid_left.x : get_vx(idx);
+                    float v_front = (solid_front.a >= 1.0) ? solid_front.z : get_vz(idx + ivec3(0, 0, 1));
+                    float v_back = (solid_back.a >= 1.0) ? solid_back.z : get_vz(idx);
+
+                    delta_v = v_right - v_left + v_top - v_bottom + v_front - v_back;
+                } else {
+                    delta_v = imageLoad(residual_map, idx).r;
+                }
+
+                float p_top = ((lid.y + 1 < 8) ? s_p[lid.z][lid.y+1][lid.x] : get_pressure(idx + ivec3(0,1,0))) * f_top;
+                float p_bottom = ((lid.y - 1 >= 0) ? s_p[lid.z][lid.y-1][lid.x] : get_pressure(idx + ivec3(0,-1,0))) * f_bottom;
+                float p_right = ((lid.x + 1 < 8) ? s_p[lid.z][lid.y][lid.x+1] : get_pressure(idx + ivec3(1,0,0))) * f_right;
+                float p_left = ((lid.x - 1 >= 0) ? s_p[lid.z][lid.y][lid.x-1] : get_pressure(idx + ivec3(-1,0,0))) * f_left;
+                float p_front = ((lid.z + 1 < 8) ? s_p[lid.z+1][lid.y][lid.x] : get_pressure(idx + ivec3(0,0,1))) * f_front;
+                float p_back = ((lid.z - 1 >= 0) ? s_p[lid.z-1][lid.y][lid.x] : get_pressure(idx + ivec3(0,0,-1))) * f_back;
+
+                float p_sum = p_top + p_bottom + p_right + p_left + p_front + p_back;
+                float p;
+
+                if (current_level == 0) {
+                    p = (p_sum - density * current_cell_size * delta_v / time_step) / f_sum;
+                } else {
+                    p = (p_sum - delta_v * (current_cell_size * current_cell_size)) / f_sum;
+                }
+
+                imageStore(pressure_map, idx, vec4(p));
+            }
+        }
+        barrier();
+
+        parity = 1 - parity;
     }
 
-    imageStore(pressure_map, idx, vec4(p));
+    //float p_sum = p_top + p_bottom + p_right + p_left + p_front + p_back;
+    //float p;
+
+    //if(current_level == 0) {
+    //    p = (p_sum - density * current_cell_size * delta_v / time_step) / f_sum;
+    //} else {
+    //    p = (p_sum - delta_v * (current_cell_size * current_cell_size)) / f_sum;
+    //}
+
+    //imageStore(pressure_map, idx, vec4(p));
 }
 

@@ -104,11 +104,10 @@ void save_current(benchmark_info* b_info, const unsigned int LABEL) {
 void benchmark_end_frame(benchmark_info* b_info) {
     if(b_info->svf_info.fptr_save != NULL) {
         for (int i = 0; i < LABELS_COUNT; ++i) {
-            fprintf(b_info->svf_info.fptr_save, "%f,", b_info->run_time[i]);
+            fprintf(b_info->svf_info.fptr_save, "%f%c", b_info->run_time[i],(i < LABELS_COUNT - 1) ? ',' : '\n' );
             b_info->run_time[i] = 0.0;
         }
     }
-    fprintf(b_info->svf_info.fptr_save, "\n");
 }
 
 void free_benchmark_info(benchmark_info* b_info) {

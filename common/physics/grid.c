@@ -216,10 +216,12 @@ void v_cycle(grid* grid, const physics_shaders* shaders, int current_level) {
 void smooth(const grid* grid, const physics_shaders* shaders, const int iterations, const int current_level) {
     static int parity_location2d = -1;
     static int parity_location3d = -1;
+    static int iterations_location3d = -1;
 
-    if(parity_location2d == -1 || parity_location3d == -1) {
+    if(parity_location2d == -1 || parity_location3d == -1 || iterations_location3d == -1) {
         parity_location2d = glGetUniformLocation(shaders->shaders2d.smooth, "parity");
         parity_location3d = glGetUniformLocation(shaders->shaders3d.smooth, "parity");
+        iterations_location3d = glGetUniformLocation(shaders->shaders3d.smooth, "iterations");
     }
 
     glUseProgram((grid->is_2d) ? shaders->shaders2d.smooth : shaders->shaders3d.smooth);
@@ -227,7 +229,7 @@ void smooth(const grid* grid, const physics_shaders* shaders, const int iteratio
     ivec3 current_grid_size;
     get_pyramid_size(grid, current_level, current_grid_size);
 
-    int parity_location = (grid->is_2d) ? parity_location2d : parity_location3d;
+    /*int parity_location = (grid->is_2d) ? parity_location2d : parity_location3d;
 
     int parity = 0;
     for(int i = 0; i < iterations * 2; ++i) {
@@ -235,8 +237,13 @@ void smooth(const grid* grid, const physics_shaders* shaders, const int iteratio
         glDispatchCompute((int)ceilf((float)(current_grid_size[0] + 7) / 8), (int)ceilf((float)(current_grid_size[1] + 7) / 8), (int)ceilf((float)(current_grid_size[2] + 7) / 8));
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         parity = 1 - parity;
-    }
+    }*/
+
+    glUniform1i(iterations_location3d, iterations * 2);
+    glDispatchCompute((int)ceilf((float)(current_grid_size[0] + 7) / 8), (int)ceilf((float)(current_grid_size[1] + 7) / 8), (int)ceilf((float)(current_grid_size[2] + 7) / 8));
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 }
+
 void compute_residual(const grid *grid, const physics_shaders* shaders, const int current_level) {
     ivec3 current_grid_size;
     get_pyramid_size(grid, current_level, current_grid_size);
